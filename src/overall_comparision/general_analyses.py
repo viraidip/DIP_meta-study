@@ -10,9 +10,9 @@ import matplotlib.pyplot as plt
 from scipy.stats import chi2_contingency
 
 sys.path.insert(0, "..")
-from utils import load_alnaji2019, load_alnaji2021, load_pelz2021
+from utils import load_alnaji2019, load_alnaji2021, load_pelz2021, load_mendes2021, load_lui2019
 from utils import preprocess, join_data
-from utils import SEGMENTS, RESULTSPATH
+from utils import SEGMENTS, RESULTSPATH, CUTOFF
 
 
 def plot_distribution_over_segments(dfs: list, dfnames: list)-> None:
@@ -61,9 +61,9 @@ def plot_distribution_over_segments(dfs: list, dfnames: list)-> None:
             j = 0
 
     table = np.array(li)
-    statistic, pvalue, dof, expected_freq = chi2_contingency(table)
-    print(statistic)
-    print(pvalue)
+ #   statistic, pvalue, dof, expected_freq = chi2_contingency(table)
+  #  print(statistic)
+   # print(pvalue)
 
     plt.tight_layout()
     save_path = os.path.join(RESULTSPATH, "segments_shift", "fraction_segments.png")
@@ -113,9 +113,9 @@ def calculate_deletion_shifts(dfs: list, dfnames: list)-> None:
 
 
     table = np.array(li)
-    statistic, pvalue, dof, expected_freq = chi2_contingency(table)
-    print(statistic)
-    print(pvalue)
+ #   statistic, pvalue, dof, expected_freq = chi2_contingency(table)
+  #  print(statistic)
+   # print(pvalue)
 
     print(f"mean distribution:\n\t{overall/n}")
 
@@ -126,31 +126,45 @@ def calculate_deletion_shifts(dfs: list, dfnames: list)-> None:
  
 
 if __name__ == "__main__":
-    cutoff = 5
     plt.style.use("seaborn")
     dfs = list()
     dfnames = list()
     expected_dfs = list()
 
-
+    
     ### Alnaji2019 ###
-    #for st in ["Cal07", "NC", "Perth", "BLee"]:
-    for st in ["Cal07_time"]:
-        df = join_data(load_alnaji2019(st))
-        strain = "Cal07" if st == "Cal07_time" else st
-        dfs.append(preprocess(strain, df, cutoff))
-        dfnames.append(f"Alnaji2021 {st}")
+    for strain, p in [("Cal07", "6"), ("NC", "1"), ("Perth", "4") , ("BLEE", "7")]:
+        df = load_alnaji2019(strain)
+        df = df[df["Passage"] == p].copy()
+        df = join_data(df)
+        dfs.append(preprocess(strain, df, CUTOFF))
+        dfnames.append(f"Alnaji2021 {strain}")
 
     ### Alnaji2021 ###
     strain = "PR8"
     df = join_data(load_alnaji2021())
-    dfs.append(preprocess(strain, df, cutoff))
+    dfs.append(preprocess(strain, df, CUTOFF))
     dfnames.append("Alnaji2021")
 
     ### Pelz2021 ###
     df = join_data(load_pelz2021())
-    dfs.append(preprocess(strain, df, cutoff))
+    dfs.append(preprocess(strain, df, CUTOFF))
     dfnames.append("Pelz2021")
+    
+    ### Mendes2021 ###
+    df = load_mendes2021()
+    strain = "WSN"
+    for virus in ["1", "2"]:
+        df_v = df[df["Virus"] == virus].copy()
+        df_v = join_data(df_v)
+        dfs.append(preprocess(strain, df_v, CUTOFF))
+        dfnames.append(f"Mendes2021_V{virus}")
+
+    ### Lui2019 ###
+    strain = "Anhui"
+    df = load_lui2019()
+    dfs.append(preprocess(strain, df, CUTOFF))
+    dfnames.append("Alnaji2021")
 
 
 

@@ -10,9 +10,9 @@ import scipy.stats as stats
 import matplotlib.pyplot as plt
 
 sys.path.insert(0, "..")
-from utils import join_data, load_alnaji2019, load_alnaji2021, load_pelz2021
+from utils import join_data, load_alnaji2019, load_alnaji2021, load_pelz2021, load_mendes2021, load_lui2019
 from utils import get_sequence, count_direct_repeats_overall, include_correction, get_p_value_symbol, generate_expected_data, preprocess, create_nucleotide_ratio_matrix, plot_heatmap
-from utils import SEGMENTS, RESULTSPATH, NUCLEOTIDES
+from utils import SEGMENTS, RESULTSPATH, NUCLEOTIDES, CUTOFF
 
 
 def plot_nucleotide_ratio_around_deletion_junction_heatmaps(dfs, dfnames):
@@ -355,17 +355,13 @@ if __name__ == "__main__":
     dfnames = list()
     expected_dfs = list()
 
-    cutoff = 5
-
     ### Alnaji2019 ###
-    #for st in ["Cal07", "NC", "Perth", "BLee"]:
-    for st in ["Cal07_time"]:
-        df = load_alnaji2019(st)
+    for strain, p in [("Cal07", "6"), ("NC", "1"), ("Perth", "4") , ("BLEE", "7")]:
+        df = load_alnaji2019(strain)
+        df = df[df["Passage"] == p].copy()
         df = join_data(df)
-        if st == "Cal07_time":
-            strain = "Cal07"
-        dfs.append(preprocess(strain, df, cutoff))
-        dfnames.append(f"Alnaji2021 {st}")
+        dfs.append(preprocess(strain, df, CUTOFF))
+        dfnames.append(f"Alnaji2019 {strain}")
      #   expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
 
 
@@ -373,7 +369,7 @@ if __name__ == "__main__":
     strain = "PR8"
     df = load_alnaji2021()
     df = join_data(df)
-    dfs.append(preprocess(strain, df, cutoff))
+    dfs.append(preprocess(strain, df, CUTOFF))
     dfnames.append("Alnaji2021")
  #   expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
 
@@ -382,9 +378,29 @@ if __name__ == "__main__":
     strain = "PR8"
     df = load_pelz2021()
     df = join_data(df)
-    dfs.append(preprocess(strain, df, cutoff))
+    dfs.append(preprocess(strain, df, CUTOFF))
     dfnames.append("Pelz2021")
 #    expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
+
+
+    ### Mendes2021 ###
+    df = load_mendes2021()
+    strain = "WSN"
+    for virus in ["1", "2"]:
+        df_v = df[df["Virus"] == virus].copy()
+        df_v = join_data(df_v)
+        dfs.append(preprocess(strain, df_v, CUTOFF))
+        dfnames.append(f"Mendes2021_V{virus}")
+    #    expected_dfs.append(preprocess(strain, generate_expected_data(strain, df_v), 1))
+
+
+    ### Lui2019 ###
+    strain = "Anhui"
+    df = load_lui2019()
+    dfs.append(preprocess(strain, df, CUTOFF))
+    dfnames.append("Alnaji2021")
+    #expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
+
 
 
     plot_nucleotide_ratio_around_deletion_junction_heatmaps(dfs, dfnames)
