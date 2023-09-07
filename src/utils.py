@@ -18,6 +18,7 @@ DATAPATH = json.load(open("../../.config.json"))["DATAPATH"]
 RESULTSPATH = json.load(open("../../.config.json"))["RESULTSPATH"]
 
 # segments, nuclotides, and strains
+CUTOFF = 15
 SEGMENTS = list(["PB2", "PB1", "PA", "HA", "NP", "NA", "M", "NS"])
 NUCLEOTIDES = dict({"A": "Adenine", "C": "Cytosin", "G": "Guanine", "U": "Uracil"})
 STRAINS = dict({"Cal07": "A/California/07/2009",
@@ -69,7 +70,7 @@ SEGMENT_DICTS = dict({
         "KJ609209.1": "M",
         "KJ609210.1": "NS"
     }),
-    "BLee": dict({
+    "BLEE": dict({
         "CY115118.1": "PB2",
         "CY115117.1": "PB1",
         "CY115116.1": "PA",
@@ -89,15 +90,15 @@ SEGMENT_DICTS = dict({
         "CY034133.1": "M",
         "CY034136.1": "NS"
     }),
-    "Shanghai02": dict({
-        "KF021594.1": "PB2",
-        "KF021595.1": "PB1",
-        "KF021596.1": "PA",
-        "KF021597.1": "HA",
-        "KF021598.1": "NP",
-        "KF021599.1": "NA",
-        "KF021600.1": "M",
-        "KF021601.1": "NS"
+    "Anhui": dict({
+        "439504": "PB2",
+        "439508": "PB1",
+        "439503": "PA",
+        "439507": "HA",
+        "439505": "NP",
+        "439509": "NA",
+        "439506": "M",
+        "439510": "NS"
     })
 })
 
@@ -140,7 +141,7 @@ def load_alnaji2019(strain: str):
                        "SRR8754525": dict({"Lineage": "2", "Passage": "4"}),
                        "SRR8754526": dict({"Lineage": "1", "Passage": "8"})
                        }),
-        "BLee": dict({"SRR8754507": dict({"Lineage": "1", "Passage": "8"}),
+        "BLEE": dict({"SRR8754507": dict({"Lineage": "1", "Passage": "8"}),
                       "SRR8754508": dict({"Lineage": "2", "Passage": "7"}),
                       "SRR8754509": dict({"Lineage": "1", "Passage": "7"}),
                       "SRR8754516": dict({"Lineage": "2", "Passage": "8"})
@@ -240,48 +241,52 @@ def load_pelz2021():
 
     return concat_df
 
-def load_lui2020():
+def load_lui2019():
     '''
     
     '''
+    df = load_dataset("Lui2019", "SRR8949705", SEGMENT_DICTS["Anhui"])
+    return df
+
+def load_mendes2021():
+    '''
+
+    '''
     acc_nums = dict({
-        "SRR15084902": dict({"Time": "8dpi"}),
-        "SRR15084903": dict({"Time": "5.5dpi"}),
-        "SRR15084904": dict({"Time": "5dpi"}),
-        "SRR15084905": dict({"Time": "4.5dpi"}),
-        "SRR15084906": dict({"Time": "4dpi"}),
-        "SRR15084907": dict({"Time": "3.5dpi"}),
-        "SRR15084908": dict({"Time": "1.4dpi"}),
-        "SRR15084909": dict({"Time": "21dpi"}),
-        "SRR15084910": dict({"Time": "20.4dpi"}),
-        "SRR15084911": dict({"Time": "20dpi"}),
-        "SRR15084912": dict({"Time": "19.5dpi"}),
-        "SRR15084913": dict({"Time": "1dpi"}),
-        "SRR15084914": dict({"Time": "18dpi"}),
-        "SRR15084915": dict({"Time": "17.5dpi"}),
-        "SRR15084916": dict({"Time": "17dpi"}),
-        "SRR15084917": dict({"Time": "16dpi"}),
-        "SRR15084918": dict({"Time": "13.5dpi"}),
-        "SRR15084919": dict({"Time": "13dpi"}),
-        "SRR15084921": dict({"Time": "12.4dpi"}),
-        "SRR15084922": dict({"Time": "9.4dpi"}),
-        "SRR15084923": dict({"Time": "9dpi"}),
-        "SRR15084924": dict({"Time": "0.5dpi"}),
-        "SRR15084925": dict({"Time": "seed"})
+        "SRR15720520": dict({"Status": "enriched",
+                             "Virus": "1",
+                             "Replicate": "1"}),
+        "SRR15720521": dict({"Status": "enriched",
+                             "Virus": "1",
+                             "Replicate": "2"}),
+        "SRR15720522": dict({"Status": "enriched",
+                             "Virus": "2",
+                             "Replicate": "1"}),
+        "SRR15720523": dict({"Status": "enriched",
+                             "Virus": "2",
+                             "Replicate": "2"}),
+        "SRR15720524": dict({"Status": "depleted",
+                             "Virus": "1",
+                             "Replicate": "1"}),
+        "SRR15720525": dict({"Status": "depleted",
+                             "Virus": "1",
+                             "Replicate": "2"}),
+        "SRR15720526": dict({"Status": "depleted",
+                             "Virus": "2",
+                             "Replicate": "1"}),
+        "SRR15720527": dict({"Status": "depleted",
+                             "Virus": "2",
+                             "Replicate": "2"})
     })
 
     dfs = list()
     for acc_num, meta in acc_nums.items():
-        df = load_dataset("Pelz2021", acc_num, SEGMENT_DICTS["PR8"])
-        df["Time"] = meta["Time"]
+        df = load_dataset("Mendes2021", acc_num, SEGMENT_DICTS["PR8"])
+        df["Status"] = meta["Status"]
+        df["Virus"] = meta["Virus"]
+        df["Replicate"] = meta["Replicate"]
         dfs.append(df)
     concat_df = pd.concat(dfs)
-
-    # filter out seed virus DIs
-    concat_df["DI"] = concat_df["Segment"] + "_" + concat_df["Start"].astype(str) + "_" + concat_df["End"].astype(str)
-    seed = concat_df[concat_df["Time"] == "seed"]["DI"].to_list()
-    concat_df = concat_df.loc[~concat_df["DI"].isin(seed)]
-    concat_df.drop("DI", inplace=True, axis=1)
 
     return concat_df
 
