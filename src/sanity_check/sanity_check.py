@@ -9,8 +9,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 sys.path.insert(0, "..")
-from utils import load_dataset
-from utils import SEGMENTS, RESULTSPATH, DATAPATH
+from utils import load_dataset, load_alnaji2019
+from utils import SEGMENTS, RESULTSPATH, DATAPATH, CUTOFF
 
 
 def load_pelz2021_sanity()-> dict:
@@ -47,6 +47,35 @@ def load_alnaji2021_sanity()-> dict:
     dic = dict({"PR8": data})
     return dic
 
+
+def load_alnaji2019_sanity()-> dict:
+    '''
+    '''
+    file_path = os.path.join(DATAPATH, "sanity_check", "DI_Influenza_FA_JVI.xlsx")
+    data_dict = pd.read_excel(io=file_path,
+                              sheet_name=None,
+                              header=1,
+                              na_values=["", "None"],
+                              keep_default_na=False,
+                              converters={"Start": int,"End": int, "NGS_read_count": int,
+                                          "Start.1": int,"End.1": int, "NGS_read_count.1": int})
+    # Splitting up the two lines in new data frames and cleaning NaN data
+    # For l2 the columns get renamed, they get the same names as in l1
+    # Cleaned data is stored in a dict, can be accessed by [datasetname]_[l1/l2]
+    # dataset names are "Cal07", "NC", "Perth", "BLEE"
+    cleaned_data_dict = dict()
+    for key, value in data_dict.items():
+        cleaned_data_dict[f"{key}_l1"] = data_dict[key].iloc[:, 0:4]
+        cleaned_data_dict[f"{key}_l2"] = data_dict[key].iloc[:, 5:9]
+
+        cleaned_data_dict[f"{key}_l1"].dropna(how="all", inplace=True)
+        cleaned_data_dict[f"{key}_l2"].dropna(how="all", inplace=True)
+
+        cleaned_data_dict[f"{key}_l2"].columns = cleaned_data_dict[f"{key}_l1"].columns 
+
+    return cleaned_data_dict
+
+
 def compare_datasets(d1, d2, thresh=1)-> float:
     '''
     
@@ -60,15 +89,11 @@ def compare_datasets(d1, d2, thresh=1)-> float:
     for d in dfs:
         DI_sets.append(set(d["Segment"] + "_" + d["Start"].astype(str) + "_" + d["End"].astype(str)))
     
-#    print(f"## {t} ##")
- #   print(len(DI_sets[0]))
-  #  print(len(DI_sets[1]))
-   # print(len(DI_sets[0] & DI_sets[1]))
     n1 = len(DI_sets[0])
     n2 = len(DI_sets[1])
     n_intersect = len(DI_sets[0] & DI_sets[1])
 
-    return n_intersect / min(n1, n2), n1, n2
+    return n_intersect, n1, n2
 
 
 def loop_threshs(d1, d2)-> None:
@@ -208,6 +233,8 @@ def calculate_deletion_shifts(dfs, dfnames, mode)-> None:
  
 
 if __name__ == "__main__":
+    '''
+    ### Pelz ###
     seed = load_dataset("Pelz2021", "SRR15084925")
     orig_pelz = load_pelz2021_sanity()
     orig_seed = orig_pelz["PR8"].iloc[:, :4].copy()
@@ -216,6 +243,7 @@ if __name__ == "__main__":
     print("### Pelz seed virus ###")
     loop_threshs(seed, orig_seed)
 
+    ### Alnaji2021 ###
     repB_6hpi = load_dataset("Alnaji2021", "SRR14352110")
     orig_alnaji2021 = load_alnaji2021_sanity()["PR8"]
     org_B_6 = orig_alnaji2021[(orig_alnaji2021["Replicate"] == "Rep2") & (orig_alnaji2021["Timepoint"] == "6hpi")]
@@ -226,3 +254,23 @@ if __name__ == "__main__":
     org_C_3 = orig_alnaji2021[(orig_alnaji2021["Replicate"] == "Rep3") & (orig_alnaji2021["Timepoint"] == "3hpi")]
     print("### Rep C 3 hpi ###")
     loop_threshs(repC_3hpi, org_C_3)
+    '''
+    ### Alnaji2019 ###
+    orig_alnaji2019 = load_alnaji2019_sanity()
+    for st in ["Cal07", "NC", "Perth", "BLEE"]:
+        df = load_alnaji2019(st)
+        df = df[df["NGS_read_count"] >= 5]
+        print(f"\n### {st} ###")
+        for pas in df["Passage"].unique():
+            pas_df = df[df["Passage"] == pas].copy()
+            print(f"# passage {pas} #")
+            for l in df["Lineage"].unique():
+                l_df = pas_df[pas_df["Lineage"] == l]
+                orig = orig_alnaji2019[f"{st}_l{l}"]
+                inter, n1, n2 = compare_datasets(l_df, orig)
+
+                print(f"lineage {l}")
+                print(f"orig {n2}")
+                print(f"self {n1}")
+                print(f"intersection {inter}")
+                
