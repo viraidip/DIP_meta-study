@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from scipy.stats import chi2_contingency
 
 sys.path.insert(0, "..")
-from utils import load_alnaji2019, load_alnaji2021, load_pelz2021, load_mendes2021, load_lui2019
+from utils import load_alnaji2019, load_alnaji2021, load_pelz2021, load_mendes2021, load_lui2019, load_penn2022
 from utils import preprocess, join_data
 from utils import SEGMENTS, RESULTSPATH, CUTOFF
 
@@ -27,7 +27,7 @@ def plot_distribution_over_segments(dfs: list, dfnames: list)-> None:
 
     :return: None
     '''
-    fig, axs = plt.subplots(figsize=(12, 6), nrows=2, ncols=4)
+    fig, axs = plt.subplots(figsize=(12, 10), nrows=3, ncols=4)
     cm = plt.get_cmap("tab10")
 
     i = 0
@@ -57,7 +57,7 @@ def plot_distribution_over_segments(dfs: list, dfnames: list)-> None:
 
         j += 1
         if j == 4:
-            i = 1
+            i += 1
             j = 0
 
     table = np.array(li)
@@ -82,7 +82,7 @@ def calculate_deletion_shifts(dfs: list, dfnames: list)-> None:
                              Default is "seq_around_deletion_junction".
     :return: None
     '''
-    fig, axs = plt.subplots(figsize=(12, 6), nrows=2, ncols=4)
+    fig, axs = plt.subplots(figsize=(12, 10), nrows=3, ncols=4)
     cm = plt.get_cmap("tab10")
     colors = [cm(1.*i/3) for i in range(3)]
 
@@ -108,7 +108,7 @@ def calculate_deletion_shifts(dfs: list, dfnames: list)-> None:
 
         j += 1
         if j == 4:
-            i = 1
+            i += 1
             j = 0
 
 
@@ -131,7 +131,7 @@ if __name__ == "__main__":
     dfnames = list()
     expected_dfs = list()
 
-    
+
     ### Alnaji2019 ###
     for strain, p in [("Cal07", "6"), ("NC", "1"), ("Perth", "4") , ("BLEE", "7")]:
         df = load_alnaji2019(strain)
@@ -160,13 +160,21 @@ if __name__ == "__main__":
         dfs.append(preprocess(strain, df_v, CUTOFF))
         dfnames.append(f"Mendes2021_V{virus}")
 
+    '''
     ### Lui2019 ###
     strain = "Anhui"
     df = load_lui2019()
     dfs.append(preprocess(strain, df, CUTOFF))
-    dfnames.append("Alnaji2021")
-
-
+    dfnames.append("Lui2019")
+    '''
+    ### Penn2022 ###
+    strain = "Turkey"
+    df = load_penn2022()
+    for l in ["1", "2"]:
+        df_l = df[df["Lineage"] == l].copy()
+        df_l = join_data(df_l)
+        dfs.append(preprocess(strain, df_l, CUTOFF))
+        dfnames.append(f"Penn2022_l{l}")
 
     plot_distribution_over_segments(dfs, dfnames)
     calculate_deletion_shifts(dfs, dfnames)

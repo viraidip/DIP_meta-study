@@ -10,7 +10,7 @@ import scipy.stats as stats
 import matplotlib.pyplot as plt
 
 sys.path.insert(0, "..")
-from utils import join_data, load_alnaji2019, load_alnaji2021, load_pelz2021, load_mendes2021, load_lui2019
+from utils import join_data, load_alnaji2019, load_alnaji2021, load_pelz2021, load_mendes2021, load_lui2019, load_penn2022
 from utils import get_sequence, count_direct_repeats_overall, include_correction, get_p_value_symbol, generate_expected_data, preprocess, create_nucleotide_ratio_matrix, plot_heatmap
 from utils import SEGMENTS, RESULTSPATH, NUCLEOTIDES, CUTOFF
 
@@ -394,13 +394,25 @@ if __name__ == "__main__":
     #    expected_dfs.append(preprocess(strain, generate_expected_data(strain, df_v), 1))
 
 
+    '''
     ### Lui2019 ###
     strain = "Anhui"
     df = load_lui2019()
     dfs.append(preprocess(strain, df, CUTOFF))
     dfnames.append("Alnaji2021")
     #expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
-
+    '''
+    
+    ### Penn2022 ###
+    ### Penn2022 ###
+    strain = "Turkey"
+    df = load_penn2022()
+    for l in ["1", "2"]:
+        df_l = df[df["Lineage"] == l].copy()
+        df_l = join_data(df_l)
+        dfs.append(preprocess(strain, df_l, CUTOFF))
+        dfnames.append(f"Penn2022_l{l}")
+        #expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
 
 
     plot_nucleotide_ratio_around_deletion_junction_heatmaps(dfs, dfnames)
