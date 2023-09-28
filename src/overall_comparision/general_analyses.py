@@ -26,45 +26,36 @@ def plot_distribution_over_segments(dfs: list, dfnames: list)-> None:
 
     :return: None
     '''
-    fig, axs = plt.subplots(figsize=(12, 12), nrows=4, ncols=4)
+    fig, axs = plt.subplots(figsize=(len(dfs), 6), nrows=1, ncols=1)
     cm = plt.get_cmap("tab10")
+    colors = [cm(1.*i/len(SEGMENTS)) for i in range(len(SEGMENTS))]
 
-    i = 0
-    j = 0
-    li = list()
-    for df, dfname in zip(dfs, dfnames):
-        fractions = df["Segment"].value_counts() / len(df) * 100
+    x = np.arange(0, len(dfs))
+
+    y = dict({s: list() for s in SEGMENTS})
+    for df in dfs:
+        fractions = df["Segment"].value_counts() / len(df)
         for s in SEGMENTS:
             if s not in fractions:
-                fractions[s] = 0.0
-        sorted_fractions = fractions.loc[SEGMENTS]
-        li.append(sorted_fractions.values)
-
-        colors = list()
-        for k, s in enumerate(SEGMENTS):
-            if sorted_fractions[s] != 0.0:
-                colors.append(cm(1.*k/8))
+                y[s].append(0.0)
             else:
-                sorted_fractions.drop(s, inplace=True)
+                y[s].append(fractions[s])
 
-        axs[i,j].set_prop_cycle("color", colors)
-        axs[i,j].set_title(dfname)
-        
-        patches, _ = axs[i,j].pie(sorted_fractions)
-        labels = ['{0} {1:1.1f} %'.format(i,j) for i,j in zip(sorted_fractions.index, sorted_fractions)]
-        axs[i,j].legend(patches, labels, loc="center", bbox_to_anchor=(-0.2, 0.5), fontsize=10)
+    bar_width = 0.7
+    bottom = np.zeros(len(dfs))
 
-        j += 1
-        if j == 4:
-            i += 1
-            j = 0
+    for i, s in enumerate(SEGMENTS):
+        axs.bar(x, y[s], bar_width, color=colors[i], label=s, bottom=bottom)
+        bottom += y[s]
+    
+    axs.set_ylabel("relative occurrence of segment")
+    axs.set_xlabel("dataset")
+    plt.xticks(range(len(dfnames)), dfnames, size='small', rotation=45) 
 
-    table = np.array(li)
- #   statistic, pvalue, dof, expected_freq = chi2_contingency(table)
-  #  print(statistic)
-   # print(pvalue)
-
-    plt.tight_layout()
+    box = axs.get_position()
+    axs.set_position([box.x0, box.y0 + box.height * 0.1, box.width, box.height * 0.9])
+    axs.legend(loc="upper center", bbox_to_anchor=(0.5, 1.1), fancybox=True, shadow=True, ncol=8)
+    
     save_path = os.path.join(RESULTSPATH, "segments_shift", "fraction_segments.png")
     plt.savefig(save_path)
     plt.close()
