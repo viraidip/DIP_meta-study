@@ -992,7 +992,8 @@ def preprocess(strain, df, cutoff):
     '''
     
     '''
-    df = df[df["NGS_read_count"] >= cutoff].copy()
+    if cutoff > 1:
+        df = df[df["NGS_read_count"] >= cutoff].copy()
     df["key"] = df["Segment"] + "_" + df["Start"].map(str) + "_" + df["End"].map(str)
     return sequence_df(df, strain)
 def get_deleted_sequence(dip_id, strain):

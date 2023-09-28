@@ -316,7 +316,7 @@ def plot_expected_vs_observed_direct_repeat_heatmaps(dfs: list, dfnames: list, e
         vals.extend(final/final.sum() - expected_final/expected_final.sum())
 
         for f_ob, f_ex, n_samples in zip(f_obs, f_exp, final_d.values()):
-            if n_samples == 0:
+            if int(n_samples) == 0:
                 pval_symbol = ""
             else:
                 pvalue = stats.binomtest(int(n_samples * f_ob), int(n_samples), f_ex).pvalue
@@ -351,13 +351,12 @@ def plot_expected_vs_observed_direct_repeat_heatmaps(dfs: list, dfnames: list, e
 
 if __name__ == "__main__":
     plt.style.use("seaborn")
-    dfs, dfnames, expected_dfs = load_all()
-
+    dfs, dfnames, expected_dfs = load_all(expected=True)
 
     plot_nucleotide_ratio_around_deletion_junction_heatmaps(dfs, dfnames)
-    #plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs, dfnames, expected_dfs)
+    plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs, dfnames, expected_dfs)
 
     plot_direct_repeat_ratio_heatmaps(dfs, dfnames)
-  #  plot_expected_vs_observed_direct_repeat_heatmaps(dfs, dfnames, expected_dfs)
+    plot_expected_vs_observed_direct_repeat_heatmaps(dfs, dfnames, expected_dfs)
 
     
