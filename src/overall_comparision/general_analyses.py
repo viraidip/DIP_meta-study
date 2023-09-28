@@ -5,6 +5,7 @@ import os
 import sys
 
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 
 from scipy.stats import chi2_contingency
@@ -56,7 +57,7 @@ def plot_distribution_over_segments(dfs: list, dfnames: list)-> None:
     axs.set_position([box.x0, box.y0 + box.height * 0.1, box.width, box.height * 0.9])
     axs.legend(loc="upper center", bbox_to_anchor=(0.5, 1.1), fancybox=True, shadow=True, ncol=8)
     
-    save_path = os.path.join(RESULTSPATH, "segments_shift", "fraction_segments.png")
+    save_path = os.path.join(RESULTSPATH, "general_analysis", "fraction_segments.png")
     plt.savefig(save_path)
     plt.close()
 
@@ -110,15 +111,69 @@ def calculate_deletion_shifts(dfs: list, dfnames: list)-> None:
     print(f"mean distribution:\n\t{overall/n}")
 
     plt.tight_layout()
-    save_path = os.path.join(RESULTSPATH, "segments_shift", "deletion_shifts.png")
+    save_path = os.path.join(RESULTSPATH, "general_analysis", "deletion_shifts.png")
     plt.savefig(save_path)
     plt.close()
  
+
+def length_distribution(dfs, dfnames: list)-> None:
+    '''
+    
+    '''
+    plt.rc("font", size=16)
+    mean_dict = dict({"Segment": SEGMENTS})
+
+    for df, dfname in zip(dfs, dfnames):
+        mean_list = list()
+        # create a dict for each segment including the NGS read count
+        count_dict = dict()
+        for s in SEGMENTS:
+            count_dict[s] = dict()
+
+       # df["DVG_Length"] = len(df["seq"])-len(df["deleted_sequence"])
+        for _, r in df.iterrows():
+            DVG_Length = len(r["seq"])-len(r["deleted_sequence"])
+            if DVG_Length in count_dict[r["Segment"]]:
+                count_dict[r["Segment"]][DVG_Length] += 1
+            else:
+                count_dict[r["Segment"]][DVG_Length] = 1
+
+        # create a subplot for each key, value pair in count_dict
+        fig, axs = plt.subplots(8, 1, figsize=(10, 15), tight_layout=True)
+        for i, s in enumerate(SEGMENTS):
+            if len(count_dict[s].keys()) > 1:
+                counts_list = list()
+                for length, count in count_dict[s].items():
+                    counts_list.extend([length] * count)
+
+                m = round(np.mean(list(counts_list)), 2)                
+                axs[i].hist(count_dict[s].keys(), weights=count_dict[s].values(), bins=100, label=f"{dfname} (µ={m})", alpha=0.3)
+                axs[i].set_xlim(left=0)
+   #             axs[i].set_yticks([0, 4, 8, 12])
+                axs[i].set_xlabel("sequence length")
+                axs[i].set_ylabel("occurrences")
+                axs[i].legend()
+            else:
+                axs[i].set_visible(False)
+                m = 0
+
+            mean_list.append(m)
+
+        mean_dict[dfname] = mean_list
+
+        save_path = os.path.join(RESULTSPATH, "general_analysis", f"{dfname}_length_del_hist.png")
+        plt.savefig(save_path)
+        plt.close()
+
+    mean_df = pd.DataFrame(mean_dict)
+    print(mean_df)
+
 
 if __name__ == "__main__":
     plt.style.use("seaborn")
     dfs, dfnames, expected_dfs = load_all()
 
+ #   plot_distribution_over_segments(dfs, dfnames)
+  #  calculate_deletion_shifts(dfs, dfnames)
 
-    plot_distribution_over_segments(dfs, dfnames)
-    calculate_deletion_shifts(dfs, dfnames)
+    length_distribution(dfs, dfnames)
