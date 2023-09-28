@@ -21,13 +21,29 @@ RESULTSPATH = json.load(open("../../.config.json"))["RESULTSPATH"]
 CUTOFF = 10
 SEGMENTS = list(["PB2", "PB1", "PA", "HA", "NP", "NA", "M", "NS"])
 NUCLEOTIDES = dict({"A": "Adenine", "C": "Cytosin", "G": "Guanine", "U": "Uracil"})
-STRAINS = dict({"Cal07": "A/California/07/2009",
-                "NC": "A/New Caledonia/20-JY2/1999",
-                "Perth": "A/Perth/16/2009",
-                "BLEE": "B/Lee/1940",
-                "PR8": "A/Puerto Rico/8/1934",
-                "WSN": "A/WSN/1933"
-                })
+STRAINS = dict({
+    "Cal07": "A/California/07/2009",
+    "NC": "A/New Caledonia/20-JY2/1999",
+    "Perth": "A/Perth/16/2009",
+    "BLEE": "B/Lee/1940",
+    "PR8": "A/Puerto Rico/8/1934",
+    "WSN": "A/WSN/1933"
+})
+
+DATASET_STRAIN_DICT = dict({
+    "Alnaji2019 Cal07": "Cal07",
+    "Alnaji2019 NC" : "NC",
+    "Alnaji2019 Perth": "Perth",
+    "Alnaji2019 BLEE": "BLEE",
+    "Alnaji2021": "PR8",
+    "Pelz2021": "PR8",
+    "Mendes2021": "WSN",
+    "Wang2023": "PR8",
+    "Lui2019": "Anhui",
+    "Wang2020": "PR8",
+    "Penn2022": "Turkey",
+    "Kupke2020": "PR8"
+})
 
 SEGMENT_DICTS = dict({
     "PR8": dict({
@@ -546,13 +562,12 @@ def load_all(expected: str=False):
     expected_dfs = list()
 
     ### Alnaji2019 ###
-    strain = "PR8"
     for strain, p in [("Cal07", "6"), ("NC", "1"), ("Perth", "4") , ("BLEE", "7")]:
         df = load_alnaji2019(strain)
         df = df[df["Passage"] == p].copy()
         df = join_data(df)
         dfs.append(preprocess(strain, df, CUTOFF))
-        dfnames.append(f"Alnaji2021 {strain}")
+        dfnames.append(f"Alnaji2019 {strain}")
         if expected:
             expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
 
