@@ -18,7 +18,7 @@ DATAPATH = json.load(open("../../.config.json"))["DATAPATH"]
 RESULTSPATH = json.load(open("../../.config.json"))["RESULTSPATH"]
 
 # segments, nuclotides, and strains
-CUTOFF = 15
+CUTOFF = 10
 SEGMENTS = list(["PB2", "PB1", "PA", "HA", "NP", "NA", "M", "NS"])
 NUCLEOTIDES = dict({"A": "Adenine", "C": "Cytosin", "G": "Guanine", "U": "Uracil"})
 STRAINS = dict({"Cal07": "A/California/07/2009",
@@ -124,9 +124,63 @@ def load_dataset(exp: str, acc: str, segment_dict: dict)-> pd.DataFrame:
     
     '''
     path = os.path.join(DATAPATH, exp, f"{exp}_{acc}.csv")
-    df = pd.read_csv(path)
+    df = pd.read_csv(path, dtype={"Segment": "string", "Start": "int64", "End": "int64", "NGS_read_count": "int64"})
     df["Segment"] = df["Segment"].replace(segment_dict)
 
+    return df
+
+
+def load_wang2023():
+    '''
+    
+    '''
+    acc_nums = dict({
+        "SRR16770171" : dict({"IFNAR": "1", "IFNLR": "0", "Replicate": "1"}),
+        "SRR16770172" : dict({"IFNAR": "1", "IFNLR": "0", "Replicate": "1"}),
+        "SRR16770173" : dict({"IFNAR": "1", "IFNLR": "0", "Replicate": "1"}),
+        "SRR16770174" : dict({"IFNAR": "1", "IFNLR": "0", "Replicate": "1"}),
+        "SRR16770175" : dict({"IFNAR": "1", "IFNLR": "0", "Replicate": "1"}),
+        "SRR16770181" : dict({"IFNAR": "0", "IFNLR": "1", "Replicate": "1"}),
+        "SRR16770182" : dict({"IFNAR": "0", "IFNLR": "1", "Replicate": "1"}),
+        "SRR16770183" : dict({"IFNAR": "0", "IFNLR": "1", "Replicate": "1"}),
+        "SRR16770184" : dict({"IFNAR": "0", "IFNLR": "1", "Replicate": "1"}),
+        "SRR16770185" : dict({"IFNAR": "0", "IFNLR": "1", "Replicate": "1"}),
+        "SRR16770186" : dict({"IFNAR": "0", "IFNLR": "1", "Replicate": "1"}),
+        "SRR16770191" : dict({"IFNAR": "1", "IFNLR": "1", "Replicate": "1"}),
+        "SRR16770192" : dict({"IFNAR": "1", "IFNLR": "1", "Replicate": "1"}),
+        "SRR16770193" : dict({"IFNAR": "1", "IFNLR": "1", "Replicate": "1"}),
+        "SRR16770197" : dict({"IFNAR": "1", "IFNLR": "0", "Replicate": "2"}),
+        "SRR16770198" : dict({"IFNAR": "1", "IFNLR": "0", "Replicate": "2"}),
+        "SRR16770201" : dict({"IFNAR": "1", "IFNLR": "0", "Replicate": "2"}),
+        "SRR16770200" : dict({"IFNAR": "1", "IFNLR": "0", "Replicate": "2"}),
+        "SRR16770199" : dict({"IFNAR": "1", "IFNLR": "0", "Replicate": "2"}),
+        "SRR16770207" : dict({"IFNAR": "0", "IFNLR": "1", "Replicate": "2"}),
+        "SRR16770208" : dict({"IFNAR": "0", "IFNLR": "1", "Replicate": "2"}),
+        "SRR16770209" : dict({"IFNAR": "0", "IFNLR": "1", "Replicate": "2"}),
+        "SRR16770210" : dict({"IFNAR": "0", "IFNLR": "1", "Replicate": "2"}),
+        "SRR16770211" : dict({"IFNAR": "0", "IFNLR": "1", "Replicate": "2"}),
+        "SRR16770212" : dict({"IFNAR": "0", "IFNLR": "1", "Replicate": "2"}),
+        "SRR16770219" : dict({"IFNAR": "1", "IFNLR": "1", "Replicate": "2"}),
+        "SRR16770218" : dict({"IFNAR": "1", "IFNLR": "1", "Replicate": "2"}),
+        "SRR16770217" : dict({"IFNAR": "1", "IFNLR": "1", "Replicate": "2"})
+    })
+
+    dfs = list()
+    for acc_num, meta in acc_nums.items():
+        df = load_dataset("Wang2023", acc_num, SEGMENT_DICTS["PR8"])
+        df["IFNAR"] = meta["IFNAR"]
+        df["IFNLR"] = meta["IFNLR"]
+        df["Replicate"] = meta["Replicate"]
+        dfs.append(df)
+    concat_df = pd.concat(dfs)
+
+    return concat_df
+
+def load_wang2020():
+    '''
+    
+    '''
+    df = load_dataset("Wang2020", "SRR7722046", SEGMENT_DICTS["PR8"])
     return df
 
 def load_mendes2021():
@@ -327,11 +381,209 @@ def load_alnaji2021():
 
     return concat_df
 
+def load_kupke2020():
+    '''
+
+    '''
+    acc_nums = dict({
+        "SRR10489473": dict({"Cell": "XX"}),
+        "SRR10489474": dict({"Cell": "XX"}),
+        "SRR10489475": dict({"Cell": "XX"}),
+        "SRR10489476": dict({"Cell": "XX"}),
+        "SRR10489477": dict({"Cell": "XX"}),
+        "SRR10489478": dict({"Cell": "XX"}),
+        "SRR10489479": dict({"Cell": "XX"}),
+        "SRR10489480": dict({"Cell": "XX"}),
+        "SRR10489481": dict({"Cell": "XX"}),
+        "SRR10489482": dict({"Cell": "XX"}),
+        "SRR10489483": dict({"Cell": "XX"}),
+        "SRR10489484": dict({"Cell": "XX"}),
+        "SRR10489485": dict({"Cell": "XX"}),
+        "SRR10489486": dict({"Cell": "XX"}),
+        "SRR10489487": dict({"Cell": "XX"}),
+        "SRR10489488": dict({"Cell": "XX"}),
+        "SRR10489489": dict({"Cell": "XX"}),
+        "SRR10489490": dict({"Cell": "XX"}),
+        "SRR10489491": dict({"Cell": "XX"}),
+        "SRR10489492": dict({"Cell": "XX"}),
+        "SRR10489493": dict({"Cell": "XX"}),
+        "SRR10489494": dict({"Cell": "XX"}),
+        "SRR10489495": dict({"Cell": "XX"}),
+        "SRR10489496": dict({"Cell": "XX"}),
+        "SRR10489497": dict({"Cell": "XX"}),
+        "SRR10489498": dict({"Cell": "XX"}),
+        "SRR10489499": dict({"Cell": "XX"}),
+        "SRR10489500": dict({"Cell": "XX"}),
+        "SRR10489501": dict({"Cell": "XX"}),
+        "SRR10489502": dict({"Cell": "XX"}),
+        "SRR10489503": dict({"Cell": "XX"}),
+        "SRR10489504": dict({"Cell": "XX"}),
+        "SRR10489505": dict({"Cell": "XX"}),
+        "SRR10489506": dict({"Cell": "XX"}),
+        "SRR10489507": dict({"Cell": "XX"}),
+        "SRR10489508": dict({"Cell": "XX"}),
+        "SRR10489509": dict({"Cell": "XX"}),
+        "SRR10489510": dict({"Cell": "XX"}),
+        "SRR10489511": dict({"Cell": "XX"}),
+        "SRR10489512": dict({"Cell": "XX"}),
+        "SRR10489513": dict({"Cell": "XX"}),
+        "SRR10489514": dict({"Cell": "XX"}),
+        "SRR10489515": dict({"Cell": "XX"}),
+        "SRR10489516": dict({"Cell": "XX"}),
+        "SRR10489517": dict({"Cell": "XX"}),
+        "SRR10489518": dict({"Cell": "XX"}),
+        "SRR10489519": dict({"Cell": "XX"}),
+        "SRR10489520": dict({"Cell": "XX"}),
+        "SRR10489521": dict({"Cell": "XX"}),
+        "SRR10489522": dict({"Cell": "XX"}),
+        "SRR10489523": dict({"Cell": "XX"}),
+        "SRR10489524": dict({"Cell": "XX"}),
+        "SRR10489525": dict({"Cell": "XX"}),
+        "SRR10489526": dict({"Cell": "XX"}),
+        "SRR10489527": dict({"Cell": "XX"}),
+        "SRR10489528": dict({"Cell": "XX"}),
+        "SRR10489529": dict({"Cell": "XX"}),
+        "SRR10489530": dict({"Cell": "XX"}),
+        "SRR10489531": dict({"Cell": "XX"}),
+        "SRR10489532": dict({"Cell": "XX"}),
+        "SRR10489533": dict({"Cell": "XX"}),
+        "SRR10489534": dict({"Cell": "XX"}),
+        "SRR10489535": dict({"Cell": "XX"}),
+        "SRR10489536": dict({"Cell": "XX"}),
+        "SRR10489537": dict({"Cell": "XX"}),
+        "SRR10489538": dict({"Cell": "XX"}),
+        "SRR10489539": dict({"Cell": "XX"}),
+        "SRR10489540": dict({"Cell": "XX"}),
+        "SRR10489541": dict({"Cell": "XX"}),
+        "SRR10489542": dict({"Cell": "XX"}),
+        "SRR10489543": dict({"Cell": "XX"}),
+        "SRR10489544": dict({"Cell": "XX"}),
+        "SRR10489545": dict({"Cell": "XX"}),
+        "SRR10489546": dict({"Cell": "XX"}),
+        "SRR10489547": dict({"Cell": "XX"}),
+        "SRR10489548": dict({"Cell": "XX"}),
+        "SRR10489549": dict({"Cell": "XX"}),
+        "SRR10489550": dict({"Cell": "XX"}),
+        "SRR10489551": dict({"Cell": "XX"}),
+        "SRR10489552": dict({"Cell": "XX"}),
+        "SRR10489553": dict({"Cell": "XX"}),
+        "SRR10489554": dict({"Cell": "XX"}),
+        "SRR10489555": dict({"Cell": "XX"}),
+        "SRR10489556": dict({"Cell": "XX"}),
+        "SRR10489557": dict({"Cell": "XX"}),
+        "SRR10489558": dict({"Cell": "XX"}),
+        "SRR10489559": dict({"Cell": "XX"}),
+        "SRR10489560": dict({"Cell": "XX"}),
+        "SRR10489561": dict({"Cell": "XX"}),
+        "SRR10489562": dict({"Cell": "XX"}),
+        "SRR10489563": dict({"Cell": "XX"}),
+        "SRR10489564": dict({"Cell": "XX"}),
+        "SRR10489565": dict({"Cell": "XX"}),
+        "SRR10489566": dict({"Cell": "XX"}),
+        "SRR10489567": dict({"Cell": "XX"}),
+        "SRR10489568": dict({"Cell": "XX"})
+    })
+
+    dfs = list()
+    for acc_num, meta in acc_nums.items():
+        df = load_dataset("Kupke2020", acc_num, SEGMENT_DICTS["PR8"])
+        df["Cell"] = meta["Cell"]
+        dfs.append(df)
+    concat_df = pd.concat(dfs)
+
+    return concat_df
+
 def join_data(df: pd.DataFrame)-> pd.DataFrame:
     '''
     
     '''
     return df.groupby(["Segment", "Start", "End"]).sum(["NGS_read_count"]).reset_index()
+
+def load_all(expected: str=False):
+    '''
+    
+    '''
+    dfs = list()
+    dfnames =list()
+    expected_dfs = list()
+
+    ### Alnaji2019 ###
+    strain = "PR8"
+    for strain, p in [("Cal07", "6"), ("NC", "1"), ("Perth", "4") , ("BLEE", "7")]:
+        df = load_alnaji2019(strain)
+        df = df[df["Passage"] == p].copy()
+        df = join_data(df)
+        dfs.append(preprocess(strain, df, CUTOFF))
+        dfnames.append(f"Alnaji2021 {strain}")
+        if expected:
+            expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
+
+    ### Alnaji2021 ###
+    strain = "PR8"
+    df = join_data(load_alnaji2021())
+    dfs.append(preprocess(strain, df, CUTOFF))
+    dfnames.append("Alnaji2021")
+    if expected:
+        expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
+
+    ### Pelz2021 ###
+    strain = "PR8"
+    df = join_data(load_pelz2021())
+    dfs.append(preprocess(strain, df, CUTOFF))
+    dfnames.append("Pelz2021")
+    if expected:
+        expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
+        
+    ### Mendes2021 ###
+    strain = "WSN"
+    df = join_data(load_mendes2021())
+    dfs.append(preprocess(strain, df, CUTOFF))
+    dfnames.append(f"Mendes2021")
+    if expected:
+        expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
+    
+    ### Wang2023 ###
+    strain = "PR8"
+    df = join_data(load_wang2023())
+    dfs.append(preprocess(strain, df, CUTOFF))
+    dfnames.append(f"Wang2023")
+    if expected:
+        expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
+
+    ### Lui2019 ###
+    strain = "Anhui"
+    df = load_lui2019()
+    dfs.append(preprocess(strain, df, CUTOFF))
+    dfnames.append("Lui2019")
+    if expected:
+        expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
+
+    ### Wang2020 ###
+    strain = "PR8"
+    df = load_wang2020()
+    dfs.append(preprocess(strain, df, CUTOFF))
+    dfnames.append("Wang2020")
+    if expected:
+        expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
+    
+    ### Penn2022 ###
+    strain = "Turkey"
+    df = join_data(load_penn2022())
+    dfs.append(preprocess(strain, df, CUTOFF))
+    dfnames.append(f"Penn2022")
+    if expected:
+        expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
+    
+    ### Kupke2020 ###
+    strain = "PR8"
+    df = join_data(load_kupke2020())
+    dfs.append(preprocess(strain, df, 1))
+    dfnames.append("Kupke2020")
+    if expected:
+        expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
+
+    return dfs, dfnames, expected_dfs
+
 
 def get_sequence(strain: str, seg: str, full: bool=False)-> object:
     '''
