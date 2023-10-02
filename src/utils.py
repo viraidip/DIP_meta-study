@@ -396,6 +396,7 @@ def load_penn2022():
     for acc_num, meta in acc_nums.items():
         df = load_dataset("Penn2022", acc_num, SEGMENT_DICTS["Turkey"])
         df["Time"] = meta["Time"]
+        df["Mode"] = meta["Mode"]
         df["Lineage"] = meta["Lineage"]
         dfs.append(df)
     concat_df = pd.concat(dfs)
