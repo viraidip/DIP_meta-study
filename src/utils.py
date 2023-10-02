@@ -546,6 +546,19 @@ def load_kupke2020():
         dfs.append(df)
     concat_df = pd.concat(dfs)
 
+
+    df = load_dataset("Kupke2020", "SRR10530643", SEGMENT_DICTS["PR8"])
+    dfs.append(df)
+    concat_df = pd.concat(dfs)
+
+    # filter out seed virus DIs
+    concat_df["DI"] = concat_df["Segment"] + "_" + concat_df["Start"].astype(str) + "_" + concat_df["End"].astype(str)
+    seed_df = load_dataset("Kupke2020", "SRR10530642", SEGMENT_DICTS["PR8"])
+    seed_df["DI"] = seed_df["Segment"] + "_" + seed_df["Start"].astype(str) + "_" + seed_df["End"].astype(str)
+    seed = seed_df["DI"].to_list()
+    concat_df = concat_df.loc[~concat_df["DI"].isin(seed)]
+    concat_df.drop("DI", inplace=True, axis=1)
+
     return concat_df
 
 def join_data(df: pd.DataFrame)-> pd.DataFrame:
@@ -562,16 +575,6 @@ def load_all(expected: str=False):
     dfnames =list()
     expected_dfs = list()
 
-    ### Alnaji2019 ###
-    for strain, p in [("Cal07", "6"), ("NC", "1"), ("Perth", "4") , ("BLEE", "7")]:
-        df = load_alnaji2019(strain)
-        df = df[df["Passage"] == p].copy()
-        df = join_data(df)
-        dfs.append(preprocess(strain, df, CUTOFF))
-        dfnames.append(f"Alnaji2019 {strain}")
-        if expected:
-            expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
-
     ### Alnaji2021 ###
     strain = "PR8"
     df = join_data(load_alnaji2021())
@@ -587,28 +590,12 @@ def load_all(expected: str=False):
     dfnames.append("Pelz2021")
     if expected:
         expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
-        
-    ### Mendes2021 ###
-    strain = "WSN"
-    df = join_data(load_mendes2021())
-    dfs.append(preprocess(strain, df, CUTOFF))
-    dfnames.append(f"Mendes2021")
-    if expected:
-        expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
-    
+
     ### Wang2023 ###
     strain = "PR8"
     df = join_data(load_wang2023())
     dfs.append(preprocess(strain, df, CUTOFF))
     dfnames.append(f"Wang2023")
-    if expected:
-        expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
-
-    ### Lui2019 ###
-    strain = "Anhui"
-    df = load_lui2019()
-    dfs.append(preprocess(strain, df, CUTOFF))
-    dfnames.append("Lui2019")
     if expected:
         expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
 
@@ -620,6 +607,24 @@ def load_all(expected: str=False):
     if expected:
         expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
     
+    ### Kupke2020 ###
+    strain = "PR8"
+    df = join_data(load_kupke2020())
+    dfs.append(preprocess(strain, df, 1))
+    dfnames.append("Kupke2020")
+    if expected:
+        expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
+
+    ### Alnaji2019 ###
+    for strain, p in [("Cal07", "6"), ("NC", "1"), ("Perth", "4") , ("BLEE", "7")]:
+        df = load_alnaji2019(strain)
+        df = df[df["Passage"] == p].copy()
+        df = join_data(df)
+        dfs.append(preprocess(strain, df, CUTOFF))
+        dfnames.append(f"Alnaji2019 {strain}")
+        if expected:
+            expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
+
     ### Penn2022 ###
     strain = "Turkey"
     df = join_data(load_penn2022())
@@ -627,12 +632,20 @@ def load_all(expected: str=False):
     dfnames.append(f"Penn2022")
     if expected:
         expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
-    
-    ### Kupke2020 ###
-    strain = "PR8"
-    df = join_data(load_kupke2020())
-    dfs.append(preprocess(strain, df, 1))
-    dfnames.append("Kupke2020")
+
+    ### Lui2019 ###
+    strain = "Anhui"
+    df = load_lui2019()
+    dfs.append(preprocess(strain, df, CUTOFF))
+    dfnames.append("Lui2019")
+    if expected:
+        expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
+
+    ### Mendes2021 ###
+    strain = "WSN"
+    df = join_data(load_mendes2021())
+    dfs.append(preprocess(strain, df, CUTOFF))
+    dfnames.append(f"Mendes2021")
     if expected:
         expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
 
