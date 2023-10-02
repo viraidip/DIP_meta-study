@@ -356,7 +356,7 @@ if __name__ == "__main__":
     plot_nucleotide_ratio_around_deletion_junction_heatmaps(dfs, dfnames)
     plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs, dfnames, expected_dfs)
 
-    #plot_direct_repeat_ratio_heatmaps(dfs, dfnames)
-    #plot_expected_vs_observed_direct_repeat_heatmaps(dfs, dfnames, expected_dfs)
+    plot_direct_repeat_ratio_heatmaps(dfs, dfnames)
+    plot_expected_vs_observed_direct_repeat_heatmaps(dfs, dfnames, expected_dfs)
 
     

@@ -139,10 +139,6 @@ def length_distribution(dfs: list, dfnames: list)-> None:
 
         overall_count_dict[dfname] = count_dict
 
-
-
-    # create a subplot for each dataset
-
     for s in SEGMENTS:
         fig, axs = plt.subplots(len(dfnames), 1, figsize=(10, 15), tight_layout=True)
         for i, dfname in enumerate(dfnames):
@@ -167,7 +163,6 @@ def length_distribution(dfs: list, dfnames: list)-> None:
         save_path = os.path.join(RESULTSPATH, "general_analysis", f"{s}_length_del_hist.png")
         plt.savefig(save_path)
         plt.close()
-
 
 
 def create_start_end_connection_plot(df: pd.DataFrame,
@@ -225,12 +220,56 @@ def start_end_positions(dfs: list, dfnames: list)-> None:
             copy_df = df[(df["Segment"] == s)].copy()
             create_start_end_connection_plot(copy_df, dfname, strain, s)
 
+
+def dataset_distributions(dfs: list, dfnames: list)-> None:
+    '''
+    
+    '''
+    ns = list()
+    plot_data = list()
+    means = list()
+    medians = list()
+    stddevs = list()
+    maxs = list()
+    
+    for df in dfs:
+        ns.append(df.shape[0])
+        counts = df["NGS_read_count"]
+        plot_data.append(counts)
+        means.append(counts.mean())
+        medians.append(counts.median())
+        stddevs.append(counts.std())
+        maxs.append(counts.max())
+
+    labels = [f"{name} ({n})" for name, n in zip(dfnames, ns)]
+    plt.figure(figsize=(8, 6), tight_layout=True)
+    plt.boxplot(plot_data, labels=labels)
+    plt.yscale("log")
+    plt.xticks(rotation=45) 
+    plt.xlabel("Datasets")
+    plt.ylabel("NGS read count (log scale)")
+
+    save_path = os.path.join(RESULTSPATH, "general_analysis", "ngs_count_distribution.png")
+    plt.savefig(save_path)
+    plt.close()
+
+    stats_df = pd.DataFrame({"Dataset": dfnames,
+                             "Size": ns,
+                             "Mean": means,
+                             "Median": medians,
+                             "Std. dev.": stddevs,
+                             "Max": maxs})
+
+    save_path = os.path.join(RESULTSPATH, "general_analysis", "ngs_count_stats.csv")
+    stats_df.to_csv(save_path, index=False)
+
+
 if __name__ == "__main__":
     plt.style.use("seaborn")
     dfs, dfnames, expected_dfs = load_all()
 
- #   plot_distribution_over_segments(dfs, dfnames)
-  #  calculate_deletion_shifts(dfs, dfnames)
-   # length_distribution(dfs, dfnames)
-
+    dataset_distributions(dfs, dfnames)
+    plot_distribution_over_segments(dfs, dfnames)
+    calculate_deletion_shifts(dfs, dfnames)
+    length_distribution(dfs, dfnames)
     start_end_positions(dfs, dfnames)

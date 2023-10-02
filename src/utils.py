@@ -916,6 +916,7 @@ def generate_expected_data(k, v):
             samp_df = generate_sampling_data(s, e, N_SAMPLES)
             samp_df["Segment"] = seg
     
+    samp_df["NGS_read_count"] = 1
     return samp_df
 
 def generate_sampling_data(s: Tuple[int, int], e: Tuple[int, int],  n: int) -> object:
@@ -985,8 +986,9 @@ def sequence_df(df, strain, isize=5):
             - "seq_before_end": The sequence before the end position of length "isize".
             - "seq_after_end": The sequence after the end position of length "isize".
     '''
-    res_df = pd.DataFrame(columns=["key","Segment", "Start","End","seq", "deleted_sequence", "isize", "full_seq", "Strain", "seq_around_deletion_junction"])
-    for k in df.key:
+    res_df = pd.DataFrame(columns=["key","Segment", "Start","End","seq", "deleted_sequence", "isize", "full_seq", "Strain", "seq_around_deletion_junction", "NGS_read_count"])
+    for _, r in df.iterrows():
+        k = r["key"]
         seq, seq_head, seq_foot = get_dip_sequence(k, strain)
         start = int(k.split("_")[1].split("_")[0])
         end = int(k.split("_")[2])
@@ -997,10 +999,11 @@ def sequence_df(df, strain, isize=5):
         seq_after_start = deleted_seq[:isize]
         seq_before_end = deleted_seq[-isize:]
         seq_after_end = seq_foot[:isize]
+        NGS_read_count = r["NGS_read_count"]
 
         seq_around_deletion_junction = seq_before_start + seq_after_start + seq_before_end + seq_after_end
         res_df = pd.concat([res_df, pd.DataFrame({"key":k, "Segment":seg, "Start":start, "End":end, "seq":seq, "isize":isize, "full_seq": full_seq, "Strain": strain,
-                                "deleted_sequence":deleted_seq, "seq_around_deletion_junction": seq_around_deletion_junction}, index=[0])], ignore_index=True)
+                                "deleted_sequence":deleted_seq, "seq_around_deletion_junction": seq_around_deletion_junction, "NGS_read_count": NGS_read_count}, index=[0])], ignore_index=True)
     return res_df
 def preprocess(strain, df, cutoff):
     '''
