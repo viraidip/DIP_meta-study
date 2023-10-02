@@ -122,16 +122,14 @@ def length_distribution(dfs: list, dfnames: list)-> None:
     
     '''
     plt.rc("font", size=16)
-    mean_dict = dict({"Segment": SEGMENTS})
+    overall_count_dict = dict()
 
     for df, dfname in zip(dfs, dfnames):
-        mean_list = list()
         # create a dict for each segment including the NGS read count
         count_dict = dict()
         for s in SEGMENTS:
             count_dict[s] = dict()
 
-       # df["DVG_Length"] = len(df["seq"])-len(df["deleted_sequence"])
         for _, r in df.iterrows():
             DVG_Length = len(r["seq"])-len(r["deleted_sequence"])
             if DVG_Length in count_dict[r["Segment"]]:
@@ -139,9 +137,16 @@ def length_distribution(dfs: list, dfnames: list)-> None:
             else:
                 count_dict[r["Segment"]][DVG_Length] = 1
 
-        # create a subplot for each key, value pair in count_dict
-        fig, axs = plt.subplots(8, 1, figsize=(10, 15), tight_layout=True)
-        for i, s in enumerate(SEGMENTS):
+        overall_count_dict[dfname] = count_dict
+
+
+
+    # create a subplot for each dataset
+
+    for s in SEGMENTS:
+        fig, axs = plt.subplots(len(dfnames), 1, figsize=(10, 15), tight_layout=True)
+        for i, dfname in enumerate(dfnames):
+            count_dict = overall_count_dict[dfname]
             if len(count_dict[s].keys()) > 1:
                 counts_list = list()
                 for length, count in count_dict[s].items():
@@ -158,16 +163,11 @@ def length_distribution(dfs: list, dfnames: list)-> None:
                 axs[i].set_visible(False)
                 m = 0
 
-            mean_list.append(m)
 
-        mean_dict[dfname] = mean_list
-
-        save_path = os.path.join(RESULTSPATH, "general_analysis", f"{dfname}_length_del_hist.png")
+        save_path = os.path.join(RESULTSPATH, "general_analysis", f"{s}_length_del_hist.png")
         plt.savefig(save_path)
         plt.close()
 
-    mean_df = pd.DataFrame(mean_dict)
-    print(mean_df)
 
 
 def create_start_end_connection_plot(df: pd.DataFrame,
@@ -194,7 +194,7 @@ def create_start_end_connection_plot(df: pd.DataFrame,
             end_angle = 0
             color = colors[3]
             y = 0
-        half_cirlce = patches.Arc((center, y), radius*2, radius*2, angle=0, theta1=start_angle, theta2=end_angle, color=color)
+        half_cirlce = patches.Arc((center, y), radius*2, radius*2, angle=0, theta1=start_angle, theta2=end_angle, color=color, alpha=0.5)
         ax.add_patch(half_cirlce)
 
     # add boxes for start and end of DI RNA sequence
