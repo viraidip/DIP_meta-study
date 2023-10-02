@@ -33,7 +33,7 @@ def plot_nucleotide_ratio_around_deletion_junction_heatmaps(dfs, dfnames):
             - axs (numpy.ndarray of matplotlib.axes.Axes): The axes of the subplots.
 
     '''
-    fig, axs = plt.subplots(figsize=(10, len(dfs)), nrows=2, ncols=2)
+    fig, axs = plt.subplots(figsize=(13, len(dfs)), nrows=2, ncols=2)
     axs = axs.flatten()
 
     for i, nuc in enumerate(NUCLEOTIDES.keys()):
@@ -106,7 +106,7 @@ def plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs, dfnames, expec
             - axs (numpy.ndarray of matplotlib.axes.Axes): The axes of the subplots.
 
     '''
-    fig, axs = plt.subplots(figsize=(10, len(dfs)), nrows=2, ncols=2)
+    fig, axs = plt.subplots(figsize=(13, len(dfs)), nrows=2, ncols=2)
     axs = axs.flatten()
 
     for i, nuc in enumerate(NUCLEOTIDES.keys()):
@@ -130,7 +130,7 @@ def plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs, dfnames, expec
                 if n_samples < n_samples2:
                     n_s = n_samples
                 else:
-                    p1, p2 = p2, p1
+                #    p1, p2 = p2, p1
                     n_s = n_samples2
 
                 n_s = min(n_s, 1000)
@@ -141,7 +141,7 @@ def plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs, dfnames, expec
                 # perform an ANOVA as done in Alaji2021
                 pval =  stats.f_oneway(test_array, test_array2).pvalue
 
-                diff = p2 - p1
+                diff = p1 - p2
                 vals.append(diff)
                 if pval < 0.00001:
                     pval_symbol = "**"
@@ -356,7 +356,7 @@ if __name__ == "__main__":
     plot_nucleotide_ratio_around_deletion_junction_heatmaps(dfs, dfnames)
     plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs, dfnames, expected_dfs)
 
-    plot_direct_repeat_ratio_heatmaps(dfs, dfnames)
-    plot_expected_vs_observed_direct_repeat_heatmaps(dfs, dfnames, expected_dfs)
+    #plot_direct_repeat_ratio_heatmaps(dfs, dfnames)
+    #plot_expected_vs_observed_direct_repeat_heatmaps(dfs, dfnames, expected_dfs)
 
     
