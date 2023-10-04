@@ -52,7 +52,7 @@ def plot_distribution_over_segments(dfs: list, dfnames: list)-> None:
     
     axs.set_ylabel("relative occurrence of segment")
     axs.set_xlabel("dataset")
-    plt.xticks(range(len(dfnames)), dfnames, size='small', rotation=45) 
+    plt.xticks(range(len(dfnames)), dfnames, size='small', rotation=45)
 
     box = axs.get_position()
     axs.set_position([box.x0, box.y0 + box.height * 0.1, box.width, box.height * 0.9])
