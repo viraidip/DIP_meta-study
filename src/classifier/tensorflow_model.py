@@ -6,6 +6,7 @@ import sys
 
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 import pandas as pd
 import numpy as np
@@ -24,7 +25,10 @@ if __name__ == "__main__":
     df = pd.read_csv(path, na_values=["", "None"], keep_default_na=False)
 
     df = df[df["NGS_read_count"] > 10].copy()
-  
+
+    train_df = df[df["dataset_name"].isin(["Wang2023", "Wang2020"])]
+    validate_df = df[df["dataset_name"].isin(["Alnaji2021", "Pelz2021", "Kupke2020"])]
+
     X_train, X_test, y_train, y_test = preprocessing(df)
     
     # Define the neural network model
@@ -46,17 +50,31 @@ if __name__ == "__main__":
     print(f'Test Loss: {loss:.4f}')
     print(f'Test Accuracy: {accuracy:.4f}')
     
-    for n in df["dataset_name"].unique():
+    for n in validate_df["dataset_name"].unique():
         print(n)
-        n_df = df[df["dataset_name"] == n].copy()
+        n_df = validate_df[validate_df["dataset_name"] == n].copy()
         X_1, X_2, y_1, y_2 = preprocessing(n_df)
 
         X = np.vstack((X_1, X_2))
         y = np.concatenate((y_1, y_2), axis=0)
 
+        y_pred = model.predict(X)
+        print(y_pred)
+        y_pred = np.where(y_pred >= 0.5, 1, 0)
+        print(y)
+        print(y_pred)
 
-        loss, accuracy = model.evaluate(X, y)
-        print(f'Test Loss: {loss:.4f}')
-        print(f'Test Accuracy: {accuracy:.4f}')
+        accuracy = accuracy_score(y, y_pred)
+        precision = precision_score(y, y_pred)
+        recall = recall_score(y, y_pred)
+        f1 = f1_score(y, y_pred)
+        cm = confusion_matrix(y, y_pred)
+
+        print("Accuracy:", accuracy)
+        print("Precision:", precision)
+        print("Recall:", recall)
+        print("F1 Score:", f1)
+        print("Confusion Matrix:\n", cm)
+
 
 
