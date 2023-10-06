@@ -20,9 +20,6 @@ def prepare_y(df):
         r = row[1]
         y.append("low" if r["NGS_log_norm"] < median else "high")
 
-    print(f"label 'low':\t{y.count('low')}")
-    print(f"label 'high':\t{y.count('high')}")
-
     encoder = LabelEncoder()
     encoder.fit(y)
     y = encoder.transform(y)   
@@ -33,11 +30,9 @@ def preprocessing(df):
     '''
     
     '''
-    print(df.shape)
     dupl = identify_duplicates(df)
     df = df[~df["DI"].isin(dupl)]
     df.drop(["DI"], axis=1, inplace=True)
-    print(df.shape)
 
     # Separate features (X) and target (y)
     X = df.drop(["Segment", "NGS_read_count", "dataset_name","Strain","NGS_log","NGS_norm","NGS_log_norm"], axis=1).copy()
@@ -53,33 +48,15 @@ def preprocessing(df):
 
     return X_train, X_test, y_train, y_test
 
-
-
 def identify_duplicates(df):
     '''
 
     '''
     df["label"] = prepare_y(df)
     df["DI"] = df["Segment"] + "_" + df["Start"].astype(str) + "_" + df["End"].astype(str) + "_" + df["Strain"]
-
     entries = df["DI"].tolist()
     dupl = [e for e in entries if entries.count(e) > 1]
 
-    '''
-    all = len(dupl)
-    equal = 0
-    unequal = 0
-
-    for d in dupl:
-        if len(df[df["DI"] == d]["label"].unique()) == 1:
-            equal += 1
-        else:
-            unequal += 1
-
-    print(all)
-    print(equal)
-    print(unequal)
-    '''
     return dupl
 
 
