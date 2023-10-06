@@ -4,10 +4,11 @@
 import os
 import sys
 
-import classifier.tensorflow_model as tf
+import tensorflow as tf
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 import pandas as pd
+import numpy as np
 
 from ml_utils import preprocessing, prepare_y
 
@@ -22,9 +23,10 @@ if __name__ == "__main__":
     path = os.path.join(DATAPATH, "ML", "features.csv")
     df = pd.read_csv(path, na_values=["", "None"], keep_default_na=False)
 
+    df = df[df["NGS_read_count"] > 10].copy()
+  
     X_train, X_test, y_train, y_test = preprocessing(df)
-
-
+    
     # Define the neural network model
     model = tf.keras.Sequential([
         tf.keras.layers.Dense(64, activation='relu', input_shape=(X_train.shape[1],)),
@@ -43,12 +45,15 @@ if __name__ == "__main__":
     loss, accuracy = model.evaluate(X_test, y_test)
     print(f'Test Loss: {loss:.4f}')
     print(f'Test Accuracy: {accuracy:.4f}')
-
+    
     for n in df["dataset_name"].unique():
         print(n)
         n_df = df[df["dataset_name"] == n].copy()
-        X = n_df.drop(["Unnamed: 0", "Segment", "NGS_read_count", "class", "dataset_name","Strain","NGS_log","NGS_norm","NGS_log_norm","int_dup","Duplicate","comb_dup"], axis=1)
-        y = prepare_y(n_df)
+        X_1, X_2, y_1, y_2 = preprocessing(n_df)
+
+        X = np.vstack((X_1, X_2))
+        y = np.concatenate((y_1, y_2), axis=0)
+
 
         loss, accuracy = model.evaluate(X, y)
         print(f'Test Loss: {loss:.4f}')

@@ -4,12 +4,6 @@
 '''
 import os
 import sys
-import shap
-import joblib
-import logging
-import argparse
-import datetime
-import warnings
 
 import numpy as np
 import pandas as pd
@@ -117,28 +111,14 @@ def select_classifier(clf_name: str,
 
 
 if __name__ == "__main__":
-    perform_grid_search = True
+    perform_grid_search = False
 
     # load precalculated data from file
     path = os.path.join(DATAPATH, "ML", "features.csv")
     df = pd.read_csv(path, na_values=["", "None"], keep_default_na=False)
 
 
-    
-    #    df["DI"] = df["Segment"] + "_" + df["Start"].map(str) + "_" + df["End"].map(str)
-     #   df.drop_duplicates("DI", keep=False, inplace=True, ignore_index=True)
-
-
-
-
-    
-
     X, y, X_val, y_val = preprocessing(df)
-
-    logging.info("Distribution of labels:")
-    logging.info(y.value_counts())
-    logging.info(y_val.value_counts())
-    logging.info("#####\n")
 
     # Testing different classifiers
     clf_names = ["logistic_regression", "svc", "random_forest", "mlp", "ada_boost", "naive_bayes"]

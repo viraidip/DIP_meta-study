@@ -38,25 +38,35 @@ def generate_features(df: pd.DataFrame,
                  list with the names of the columns for the features
     '''
     if "Segment" in features:
+        print("Segment")
         df, segment_cols = segment_ohe(df)
     if "DI_Length" in features:
+        print("DI_Length")
         df["DI_Length"] = df.apply(get_dirna_length, axis=1)
     if "Direct_repeat" in features:
+        print("Direct_repeat")
         df["Direct_repeat"] = df.apply(get_direct_repeat_length, axis=1)
     if "Junction" in features:
+        print("Junction")
         df, junction_start_cols = junction_site_ohe(df, "Start")
         df, junction_end_cols = junction_site_ohe(df, "End")
     if "3_5_ratio" in features:
+        print("3_5_ratio")
         df["3_5_ratio"] = df.apply(get_3_to_5_ratio, axis=1)
     if "length_proportion" in features:
+        print("length_proportion")
         df["length_proportion"] = df.apply(get_length_proportion, axis=1)
     if "full_sequence" in features:
+        print("full_sequence")
         df, sequence_cols = full_sequence_ohe(df)
     if "delta_G" in features:
+        print("delta_G")
         df["delta_G"] = df.apply(get_delta_G, axis=1)
     if "Peptide_Length" in features:
+        print("Peptide_Length")
         df["Peptide_Length"] = df.apply(get_peptide_length, axis=1)
     if "Inframe_Deletion" in features:
+        print("Inframe_Deletion")
         df["Inframe_Deletion"] = df.apply(get_inframe_deletion, axis=1)
 
 
@@ -66,7 +76,8 @@ def generate_features(df: pd.DataFrame,
     df["NGS_norm"] = df["NGS_read_count"]/max(df["NGS_read_count"])
     df["NGS_log_norm"] = df["NGS_log"]/max(df["NGS_log"])
 
-    df.write_csv(DATAPATH, "ML", "features.csv", index=False)
+    path = os.path.join(DATAPATH, "ML", "features.csv")
+    df.to_csv(path, index=False)
 
 def segment_ohe(df: pd.DataFrame)-> Tuple[pd.DataFrame, list]:
     '''
@@ -250,10 +261,11 @@ def get_inframe_deletion(row: pd.Series)-> int:
 
 
 if __name__ == "__main__":
-    dfs, dfnames = load_all()
+    dfs, dfnames, _ = load_all()
+
     for df, dfname in zip(dfs, dfnames):
         df["dataset_name"] = dfname
-        df["strain"] = DATASET_STRAIN_DICT[dfname]
+        df.drop(["key", "seq", "isize", "full_seq", "deleted_sequence", "seq_around_deletion_junction"], axis=1, inplace=True)
     concat_df = pd.concat(dfs)
 
     features = list(["Segment",
