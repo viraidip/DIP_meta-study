@@ -266,7 +266,7 @@ if __name__ == "__main__":
     for df, dfname in zip(dfs, dfnames):
         df["dataset_name"] = dfname
         df.drop(["key", "seq", "isize", "full_seq", "deleted_sequence", "seq_around_deletion_junction"], axis=1, inplace=True)
-    concat_df = pd.concat(dfs)
+    concat_df = pd.concat(dfs, ignore_index=True)
 
     features = list(["Segment",
                      "DI_Length",
