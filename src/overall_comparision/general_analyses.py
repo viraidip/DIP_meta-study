@@ -117,7 +117,7 @@ def calculate_deletion_shifts(dfs: list, dfnames: list)-> None:
     plt.close()
  
 
-def length_distribution(dfs: list, dfnames: list)-> None:
+def length_distribution_heatmap(dfs: list, dfnames: list)-> None:
     '''
     
     '''
@@ -151,7 +151,6 @@ def length_distribution(dfs: list, dfnames: list)-> None:
                 m = round(np.mean(list(counts_list)), 2)                
                 axs[i].hist(count_dict[s].keys(), weights=count_dict[s].values(), bins=100, label=f"{dfname} (µ={m})", alpha=0.3)
                 axs[i].set_xlim(left=0)
-   #             axs[i].set_yticks([0, 4, 8, 12])
                 axs[i].set_xlabel("sequence length")
                 axs[i].set_ylabel("occurrences")
                 axs[i].legend()
@@ -161,6 +160,57 @@ def length_distribution(dfs: list, dfnames: list)-> None:
 
 
         save_path = os.path.join(RESULTSPATH, "general_analysis", f"{s}_length_del_hist.png")
+        plt.savefig(save_path)
+        plt.close()
+
+
+def length_distribution_violinplot(dfs: list, dfnames: list)-> None:
+    '''
+    
+    '''
+    plt.rc("font", size=16)
+    overall_count_dict = dict()
+
+    for df, dfname in zip(dfs, dfnames):
+        # create a dict for each segment including the NGS read count
+        count_dict = dict()
+        for s in SEGMENTS:
+            count_dict[s] = dict()
+
+        for _, r in df.iterrows():
+            DVG_Length = len(r["seq"])-len(r["deleted_sequence"])
+            if DVG_Length in count_dict[r["Segment"]]:
+                count_dict[r["Segment"]][DVG_Length] += 1
+            else:
+                count_dict[r["Segment"]][DVG_Length] = 1
+
+        overall_count_dict[dfname] = count_dict
+
+    for s in SEGMENTS:
+        fig, axs = plt.subplots(1, 1, figsize=(10, 7), tight_layout=True)
+        plot_list = list()
+        position_list = list()
+        labels = list()
+
+        for i, dfname in enumerate(dfnames):
+            n_counts = len(overall_count_dict[dfname][s].keys())
+            if n_counts >= 1:
+                counts_list = list()
+                for length, count in overall_count_dict[dfname][s].items():
+                    counts_list.extend([length] * count)
+
+                plot_list.append(counts_list)
+                position_list.append(i+1)            
+
+            labels.append(f"{dfname} (n={n_counts})")
+        
+        axs.violinplot(plot_list, position_list, points=1000, showmedians=True)
+        axs.set_xticks(range(1, len(dfnames)+1))
+        axs.set_xticklabels(labels, rotation=45)
+        axs.set_xlabel("Dataset")
+        axs.set_ylabel("DVG sequence length")
+
+        save_path = os.path.join(RESULTSPATH, "general_analysis", f"{s}_length_del_violinplot.png")
         plt.savefig(save_path)
         plt.close()
 
@@ -268,8 +318,11 @@ if __name__ == "__main__":
     plt.style.use("seaborn")
     dfs, dfnames, expected_dfs = load_all()
 
+    '''
     dataset_distributions(dfs, dfnames)
     plot_distribution_over_segments(dfs, dfnames)
     calculate_deletion_shifts(dfs, dfnames)
-    length_distribution(dfs, dfnames)
-    start_end_positions(dfs, dfnames)
+    length_distribution_heatmap(dfs, dfnames)
+    '''
+    length_distribution_violinplot(dfs, dfnames)
+    #start_end_positions(dfs, dfnames)
