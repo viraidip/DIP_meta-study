@@ -14,11 +14,11 @@ from utils import DATAPATH
 
 def prepare_y(df):
     y = list()
-    median = df["NGS_log_norm"].median()
-
-    for row in df.iterrows():
-        r = row[1]
-        y.append("low" if r["NGS_log_norm"] < median else "high")
+    for name in df["dataset_name"].unique():
+        c_df = df[df["dataset_name"] == name].copy()
+        median = c_df["NGS_log_norm"].median()
+        for i, r in c_df.iterrows():
+            y.append("low" if r["NGS_log_norm"] < median else "high")
 
     encoder = LabelEncoder()
     encoder.fit(y)
@@ -52,7 +52,6 @@ def identify_duplicates(df):
     '''
 
     '''
-    df["label"] = prepare_y(df)
     df["DI"] = df["Segment"] + "_" + df["Start"].astype(str) + "_" + df["End"].astype(str) + "_" + df["Strain"]
     entries = df["DI"].tolist()
     dupl = [e for e in entries if entries.count(e) > 1]
