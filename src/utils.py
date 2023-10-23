@@ -40,9 +40,10 @@ DATASET_STRAIN_DICT = dict({
     "Mendes2021": "WSN",
     "Wang2023": "PR8",
     "Lui2019": "Anhui",
-    "Wang2020": "PR8",
+    "Wang2020 A549": "PR8",
+    "Wang2020 HBEpC": "PR8",
     "Penn2022": "Turkey",
-    "Kupke2020": "PR8"
+    "Kupke2020": "PR8",
 })
 
 SEGMENT_DICTS = dict({
@@ -196,8 +197,37 @@ def load_wang2020():
     '''
     
     '''
-    df = load_dataset("Wang2020", "SRR7722046", SEGMENT_DICTS["PR8"])
-    return df
+    acc_nums = dict({
+        "SRR7722028" : dict({"Cell": "A549", "Time": "6", "Replicate": "1"}),
+        "SRR7722030" : dict({"Cell": "A549", "Time": "12", "Replicate": "1"}),
+        "SRR7722032" : dict({"Cell": "A549", "Time": "24", "Replicate": "1"}),
+        "SRR7722029" : dict({"Cell": "A549", "Time": "6", "Replicate": "2"}),
+        "SRR7722031" : dict({"Cell": "A549", "Time": "12", "Replicate": "2"}),
+        "SRR7722033" : dict({"Cell": "A549", "Time": "24", "Replicate": "2"}),
+
+        "SRR7722036" : dict({"Cell": "HBEpC", "Time": "6", "Replicate": "1"}),
+     #   "SRR7722038" : dict({"Cell": "HBEpC", "Time": "12", "Replicate": "1"}),
+      #  "SRR7722040" : dict({"Cell": "HBEpC", "Time": "24", "Replicate": "1"}),
+       # "SRR7722037" : dict({"Cell": "HBEpC", "Time": "6", "Replicate": "2"}),
+        #"SRR7722039" : dict({"Cell": "HBEpC", "Time": "12", "Replicate": "2"}),
+        #"SRR7722041" : dict({"Cell": "HBEpC", "Time": "24", "Replicate": "2"})
+    })
+
+    dfs = list()
+    for acc_num, meta in acc_nums.items():
+        df = load_dataset("Wang2020", acc_num, SEGMENT_DICTS["PR8"])
+        df = join_data(df[df["NGS_read_count"] >= 1])
+        df["Cell"] = meta["Cell"]
+        df["Time"] = meta["Time"]
+        df["Replicate"] = meta["Replicate"]
+        dfs.append(df)
+    concat_df = pd.concat(dfs)
+
+    return concat_df
+
+    # this is the bulk data
+    #df = load_dataset("Wang2020", "SRR7722046", SEGMENT_DICTS["PR8"])
+    #return df
 
 def load_mendes2021():
     '''
@@ -602,11 +632,14 @@ def load_all(expected: str=False):
     ### Wang2020 ###
     strain = "PR8"
     df = load_wang2020()
-    dfs.append(preprocess(strain, df, CUTOFF))
-    dfnames.append("Wang2020")
-    if expected:
-        expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
-    
+    for cell in ["A549", "HBEpC"]:
+        c_df = df[df["Cell"] == cell].copy()
+        c_df = join_data(c_df)
+        dfs.append(preprocess(strain, c_df, CUTOFF))
+        dfnames.append(f"Wang2020 {cell}")
+        if expected:
+            expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
+        
     ### Kupke2020 ###
     strain = "PR8"
     df = join_data(load_kupke2020())
