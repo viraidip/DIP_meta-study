@@ -136,7 +136,7 @@ def plot_distribution_over_segments(dfs, dfnames, mode)-> None:
     :return: None
     '''
     fig, axs = plt.subplots(figsize=(len(dfs)*1.5, 6), nrows=2, ncols=4)
-    cm = plt.get_cmap("tab10")
+    cm = plt.get_cmap("viridis")
 
     i = 0
     j = 0
@@ -190,7 +190,7 @@ def calculate_deletion_shifts(dfs, dfnames, mode)-> None:
     :return: None
     '''
     fig, axs = plt.subplots(figsize=(len(dfs) * 1.5, 6), nrows=2, ncols=4)
-    cm = plt.get_cmap("tab10")
+    cm = plt.get_cmap("viridis")
     colors = [cm(1.*i/3) for i in range(3)]
 
     i = 0

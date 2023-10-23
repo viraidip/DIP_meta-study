@@ -29,7 +29,7 @@ def plot_distribution_over_segments(dfs: list, dfnames: list)-> None:
     :return: None
     '''
     fig, axs = plt.subplots(figsize=(len(dfs), 6), nrows=1, ncols=1)
-    cm = plt.get_cmap("tab10")
+    cm = plt.get_cmap("viridis")
     colors = [cm(1.*i/len(SEGMENTS)) for i in range(len(SEGMENTS))]
 
     x = np.arange(0, len(dfs))
@@ -75,7 +75,7 @@ def calculate_deletion_shifts(dfs: list, dfnames: list)-> None:
     :return: None
     '''
     fig, axs = plt.subplots(figsize=(12, 12), nrows=4, ncols=4)
-    cm = plt.get_cmap("tab10")
+    cm = plt.get_cmap("viridis")
     colors = [cm(1.*i/3) for i in range(3)]
 
     i = 0
@@ -223,7 +223,7 @@ def create_start_end_connection_plot(df: pd.DataFrame,
     
     '''
     max_val = get_seq_len(strain, segment)
-    cm = plt.get_cmap("tab10")
+    cm = plt.get_cmap("viridis")
     colors = [cm(1.*i/10) for i in range(10)]
 
     fig, ax = plt.subplots(figsize=(5, 3))
@@ -318,11 +318,11 @@ if __name__ == "__main__":
     plt.style.use("seaborn")
     dfs, dfnames, expected_dfs = load_all()
 
-    '''
+   
     dataset_distributions(dfs, dfnames)
     plot_distribution_over_segments(dfs, dfnames)
     calculate_deletion_shifts(dfs, dfnames)
     length_distribution_heatmap(dfs, dfnames)
-    '''
+    
     length_distribution_violinplot(dfs, dfnames)
-    #start_end_positions(dfs, dfnames)
+    start_end_positions(dfs, dfnames)

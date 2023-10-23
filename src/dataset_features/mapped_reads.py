@@ -24,7 +24,7 @@ def mapped_reads_distribution(dfs: list, dfnames: list)-> None:
     fig, axs = plt.subplots(1, 1, figsize=(10, 6))
     x = 0
     bar_width = 0.7
-    cm = plt.get_cmap('tab10')
+    cm = plt.get_cmap("viridis")
     colors = [cm(1.*i/10) for i in range(10)]
 
     for df in dfs:

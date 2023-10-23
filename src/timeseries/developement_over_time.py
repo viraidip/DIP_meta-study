@@ -172,7 +172,7 @@ def plot_segment_distribution_over_time(dfs, x, xlabel, fname)-> None:
     :return: None
     '''
     fig, axs = plt.subplots(figsize=(len(dfs)/2, 6), nrows=1, ncols=1)
-    cm = plt.get_cmap("tab10")
+    cm = plt.get_cmap("viridis")
     colors = [cm(1.*i/len(SEGMENTS)) for i in range(len(SEGMENTS))]
 
     y = dict({s: list() for s in SEGMENTS})
@@ -209,7 +209,7 @@ def length_over_time(dfs, x, fname):
     
     '''
     fig, axs = plt.subplots(figsize=(len(dfs)/2, 6), nrows=1, ncols=1)
-    cm = plt.get_cmap("tab10")
+    cm = plt.get_cmap("viridis")
     colors = [cm(1.*i/len(SEGMENTS)) for i in range(len(SEGMENTS))]
     
     all = list()
@@ -251,7 +251,7 @@ def compare_counts(counts_all, xs_normalised_all, labels_all):
     
     '''
     fig, axs = plt.subplots(figsize=(10, 6), nrows=1, ncols=1)
-    cm = plt.get_cmap("tab10")
+    cm = plt.get_cmap("viridis")
     colors = [cm(1.*i/len(SEGMENTS)) for i in range(len(SEGMENTS))]
     
     for c, x, l in zip(counts_all, xs_normalised_all, labels_all):
