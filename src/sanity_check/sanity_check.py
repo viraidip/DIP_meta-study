@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 sys.path.insert(0, "..")
 from utils import load_dataset, load_alnaji2019
-from utils import SEGMENTS, RESULTSPATH, DATAPATH, CUTOFF
+from utils import SEGMENTS, RESULTSPATH, DATAPATH, CUTOFF, CMAP
 
 
 def load_pelz2021_sanity()-> dict:
@@ -136,7 +136,7 @@ def plot_distribution_over_segments(dfs, dfnames, mode)-> None:
     :return: None
     '''
     fig, axs = plt.subplots(figsize=(len(dfs)*1.5, 6), nrows=2, ncols=4)
-    cm = plt.get_cmap("viridis")
+    cm = plt.get_cmap(CMAP)
 
     i = 0
     j = 0
@@ -190,7 +190,7 @@ def calculate_deletion_shifts(dfs, dfnames, mode)-> None:
     :return: None
     '''
     fig, axs = plt.subplots(figsize=(len(dfs) * 1.5, 6), nrows=2, ncols=4)
-    cm = plt.get_cmap("viridis")
+    cm = plt.get_cmap(CMAP)
     colors = [cm(1.*i/3) for i in range(3)]
 
     i = 0

@@ -13,7 +13,7 @@ from scipy.stats import chi2_contingency
 
 sys.path.insert(0, "..")
 from utils import load_all, get_seq_len
-from utils import SEGMENTS, RESULTSPATH, DATASET_STRAIN_DICT
+from utils import SEGMENTS, RESULTSPATH, DATASET_STRAIN_DICT, CMAP
 
 
 def plot_distribution_over_segments(dfs: list, dfnames: list)-> None:
@@ -29,7 +29,7 @@ def plot_distribution_over_segments(dfs: list, dfnames: list)-> None:
     :return: None
     '''
     fig, axs = plt.subplots(figsize=(len(dfs), 6), nrows=1, ncols=1)
-    cm = plt.get_cmap("viridis")
+    cm = plt.get_cmap(CMAP)
     colors = [cm(1.*i/len(SEGMENTS)) for i in range(len(SEGMENTS))]
 
     x = np.arange(0, len(dfs))
@@ -52,7 +52,7 @@ def plot_distribution_over_segments(dfs: list, dfnames: list)-> None:
     
     axs.set_ylabel("relative occurrence of segment")
     axs.set_xlabel("dataset")
-    plt.xticks(range(len(dfnames)), dfnames, size='small', rotation=45)
+    plt.xticks(range(len(dfnames)), dfnames, rotation=45)
 
     box = axs.get_position()
     axs.set_position([box.x0, box.y0 + box.height * 0.1, box.width, box.height * 0.9])
@@ -75,7 +75,7 @@ def calculate_deletion_shifts(dfs: list, dfnames: list)-> None:
     :return: None
     '''
     fig, axs = plt.subplots(figsize=(12, 12), nrows=4, ncols=4)
-    cm = plt.get_cmap("viridis")
+    cm = plt.get_cmap(CMAP)
     colors = [cm(1.*i/3) for i in range(3)]
 
     i = 0
@@ -223,7 +223,7 @@ def create_start_end_connection_plot(df: pd.DataFrame,
     
     '''
     max_val = get_seq_len(strain, segment)
-    cm = plt.get_cmap("viridis")
+    cm = plt.get_cmap(CMAP)
     colors = [cm(1.*i/10) for i in range(10)]
 
     fig, ax = plt.subplots(figsize=(5, 3))

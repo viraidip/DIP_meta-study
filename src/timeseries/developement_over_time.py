@@ -14,7 +14,7 @@ from sklearn.linear_model import LinearRegression
 sys.path.insert(0, "..")
 from utils import load_alnaji2019, load_pelz2021, load_alnaji2021
 from utils import get_sequence, create_nucleotide_ratio_matrix, count_direct_repeats_overall, include_correction, preprocess
-from utils import SEGMENTS, RESULTSPATH, NUCLEOTIDES
+from utils import SEGMENTS, RESULTSPATH, NUCLEOTIDES, CMAP
 
 
 def analyse_nucleotide_enrichment_over_time(dfs, x):
@@ -172,7 +172,7 @@ def plot_segment_distribution_over_time(dfs, x, xlabel, fname)-> None:
     :return: None
     '''
     fig, axs = plt.subplots(figsize=(len(dfs)/2, 6), nrows=1, ncols=1)
-    cm = plt.get_cmap("viridis")
+    cm = plt.get_cmap(CMAP)
     colors = [cm(1.*i/len(SEGMENTS)) for i in range(len(SEGMENTS))]
 
     y = dict({s: list() for s in SEGMENTS})
@@ -209,7 +209,7 @@ def length_over_time(dfs, x, fname):
     
     '''
     fig, axs = plt.subplots(figsize=(len(dfs)/2, 6), nrows=1, ncols=1)
-    cm = plt.get_cmap("viridis")
+    cm = plt.get_cmap(CMAP)
     colors = [cm(1.*i/len(SEGMENTS)) for i in range(len(SEGMENTS))]
     
     all = list()
@@ -251,7 +251,7 @@ def compare_counts(counts_all, xs_normalised_all, labels_all):
     
     '''
     fig, axs = plt.subplots(figsize=(10, 6), nrows=1, ncols=1)
-    cm = plt.get_cmap("viridis")
+    cm = plt.get_cmap(CMAP)
     colors = [cm(1.*i/len(SEGMENTS)) for i in range(len(SEGMENTS))]
     
     for c, x, l in zip(counts_all, xs_normalised_all, labels_all):

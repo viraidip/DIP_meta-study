@@ -18,6 +18,7 @@ DATAPATH = json.load(open("../../.config.json"))["DATAPATH"]
 RESULTSPATH = json.load(open("../../.config.json"))["RESULTSPATH"]
 
 # segments, nuclotides, and strains
+CMAP = "Accent"
 CUTOFF = 10
 SEGMENTS = list(["PB2", "PB1", "PA", "HA", "NP", "NA", "M", "NS"])
 NUCLEOTIDES = dict({"A": "Adenine", "C": "Cytosin", "G": "Guanine", "U": "Uracil"})
