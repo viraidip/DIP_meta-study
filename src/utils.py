@@ -207,11 +207,11 @@ def load_wang2020():
         "SRR7722033" : dict({"Cell": "A549", "Time": "24", "Replicate": "2"}),
 
         "SRR7722036" : dict({"Cell": "HBEpC", "Time": "6", "Replicate": "1"}),
-     #   "SRR7722038" : dict({"Cell": "HBEpC", "Time": "12", "Replicate": "1"}),
-      #  "SRR7722040" : dict({"Cell": "HBEpC", "Time": "24", "Replicate": "1"}),
-       # "SRR7722037" : dict({"Cell": "HBEpC", "Time": "6", "Replicate": "2"}),
-        #"SRR7722039" : dict({"Cell": "HBEpC", "Time": "12", "Replicate": "2"}),
-        #"SRR7722041" : dict({"Cell": "HBEpC", "Time": "24", "Replicate": "2"})
+        "SRR7722038" : dict({"Cell": "HBEpC", "Time": "12", "Replicate": "1"}),
+        "SRR7722040" : dict({"Cell": "HBEpC", "Time": "24", "Replicate": "1"}),
+        "SRR7722037" : dict({"Cell": "HBEpC", "Time": "6", "Replicate": "2"}),
+        "SRR7722039" : dict({"Cell": "HBEpC", "Time": "12", "Replicate": "2"}),
+        "SRR7722041" : dict({"Cell": "HBEpC", "Time": "24", "Replicate": "2"})
     })
 
     dfs = list()
@@ -760,7 +760,20 @@ def load_mapped_reads(experiment: str, strain: str):
                             "SRR15720526": dict({"Status": "depleted", "Virus": "2", "Replicate": "1"}),
                             "SRR15720527": dict({"Status": "depleted", "Virus": "2", "Replicate": "2"})
                             }),
-        "Wang2020": dict({"SRR7722046": dict({"Type": "bulk"})}),
+        "Wang2020": dict({"SRR7722028" : dict({"Cell": "A549", "Time": "6", "Replicate": "1"}),
+                          "SRR7722030" : dict({"Cell": "A549", "Time": "12", "Replicate": "1"}),
+                          "SRR7722032" : dict({"Cell": "A549", "Time": "24", "Replicate": "1"}),
+                          "SRR7722029" : dict({"Cell": "A549", "Time": "6", "Replicate": "2"}),
+                          "SRR7722031" : dict({"Cell": "A549", "Time": "12", "Replicate": "2"}),
+                          "SRR7722033" : dict({"Cell": "A549", "Time": "24", "Replicate": "2"}),
+
+                          "SRR7722036" : dict({"Cell": "HBEpC", "Time": "6", "Replicate": "1"}),
+                          "SRR7722038" : dict({"Cell": "HBEpC", "Time": "12", "Replicate": "1"}),
+                          "SRR7722040" : dict({"Cell": "HBEpC", "Time": "24", "Replicate": "1"}),
+                          "SRR7722037" : dict({"Cell": "HBEpC", "Time": "6", "Replicate": "2"}),
+                          "SRR7722039" : dict({"Cell": "HBEpC", "Time": "12", "Replicate": "2"}),
+                          "SRR7722041" : dict({"Cell": "HBEpC", "Time": "24", "Replicate": "2"})
+                          }),
         "Wang2023": dict({"SRR16770171" : dict({"IFNAR": "1", "IFNLR": "0", "Replicate": "1"}),
                           "SRR16770172" : dict({"IFNAR": "1", "IFNLR": "0", "Replicate": "1"}),
                           "SRR16770173" : dict({"IFNAR": "1", "IFNLR": "0", "Replicate": "1"}),
