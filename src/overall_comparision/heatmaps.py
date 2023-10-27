@@ -336,7 +336,6 @@ def plot_expected_vs_observed_direct_repeat_heatmaps(dfs: list, dfnames: list, e
 
     for v_idx, val_label in enumerate(axs.texts):
         val_label.set_text(f"{val_label.get_text()}\n{val_labels[v_idx]}")
-        val_label.set_size(6)
 
     x_ticks = axs.get_xticklabels()
     label = x_ticks[-2].get_text()
