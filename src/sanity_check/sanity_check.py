@@ -76,6 +76,31 @@ def load_alnaji2019_sanity()-> dict:
     return cleaned_data_dict
 
 
+def load_mendes2021_sanity(name: str)-> dict:
+    '''
+        :param de_novo: if True only de novo candidates are taken
+        :param long_dirna: if True loads data set that includes long DI RNA
+                           candidates
+        :param by_time: if True loads the dataset split up by timepoints
+
+        :return: dictionary with one key, value pair
+    '''
+    if name == "v12enriched":
+
+        filename = "Virus-1-2_enriched_junctions.tsv"
+    elif name == "v21depleted":
+        filename = "Virus-2-1_depleted_junctions.tsv"
+    
+    file_path = os.path.join(DATAPATH, "sanity_check", filename)
+    data = pd.read_csv(file_path,
+                            header=0,
+                            na_values=["", "None"],
+                            keep_default_na=False,
+                            sep="\t")
+    
+    return data
+
+
 def compare_datasets(d1, d2, thresh=1)-> float:
     '''
     
@@ -147,7 +172,7 @@ if __name__ == "__main__":
         "AF389121.1": "M",
         "AF389122.1": "NS"
     })
-
+    '''
     ### Pelz seed ###
     seed = load_dataset("Pelz2021", "SRR15084925", d)
     orig_pelz = load_pelz2021_sanity()
@@ -157,14 +182,12 @@ if __name__ == "__main__":
     print("### Pelz seed virus ###")
     loop_threshs(seed, orig_seed)
 
-    ### Pelz VB3-15 ###
-    seed = load_dataset("Pelz2021", "SRR15084925", d)
-    orig_pelz = load_pelz2021_sanity()
+    vb3_15 = load_dataset("Pelz2021", "SRR15084925", d)
     orig_data = orig_pelz["PR8"].iloc[:, :10].copy()
     orig_data = orig_data[orig_data["VB3-15"] != 0]
     orig_data = orig_data.rename(columns={"VB3-15": "NGS_read_count"})
     print("### Pelz VB3-15 ###")
-    loop_threshs(seed, orig_seed)
+    loop_threshs(vb3_15, orig_seed)
 
     ### Alnaji2021 ###
     repB_6hpi = load_dataset("Alnaji2021", "SRR14352110", d)
@@ -198,3 +221,14 @@ if __name__ == "__main__":
    #             print(f"intersection {inter}")
                 if pas_d[st] == pas:    
                     loop_threshs(l_df, orig)
+    '''
+    ### Mendes 2021 ###
+    v12enriched = load_dataset("Mendes2021", "SRR15720521", dict({s: s for s in SEGMENTS}))
+    orig_mendes = load_mendes2021_sanity("v12enriched")
+    print("### Pelz Mendes V-1-2 enriched###")
+    loop_threshs(v12enriched, orig_mendes)
+
+    v21depleted = load_dataset("Mendes2021", "SRR15720526", dict({s: s for s in SEGMENTS}))
+    orig_mendes = load_mendes2021_sanity("v21depleted")
+    print("### Pelz Mendes V-2-1 enriched###")
+    loop_threshs(v21depleted, orig_mendes)
