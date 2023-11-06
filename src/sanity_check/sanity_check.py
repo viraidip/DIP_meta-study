@@ -100,142 +100,56 @@ def loop_threshs(d1, d2)-> None:
     '''
     
     '''
-    threshs = np.arange(21)
+    threshs = np.arange(50)
     fracs = list()
     ns_new = list()
     ns_orig = list()
+    above_thresh = False
     for t in threshs:
-        frac, n_new, n_orig = compare_datasets(d1, d2, t)
+        n_inter, n_new, n_orig = compare_datasets(d1, d2, t)
+        frac = 2 * n_inter / (n_new + n_orig)
         fracs.append(frac)
         ns_new.append(n_new)
         ns_orig.append(n_orig)
 
+        if frac > 0.85 and not above_thresh:
+            x = t
+            above_thresh = True
+
     plt.plot(threshs, fracs)
+    plt.axvline(x=x, color='r', linestyle='--')
+    plt.text(x, 0.5, f'x={x}', ha='center')
     plt.ylim(0, 1.1)
+    plt.ylabel("ratio of common DVGs")
+    plt.xlabel("cutoff value")
     plt.show()
     plt.close()
 
     plt.plot(threshs, ns_new, label="selfm")
     plt.plot(threshs, ns_orig, label="orig")
+    plt.axvline(x=x, color='r', linestyle='--')
+    plt.text(x, n_orig, f'x={x}', ha='center')
     plt.legend()
+    plt.ylabel("number of unique DVGs")
+    plt.xlabel("cutoff value")
     plt.show()
-    plt.close()
-
-
-
-def plot_distribution_over_segments(dfs, dfnames, mode)-> None:
-    '''
-
-    Args:
-        dfs (list of pandas.DataFrame): The list of DataFrames containing the data. 
-                                        Each dataframe should be preprocessed with sequence_df(df)
-        dfnames (list of str): The names associated with each DataFrame in `dfs`.
-        col (str, optional): The column name in the DataFrames that contains the sequence segments of interest. 
-                             Default is "seq_around_deletion_junction".
-
-    :return: None
-    '''
-    fig, axs = plt.subplots(figsize=(len(dfs)*1.5, 6), nrows=2, ncols=4)
-    cm = plt.get_cmap(CMAP)
-
-    i = 0
-    j = 0
-    li = list()
-    for df, dfname in zip(dfs, dfnames):
-        fractions = df["Segment"].value_counts() / len(df) * 100
-        for s in SEGMENTS:
-            if s not in fractions:
-                fractions[s] = 0.0
-        sorted_fractions = fractions.loc[SEGMENTS]
-        li.append(sorted_fractions.values)
-
-        colors = list()
-        for k, s in enumerate(SEGMENTS):
-            if sorted_fractions[s] != 0.0:
-                colors.append(cm(1.*k/8))
-            else:
-                sorted_fractions.drop(s, inplace=True)
-
-        axs[i,j].set_prop_cycle("color", colors)
-        axs[i,j].set_title(dfname)
-        
-        patches, _ = axs[i,j].pie(sorted_fractions)
-        labels = ['{0} {1:1.1f} %'.format(i,j) for i,j in zip(sorted_fractions.index, sorted_fractions)]
-        axs[i,j].legend(patches, labels, loc="center", bbox_to_anchor=(-0.2, 0.5), fontsize=10)
-
-        j += 1
-        if j == 4:
-            i = 1
-            j = 0
-
-    table = np.array(li)
-    statistic, pvalue, dof, expected_freq = chi2_contingency(table)
-    print(statistic)
-    print(pvalue)
-
-    plt.tight_layout()
-    save_path = os.path.join(RESULTSPATH, "figure1", f"fraction_segments_{mode}.png")
-    plt.savefig(save_path)
-    plt.close()
-
-def calculate_deletion_shifts(dfs, dfnames, mode)-> None:
-    '''
-
-    Args:
-        dfs (list of pandas.DataFrame): The list of DataFrames containing the data. 
-                                        Each dataframe should be preprocessed with sequence_df(df)
-        dfnames (list of str): The names associated with each DataFrame in `dfs`.
-        col (str, optional): The column name in the DataFrames that contains the sequence segments of interest. 
-                             Default is "seq_around_deletion_junction".
-    :return: None
-    '''
-    fig, axs = plt.subplots(figsize=(len(dfs) * 1.5, 6), nrows=2, ncols=4)
-    cm = plt.get_cmap(CMAP)
-    colors = [cm(1.*i/3) for i in range(3)]
-
-    i = 0
-    j = 0
-    overall = np.array([0, 0, 0])
-    n = 0
-    li = list()
-
-    for df, dfname in zip(dfs, dfnames):
-        df["length"] = df["deleted_sequence"].apply(len)
-        df["shift"] = df["length"] % 3
-        shifts = df["shift"].value_counts()
-        sorted_shifts = shifts.loc[[0, 1, 2]]
-        overall += sorted_shifts
-        n += len(df)
-        li.append(shifts)
-        shifts = shifts / len(df)
-
-        axs[i,j].set_title(dfname)
-        labels = list(["in-frame", "shift +1", "shift -1"])
-        axs[i,j].pie(sorted_shifts, labels=labels, autopct="%1.1f%%", colors=colors, textprops={"size": 14})
-
-        j += 1
-        if j == 4:
-            i = 1
-            j = 0
-
-
-    table = np.array(li)
-    statistic, pvalue, dof, expected_freq = chi2_contingency(table)
-    print(statistic)
-    print(pvalue)
-
-    print(f"mean distribution:\n\t{overall/n}")
-
-    plt.tight_layout()
-    save_path = os.path.join(RESULTSPATH, "figure1", f"deletion_shifts_{mode}.png")
-    plt.savefig(save_path)
     plt.close()
  
 
 if __name__ == "__main__":
-    '''
-    ### Pelz ###
-    seed = load_dataset("Pelz2021", "SRR15084925")
+    d = dict({
+        "AF389115.1": "PB2",
+        "AF389116.1": "PB1",
+        "AF389117.1": "PA",
+        "AF389118.1": "HA",
+        "AF389119.1": "NP",
+        "AF389120.1": "NA",
+        "AF389121.1": "M",
+        "AF389122.1": "NS"
+    })
+
+    ### Pelz seed ###
+    seed = load_dataset("Pelz2021", "SRR15084925", d)
     orig_pelz = load_pelz2021_sanity()
     orig_seed = orig_pelz["PR8"].iloc[:, :4].copy()
     orig_seed = orig_seed[orig_seed["VB3-Saat"] != 0]
@@ -243,19 +157,29 @@ if __name__ == "__main__":
     print("### Pelz seed virus ###")
     loop_threshs(seed, orig_seed)
 
+    ### Pelz VB3-15 ###
+    seed = load_dataset("Pelz2021", "SRR15084925", d)
+    orig_pelz = load_pelz2021_sanity()
+    orig_data = orig_pelz["PR8"].iloc[:, :10].copy()
+    orig_data = orig_data[orig_data["VB3-15"] != 0]
+    orig_data = orig_data.rename(columns={"VB3-15": "NGS_read_count"})
+    print("### Pelz VB3-15 ###")
+    loop_threshs(seed, orig_seed)
+
     ### Alnaji2021 ###
-    repB_6hpi = load_dataset("Alnaji2021", "SRR14352110")
+    repB_6hpi = load_dataset("Alnaji2021", "SRR14352110", d)
     orig_alnaji2021 = load_alnaji2021_sanity()["PR8"]
     org_B_6 = orig_alnaji2021[(orig_alnaji2021["Replicate"] == "Rep2") & (orig_alnaji2021["Timepoint"] == "6hpi")]
     print("### Rep B 6 hpi ###")
     loop_threshs(repB_6hpi, org_B_6)
 
-    repC_3hpi = load_dataset("Alnaji2021", "SRR14352112")
+    repC_3hpi = load_dataset("Alnaji2021", "SRR14352112", d)
     org_C_3 = orig_alnaji2021[(orig_alnaji2021["Replicate"] == "Rep3") & (orig_alnaji2021["Timepoint"] == "3hpi")]
     print("### Rep C 3 hpi ###")
     loop_threshs(repC_3hpi, org_C_3)
-    '''
+    
     ### Alnaji2019 ###
+    pas_d = dict({"Cal07": "6", "NC": "1", "Perth": "4", "BLEE": "7"})
     orig_alnaji2019 = load_alnaji2019_sanity()
     for st in ["Cal07", "NC", "Perth", "BLEE"]:
         df = load_alnaji2019(st)
@@ -267,10 +191,10 @@ if __name__ == "__main__":
             for l in df["Lineage"].unique():
                 l_df = pas_df[pas_df["Lineage"] == l]
                 orig = orig_alnaji2019[f"{st}_l{l}"]
-                inter, n1, n2 = compare_datasets(l_df, orig)
-
-                print(f"lineage {l}")
-                print(f"orig {n2}")
-                print(f"self {n1}")
-                print(f"intersection {inter}")
-                
+#                inter, n1, n2 = compare_datasets(l_df, orig)
+#                print(f"lineage {l}")
+ #               print(f"orig {n2}")
+  #              print(f"self {n1}")
+   #             print(f"intersection {inter}")
+                if pas_d[st] == pas:    
+                    loop_threshs(l_df, orig)
