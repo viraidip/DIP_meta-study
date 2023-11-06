@@ -523,7 +523,7 @@ def plot_direct_repeat_ratio_heatmaps(dfs: list, dfnames: list)-> None:
     axs.set_xticklabels(x_ticks)
     fig.tight_layout()
 
-    save_path = os.path.join(RESULTSPATH, "compare_expected", "dir_rep.png")
+    save_path = os.path.join(RESULTSPATH, "general_analysis", "dir_rep.png")
     plt.savefig(save_path)
     plt.close()
 
