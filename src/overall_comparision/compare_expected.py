@@ -13,7 +13,7 @@ from matplotlib.ticker import FixedLocator, FixedFormatter
 sys.path.insert(0, "..")
 from utils import load_all
 from utils import get_sequence, count_direct_repeats_overall, include_correction, get_p_value_symbol, create_nucleotide_ratio_matrix, plot_heatmap
-from utils import SEGMENTS, RESULTSPATH, NUCLEOTIDES
+from utils import SEGMENTS, RESULTSPATH, NUCLEOTIDES, CMAP
 
 
 def plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs, dfnames, expected_dfs):
@@ -221,6 +221,7 @@ def direct_repeat_composition(dfs: list, dfnames: list, expected_dfs: list):
     '''
     
     '''
+    plt.set_cmap(CMAP) 
     # calculate direct repeats
     for dfname, df, expected_df in zip(dfnames, dfs, expected_dfs):
         final_d = dict()
@@ -248,7 +249,7 @@ def direct_repeat_composition(dfs: list, dfnames: list, expected_dfs: list):
             expected_final_d[s] = exp_dr_sequences
 
         # make a bar plot with direct repeats lengths 1, 2, ,3 ,4, >4
-        fig, axs = plt.subplots(figsize=(10, 5))
+        fig, axs = plt.subplots(figsize=(5, 5))
 
         nuc_counts_d = dict({"A": dict({1: 0, 2: 0, 3: 0, 4: 0, 5: 0}),
                             "C": dict({1: 0, 2: 0, 3: 0, 4: 0, 5: 0}),
@@ -289,7 +290,7 @@ def direct_repeat_composition(dfs: list, dfnames: list, expected_dfs: list):
         plt.close()
 
         # make a bar plot to compare orig. data, expected data, composition of full sequence (so I have two references)
-        fig, axs = plt.subplots(figsize=(10, 5))
+        fig, axs = plt.subplots(figsize=(5, 5))
 
         comp_nuc_counts_d = dict({"A": dict({"orig": 0, "exp": 0, "full": 0}),
                                   "C": dict({"orig": 0, "exp": 0, "full": 0}),
