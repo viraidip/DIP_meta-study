@@ -9,8 +9,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 sys.path.insert(0, "..")
-from utils import load_dataset, load_alnaji2019
-from utils import SEGMENTS, RESULTSPATH, DATAPATH, CUTOFF, CMAP
+from utils import load_dataset, load_alnaji2019, join_data
+from utils import SEGMENTS, RESULTSPATH, DATAPATH, CUTOFF, CMAP, SEGMENT_DICTS
 
 
 def load_pelz2021_sanity()-> dict:
@@ -101,6 +101,30 @@ def load_mendes2021_sanity(name: str)-> dict:
     return data
 
 
+def load_lui2019_sanity(name: str)-> dict:
+    '''
+        :param de_novo: if True only de novo candidates are taken
+        :param long_dirna: if True loads data set that includes long DI RNA
+                           candidates
+        :param by_time: if True loads the dataset split up by timepoints
+
+        :return: dictionary with one key, value pair
+    '''
+    if name == "SMRT":
+        filename = "Virus-1-2_enriched_junctions.tsv"
+    elif name == "illumina":
+        filename = "Lui2019_Illumina.csv"
+    
+    file_path = os.path.join(DATAPATH, "sanity_check", filename)
+    data = pd.read_csv(file_path,
+                            header=0,
+                            na_values=["", "None"],
+                            keep_default_na=False
+                            )
+    
+    return join_data(data)
+
+
 def compare_datasets(d1, d2, thresh=1)-> float:
     '''
     
@@ -142,8 +166,9 @@ def loop_threshs(d1, d2)-> None:
             above_thresh = True
 
     plt.plot(threshs, fracs)
-    plt.axvline(x=x, color='r', linestyle='--')
-    plt.text(x, 0.5, f'x={x}', ha='center')
+    if above_thresh:
+        plt.axvline(x=x, color='r', linestyle='--')
+        plt.text(x, 0.5, f'x={x}', ha='center')
     plt.ylim(0, 1.1)
     plt.ylabel("ratio of common DVGs")
     plt.xlabel("cutoff value")
@@ -152,8 +177,9 @@ def loop_threshs(d1, d2)-> None:
 
     plt.plot(threshs, ns_new, label="selfm")
     plt.plot(threshs, ns_orig, label="orig")
-    plt.axvline(x=x, color='r', linestyle='--')
-    plt.text(x, n_orig, f'x={x}', ha='center')
+    if above_thresh:
+        plt.axvline(x=x, color='r', linestyle='--')
+        plt.text(x, n_orig, f'x={x}', ha='center')
     plt.legend()
     plt.ylabel("number of unique DVGs")
     plt.xlabel("cutoff value")
@@ -221,14 +247,20 @@ if __name__ == "__main__":
    #             print(f"intersection {inter}")
                 if pas_d[st] == pas:    
                     loop_threshs(l_df, orig)
-    '''
+
     ### Mendes 2021 ###
     v12enriched = load_dataset("Mendes2021", "SRR15720521", dict({s: s for s in SEGMENTS}))
     orig_mendes = load_mendes2021_sanity("v12enriched")
-    print("### Pelz Mendes V-1-2 enriched###")
+    print("### Mendes V-1-2 enriched###")
     loop_threshs(v12enriched, orig_mendes)
 
     v21depleted = load_dataset("Mendes2021", "SRR15720526", dict({s: s for s in SEGMENTS}))
     orig_mendes = load_mendes2021_sanity("v21depleted")
-    print("### Pelz Mendes V-2-1 enriched###")
+    print("### Mendes V-2-1 enriched###")
     loop_threshs(v21depleted, orig_mendes)
+    '''
+    ### Lui 2019 ###
+    illumina = load_dataset("Lui2019", "SRR8949705", SEGMENT_DICTS["Anhui"])
+    orig_lui = load_lui2019_sanity("illumina")
+    print("### Lui 2019 Illumina ###")
+    loop_threshs(illumina, orig_lui)
