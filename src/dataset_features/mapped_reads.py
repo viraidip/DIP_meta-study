@@ -25,7 +25,7 @@ def mapped_reads_distribution(dfs: list, dfnames: list)-> None:
     x = 0
     bar_width = 0.7
     cm = plt.get_cmap(CMAP)
-    colors = [cm(1.*i/10) for i in range(10)]
+    colors = [cm(1.*i/8) for i in range(8)]
 
     for df in dfs:
         sum_counts = df.groupby("segment")["counts"].sum().reset_index()
@@ -43,7 +43,7 @@ def mapped_reads_distribution(dfs: list, dfnames: list)-> None:
     axs.set_xticklabels(dfnames, rotation=45)
     axs.set_xlabel('Segment')
     axs.set_ylabel('Fraction')
-    axs.set_title('Fraction of Different Segments')
+    axs.set_title('Fraction of reads from different segments')
 
     handles, labels = axs.get_legend_handles_labels()
     unique_handles_labels = {}
@@ -51,7 +51,9 @@ def mapped_reads_distribution(dfs: list, dfnames: list)-> None:
         if label not in unique_handles_labels:
             unique_handles_labels[label] = handle
 
-    axs.legend(unique_handles_labels.values(), unique_handles_labels.keys())
+    box = axs.get_position()
+    axs.set_position([box.x0, box.y0 + box.height * 0.1, box.width, box.height * 0.9])
+    axs.legend(unique_handles_labels.values(), unique_handles_labels.keys(), loc="upper center", bbox_to_anchor=(0.5, 1.1), fancybox=True, shadow=True, ncol=8)
 
     plt.show()
 
