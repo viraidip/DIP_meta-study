@@ -16,7 +16,7 @@ from utils import get_sequence, count_direct_repeats_overall, include_correction
 from utils import SEGMENTS, RESULTSPATH, NUCLEOTIDES, CMAP
 
 
-def plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs, dfnames, expected_dfs):
+def plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs, dfnames, expected_dfs, name: str=""):
     '''
         Plot difference of expected vs observed nucleotide enrichment around deletion junctions as heatmap.
 
@@ -116,12 +116,17 @@ def plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs, dfnames, expec
 
     fig.subplots_adjust(top=0.9)
 
-    save_path = os.path.join(RESULTSPATH, "compare_expected", "nuc_occ_diff.png")
+    if name != "":
+        filename = f"nuc_occ_diff_{name}.png"
+    else:
+        filename = f"nuc_occ_diff.png"
+
+    save_path = os.path.join(RESULTSPATH, "compare_expected", filename)
     plt.savefig(save_path)
     plt.close()
 
 
-def plot_expected_vs_observed_direct_repeat_heatmaps(dfs: list, dfnames: list, expected_dfs: list)-> None:
+def plot_expected_vs_observed_direct_repeat_heatmaps(dfs: list, dfnames: list, expected_dfs: list, compared: str, name: str="")-> None:
     '''
         Plot difference of expected vs observed nucleotide enrichment around deletion junctions as heatmap.
 
@@ -157,8 +162,9 @@ def plot_expected_vs_observed_direct_repeat_heatmaps(dfs: list, dfnames: list, e
 
             seq = get_sequence(df_s["Strain"].unique()[0], s)
             
-            counts, _ = count_direct_repeats_overall(df_s, seq)          
-            counts = include_correction(counts)
+            counts, _ = count_direct_repeats_overall(df_s, seq)
+            if name == "":
+                counts = include_correction(counts)
             
             for k, v in counts.items():
                 if k in final_d:
@@ -199,7 +205,7 @@ def plot_expected_vs_observed_direct_repeat_heatmaps(dfs: list, dfnames: list, e
 
     m = abs(min(vals)) if abs(min(vals)) > max(vals) else max(vals)
     axs = plot_heatmap(x,y,vals, axs, vmin=-m, vmax=m, cbar=True, format=".5f")
-    axs.set_title("direct repeat ratio difference (observed-expected)")
+    axs.set_title(f"direct repeat ratio difference ({compared})")
     axs.set_ylabel("")
     axs.set_xlabel("direct repeat length")
 
@@ -212,12 +218,17 @@ def plot_expected_vs_observed_direct_repeat_heatmaps(dfs: list, dfnames: list, e
     axs.set_xticklabels(x_ticks)
     fig.tight_layout()
 
-    save_path = os.path.join(RESULTSPATH, "compare_expected", "dir_rep_diff.png")
+    if name != "":
+        filename = f"dir_rep_diff_{name}.png"
+    else:
+        filename = f"dir_rep_diff.png"
+
+    save_path = os.path.join(RESULTSPATH, "compare_expected", filename)
     plt.savefig(save_path)
     plt.close()
 
 
-def direct_repeat_composition(dfs: list, dfnames: list, expected_dfs: list):
+def direct_repeat_composition(dfs: list, dfnames: list, expected_dfs: list, name: str=""):
     '''
     
     '''
@@ -285,7 +296,12 @@ def direct_repeat_composition(dfs: list, dfnames: list, expected_dfs: list):
         plt.gca().xaxis.set_major_formatter(FixedFormatter(labels))
         fig.tight_layout()
 
-        save_path = os.path.join(RESULTSPATH, "compare_expected", f"nucleotides_direct_repeats_{dfname}.png")
+        if name != "":
+            filename = f"nucleotides_direct_repeats_{name}_{dfname}.png"
+        else:
+            filename = f"nucleotides_direct_repeats_{dfname}.png"
+
+        save_path = os.path.join(RESULTSPATH, "compare_expected", filename)
         plt.savefig(save_path)
         plt.close()
 
@@ -332,7 +348,12 @@ def direct_repeat_composition(dfs: list, dfnames: list, expected_dfs: list):
         axs.set_xlabel("data")
         fig.tight_layout()
 
-        save_path = os.path.join(RESULTSPATH, "compare_expected", f"nucleotides_direct_repeats_compared_{dfname}.png")
+        if name != "":
+            filename = f"nucleotides_direct_repeats_compared_{name}_{dfname}.png"
+        else:
+            filename = f"nucleotides_direct_repeats_compared_{dfname}.png"
+
+        save_path = os.path.join(RESULTSPATH, "compare_expected", filename)
         plt.savefig(save_path)
         plt.close()
 
@@ -341,6 +362,6 @@ if __name__ == "__main__":
     plt.style.use("seaborn")
     dfs, dfnames, expected_dfs = load_all(expected=True)
 
-    plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs, dfnames, expected_dfs)
-    plot_expected_vs_observed_direct_repeat_heatmaps(dfs, dfnames, expected_dfs)
+ #   plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs, dfnames, expected_dfs)
+  #  plot_expected_vs_observed_direct_repeat_heatmaps(dfs, dfnames, expected_dfs "observed-expected")
     direct_repeat_composition(dfs, dfnames, expected_dfs)

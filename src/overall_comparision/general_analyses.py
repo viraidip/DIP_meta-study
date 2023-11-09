@@ -17,7 +17,7 @@ from utils import load_all, get_seq_len, get_sequence, plot_heatmap, create_nucl
 from utils import SEGMENTS, RESULTSPATH, DATASET_STRAIN_DICT, CMAP, NUCLEOTIDES
 
 
-def plot_distribution_over_segments(dfs: list, dfnames: list)-> None:
+def plot_distribution_over_segments(dfs: list, dfnames: list, name: str="")-> None:
     '''
 
     Args:
@@ -59,7 +59,12 @@ def plot_distribution_over_segments(dfs: list, dfnames: list)-> None:
     axs.set_position([box.x0, box.y0 + box.height * 0.1, box.width, box.height * 0.9])
     axs.legend(loc="upper center", bbox_to_anchor=(0.5, 1.1), fancybox=True, shadow=True, ncol=8)
     
-    save_path = os.path.join(RESULTSPATH, "general_analysis", "fraction_segments.png")
+    if name != "":
+        filename = f"fraction_segments_{name}.png"
+    else:
+        filename = "fraction_segments.png"
+
+    save_path = os.path.join(RESULTSPATH, "general_analysis", filename)
     plt.savefig(save_path)
     plt.close()
 
@@ -323,7 +328,7 @@ def start_vs_end_lengths(dfs, dfnames, limit: int=0)-> None:
         plt.close()
 
 
-def diff_start_end_lengths(dfs, dfnames)-> None:
+def diff_start_end_lengths(dfs, dfnames, name: str="")-> None:
     '''
 
     '''
@@ -348,7 +353,12 @@ def diff_start_end_lengths(dfs, dfnames)-> None:
     axs.set_ylabel("Start-End sequence lengths")
     axs.set_title(f"Difference of start to end sequence lengths (threshold={thresh})")
 
-    save_path = os.path.join(RESULTSPATH, "general_analysis", f"diff_start_end_violinplot.png")
+    if name != "":
+        filename = f"diff_start_end_violinplot_{name}.png"
+    else:
+        filename = "diff_start_end_violinplot.png"
+
+    save_path = os.path.join(RESULTSPATH, "general_analysis", filename)
     plt.savefig(save_path)
     plt.close()
 
