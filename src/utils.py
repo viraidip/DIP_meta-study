@@ -45,6 +45,9 @@ DATASET_STRAIN_DICT = dict({
     "Wang2020 HBEpC": "PR8",
     "Penn2022": "Turkey",
     "Kupke2020": "PR8",
+    "Sheng2018": "Brisbane",
+    "Vasilijevic2017 swine": "swine",
+    "Vasilijevic2017 Cal09": "Cal09"
 })
 
 ACCNUMDICT = dict({
@@ -287,6 +290,39 @@ ACCNUMDICT = dict({
         "SRR10489568": dict({"Type": "singlecell"}),
         "SRR10530642": dict({"Type": "pre"}),
         "SRR10530643": dict({"Type": "post"})
+    }),
+    "Sheng2018": dict({
+        "SRR3211978": dict({}),
+        "SRR3211980": dict({}),
+        "SRR3211976": dict({}),
+        "SRR3211977": dict({}),
+        "SRR3211974": dict({}),
+        "SRR3211975": dict({}),
+        "SRR3211972": dict({})
+    }),
+    "Vasilijevic2017_swine": dict({
+        "SRR3743505": dict({"Outcome": "Death", "Gender": "F"}),
+        "SRR3743506": dict({"Outcome": "Death", "Gender": "F"}),
+        "SRR3743507": dict({"Outcome": "Recovery", "Gender": "F"}),
+        "SRR3743508": dict({"Outcome": "Recovery", "Gender": "F"}),
+        "SRR3743509": dict({"Outcome": "Recovery", "Gender": "F"}),
+        "SRR3743510": dict({"Outcome": "Recovery", "Gender": "M"}),
+        "SRR3743512": dict({"Outcome": "Recovery", "Gender": "M"}),
+        "SRR3743517": dict({"Outcome": "Mulitorgan Failure", "Gender": "M"}),
+        "SRR3743524": dict({"Outcome": "Mulitorgan Failure", "Gender": "F"}),
+        "SRR3743525": dict({"Outcome": "Mulitorgan Failure", "Gender": "F"}),
+        "SRR3743526": dict({"Outcome": "Mulitorgan Failure", "Gender": "M"}),
+        "SRR3743527": dict({"Outcome": "Death", "Gender": "F"}),
+        "SRR3743529": dict({"Outcome": "Recovery", "Gender": "M"}),
+        "SRR3743530": dict({"Outcome": "Recovery", "Gender": "F"}),
+    }),
+    "Vasilijevic2017_Cal09": dict({
+        "SRR3743518": dict({}),
+        "SRR3743519": dict({}),
+        "SRR3743520": dict({}),
+        "SRR3743521": dict({}),
+        "SRR3743522": dict({}),
+        "SRR3743523": dict({}),
     })
 })
 
@@ -382,7 +418,40 @@ SEGMENT_DICTS = dict({
         "EF619973.1": "NA",
         "EF619978.1": "M",
         "EF619974.1": "NS"
+    }),
+    "Brisbane": dict({
+        "CY115158.1": "PB2",
+        "CY115157.1": "PB1",
+        "CY115156.1": "PA",
+        "CY115151.1": "HA",
+        "CY115154.1": "NP",
+        "CY115153.1": "NA",
+        "CY115152.1": "M",
+        "CY115155.1": "NS"
+    }),
+    "swine": dict({
+        "KR701038.1": "PB2",
+        "KR701039.1": "PB1",
+        "KR701040.1": "PA",
+        "KR701041.1": "HA",
+        "KR701042.1": "NP",
+        "KR701043.1": "NA",
+        "KR701044.1": "M",
+        "KR701045.1": "NS"
+    }),
+    "Cal09": dict({
+        "JF915190.1": "PB2",
+        "JF915189.1": "PB1",
+        "JF915188.1": "PA",
+        "JF915184.1": "HA",
+        "JF915187.1": "NP",
+        "JF915186.1": "NA",
+        "JF915185.1": "M",
+        "JF915191.1": "NS"
     })
+
+
+
 })
 
 # global colors for plotting
