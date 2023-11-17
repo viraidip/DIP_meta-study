@@ -220,62 +220,6 @@ def length_distribution_violinplot(dfs: list, dfnames: list)-> None:
         plt.close()
 
 
-def create_start_end_connection_plot(df: pd.DataFrame,
-                                     dfname: str,
-                                     strain: str,
-                                     segment: str):
-    '''
-    
-    '''
-    max_val = get_seq_len(strain, segment)
-    cm = plt.get_cmap(CMAP)
-    colors = [cm(1.*i/10) for i in range(10)]
-
-    fig, ax = plt.subplots(figsize=(5, 3))
-    for i, row in df.iterrows():
-        center = row["Start"] + (row["End"] - row["Start"]) / 2
-        radius = (row["End"] - row["Start"]) / 2
-        start_angle = 0
-        end_angle = 180
-        color = colors[0]
-        y = 80
-        if radius < 200:
-            start_angle = 180
-            end_angle = 0
-            color = colors[3]
-            y = 0
-        half_cirlce = patches.Arc((center, y), radius*2, radius*2, angle=0, theta1=start_angle, theta2=end_angle, color=color, alpha=0.5)
-        ax.add_patch(half_cirlce)
-
-    # add boxes for start and end of DI RNA sequence
-    ax.add_patch(plt.Rectangle((0, 0), max_val, 80, alpha=0.7, color="black"))
-    ax.annotate("RNA sequence", (max_val / 2, 10), color="white", ha="center", fontsize=10)
-
-    # change some values to improve figure
-    ax.set_xlim(0, max_val)
-    ax.set_ylim(-200, max_val / 2)
-    ax.set_xticks(np.arange(0, max_val, 200))
-    ax.set_yticks([])
-    ax.set_xlabel("Nucleotide position")
-
-    # save figure
-    plt.tight_layout()
-    save_path = os.path.join(RESULTSPATH, "start_end", dfname, f"{segment}.png")
-    plt.savefig(save_path)
-    plt.close()
-
-
-def start_end_positions(dfs: list, dfnames: list)-> None:
-    '''
-    
-    '''
-    for df, dfname in zip(dfs, dfnames):
-        strain = DATASET_STRAIN_DICT[dfname]
-        for s in SEGMENTS:
-            copy_df = df[(df["Segment"] == s)].copy()
-            create_start_end_connection_plot(copy_df, dfname, strain, s)
-
-
 def start_vs_end_lengths(dfs, dfnames, limit: int=0)-> None:
     '''
         Plots the length of the start against the length of the end of the DI
@@ -547,7 +491,6 @@ if __name__ == "__main__":
     calculate_deletion_shifts(dfs, dfnames)
     length_distribution_heatmap(dfs, dfnames)
     length_distribution_violinplot(dfs, dfnames)
-    start_end_positions(dfs, dfnames)
     plot_nucleotide_ratio_around_deletion_junction_heatmaps(dfs, dfnames)
     plot_direct_repeat_ratio_heatmaps(dfs, dfnames)
     start_vs_end_lengths(dfs, dfnames, limit=600)
