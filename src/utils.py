@@ -636,6 +636,20 @@ def join_data(df: pd.DataFrame)-> pd.DataFrame:
     '''
     return df.groupby(["Segment", "Start", "End"]).sum(["NGS_read_count"]).reset_index()
 
+def load_sheng2018():
+    '''
+    
+    '''
+    acc_nums = ACCNUMDICT["Sheng2018"]
+
+    dfs = list()
+    for acc_num, meta in acc_nums.items():
+        df = load_dataset("Sheng2018", acc_num, SEGMENT_DICTS["Brisbane"])
+        dfs.append(df)
+    concat_df = pd.concat(dfs)
+
+    return concat_df
+
 def load_all(expected: str=False):
     '''
     
@@ -682,7 +696,7 @@ def load_all(expected: str=False):
     ### Kupke2020 ###
     strain = "PR8"
     df = join_data(load_kupke2020())
-    dfs.append(preprocess(strain, df, 1))
+    dfs.append(preprocess(strain, df, 5))
     dfnames.append("Kupke2020")
     if expected:
         expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
@@ -718,6 +732,14 @@ def load_all(expected: str=False):
     df = join_data(load_mendes2021())
     dfs.append(preprocess(strain, df, CUTOFF))
     dfnames.append(f"Mendes2021")
+    if expected:
+        expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
+
+    ### Sheng2018 ###
+    strain = "Brisbane"
+    df = join_data(load_sheng2018())
+    dfs.append(preprocess(strain, df, CUTOFF))
+    dfnames.append(f"Sheng2018")
     if expected:
         expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
 

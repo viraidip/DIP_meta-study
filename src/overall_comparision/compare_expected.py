@@ -362,6 +362,6 @@ if __name__ == "__main__":
     plt.style.use("seaborn")
     dfs, dfnames, expected_dfs = load_all(expected=True)
 
- #   plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs, dfnames, expected_dfs)
-  #  plot_expected_vs_observed_direct_repeat_heatmaps(dfs, dfnames, expected_dfs "observed-expected")
+    plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs, dfnames, expected_dfs)
+    plot_expected_vs_observed_direct_repeat_heatmaps(dfs, dfnames, expected_dfs, "observed-expected")
     direct_repeat_composition(dfs, dfnames, expected_dfs)
