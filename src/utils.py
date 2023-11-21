@@ -159,7 +159,8 @@ ACCNUMDICT = dict({
         "SRR8754516": dict({"Lineage": "2", "Passage": "8"})
     }),
     "Lui2019": dict({
-        "SRR8949705": dict({"Plattform": "Illumina"})
+        "SRR8949705": dict({}),
+        "SRR8945328": dict({}),
     }),
     "Penn2022": dict({
         "ERR10231074": dict({"Time": "24hpi", "Mode": "High", "Lineage": "1"}),
@@ -572,9 +573,13 @@ def load_lui2019():
     '''
     acc_nums = ACCNUMDICT["Lui2019"]
 
+    dfs = list()
     for acc_num, meta in acc_nums.items():
         df = load_dataset("Lui2019", acc_num, SEGMENT_DICTS["Anhui"])
-    return df
+        dfs.append(df)
+    
+    concat_df = pd.concat(dfs)
+    return concat_df
 
 def load_penn2022():
     '''
@@ -721,7 +726,7 @@ def load_all(expected: str=False):
 
     ### Lui2019 ###
     strain = "Anhui"
-    df = load_lui2019()
+    df = join_data(load_lui2019())
     dfs.append(preprocess(strain, df, CUTOFF))
     dfnames.append("Lui2019")
     if expected:
