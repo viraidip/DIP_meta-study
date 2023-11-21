@@ -25,9 +25,11 @@ def generate_overlap_matrix_plot(dfs: list, dfnames: list):
     matrix = [[0] * matrix_size for _ in range(matrix_size)]
 
     # calculate the differences and populate the matrix
+    labels = list ()
     for i in range(matrix_size):
+        set1 = set(dfs[i]["key"])
+        labels.append(f"{dfnames[i]} (n={len(set1)})")
         for j in range(matrix_size):
-            set1 = set(dfs[i]["key"])
             set2 = set(dfs[j]["key"])
 
             matrix[i][j] = len(set1 & set2) / (max(len(set1), len(set2)))
@@ -44,7 +46,7 @@ def generate_overlap_matrix_plot(dfs: list, dfnames: list):
 
     plt.imshow(matrix, cmap="viridis", interpolation="nearest")
     plt.colorbar()
-    plt.xticks(np.arange(len(dfnames)), dfnames, rotation=45)
+    plt.xticks(np.arange(len(dfnames)), labels, rotation=30)
     plt.yticks(np.arange(len(dfnames)), dfnames)
     plt.tight_layout()
     plt.grid(False)
