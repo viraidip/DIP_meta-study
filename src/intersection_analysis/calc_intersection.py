@@ -120,11 +120,6 @@ if __name__ == "__main__":
     ### Wang2020 ###
     strain = "PR8"
     df = load_wang2020()
-#    for cell in ["A549", "HBEpC"]:
- #       c_df = df[df["Cell"] == cell].copy() # splitting by cell type
-  #      c_df = join_data(c_df)
-   #     dfs.append(preprocess(strain, c_df, CUTOFF))
-    #    dfnames.append(f"Wang2020 {cell}")
     dfs.append(preprocess(strain, join_data(df), CUTOFF))
     dfnames.append(f"Wang2020")
         
