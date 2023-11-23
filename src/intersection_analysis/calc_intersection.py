@@ -9,11 +9,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 from collections import Counter
+from scipy.stats import percentileofscore
 
 sys.path.insert(0, "..")
-from utils import join_data, load_alnaji2021, load_pelz2021, load_wang2023, load_wang2020, load_kupke2020
+from utils import join_data, load_alnaji2021, load_pelz2021, load_wang2023, load_wang2020, load_kupke2020, load_dataset
 from utils import preprocess, calculate_direct_repeat, get_sequence
-from utils import CUTOFF, RESULTSPATH
+from utils import CUTOFF, RESULTSPATH, SEGMENT_DICTS, ACCNUMDICT
 
 
 def generate_overlap_matrix_plot(dfs: list, dfnames: list):
@@ -56,7 +57,7 @@ def generate_overlap_matrix_plot(dfs: list, dfnames: list):
     plt.close()
 
 
-def generate_maximum_overlap_candidates(dfs: list, dfnames: list):
+def generate_max_overlap_candidates(dfs: list, dfnames: list):
     '''
     
     '''
@@ -65,13 +66,14 @@ def generate_maximum_overlap_candidates(dfs: list, dfnames: list):
         all_candidates.extend(df["key"].tolist())
 
     candidate_counts = Counter(all_candidates)
+    max_count = max(candidate_counts.values())
 
     candidates = list()
     counts = list()
     dir_reps = list()
     print("candidate\tcount\tdir_rep")
     for cand, count in candidate_counts.items():
-        if count >= 3:
+        if count >= max_count-1:
             seg, s, e = cand.split("_")
             seq = get_sequence("PR8", seg)
             dir_rep, _ = calculate_direct_repeat(seq, int(s), int(e), w_len=10)
@@ -83,15 +85,52 @@ def generate_maximum_overlap_candidates(dfs: list, dfnames: list):
 
 
     d = dict({"DI": candidates, "counts": counts, "dir_reps": dir_reps})
-    df = pd.DataFrame(d)
-    
-    df[["Segment", "Start", "End"]] = df["DI"].str.split("_", expand=True)
+    count_df = pd.DataFrame(d)
+
+    count_df[["Segment", "Start", "End"]] = count_df["DI"].str.split("_", expand=True)
     print(df.groupby(["Segment"]).size().reset_index(name='count'))
+
+    return count_df
+
+
+def analyze_max_overlap_candidates(dfs, dfnames, count_df):
+    '''
     
-    for c in df[df["counts"] >= 4]["DI"].tolist():
+    '''
+    max_count = count_df["counts"].max()
+    print(max_count)
+
+    for c in count_df[count_df["counts"] >= max_count]["DI"].tolist():
+        print(f"### {c} ###")
         for df, dfname in zip(dfs, dfnames):
             if c not in df["key"].tolist():
                 print(f"{c} not in {dfname}")
+            else:
+                ngs_count = df[df["key"] == c]["NGS_read_count"].values[0]
+                percentile = percentileofscore(df["NGS_read_count"], ngs_count)
+                print(f"{dfname}\t{ngs_count}\t{percentile:.1f}")
+    
+    # compare to the labels of Pelz et al.
+    for c in count_df[count_df["counts"] >= max_count]["DI"].tolist():
+        print(f"### {c} ###")  
+        counts = list()  
+        for accnum, meta in ACCNUMDICT["Pelz2021"].items():
+            t_df = load_dataset("Pelz2021", accnum, SEGMENT_DICTS["PR8"])
+            t_df["key"] = t_df["Segment"] + "_" + t_df["Start"].map(str) + "_" + t_df["End"].map(str)
+            
+            count = t_df[t_df["key"] == c]["NGS_read_count"]
+
+            if count.empty:
+                counts.append(0)
+            else:
+                counts.append(count.values[0])
+
+        print(counts)
+
+        t1 = "de novo " if counts[0] == 0 else ""
+        t2 = "gain" if counts[0] < counts[-1] else "loss"
+
+        print(f"{t1}{t2}")
 
 
 if __name__ == "__main__":
@@ -130,5 +169,6 @@ if __name__ == "__main__":
     dfnames.append("Kupke2020")
 
 
-    generate_overlap_matrix_plot(dfs, dfnames)
-    generate_maximum_overlap_candidates(dfs, dfnames)
+ #   generate_overlap_matrix_plot(dfs, dfnames)
+    count_df = generate_max_overlap_candidates(dfs, dfnames)
+    analyze_max_overlap_candidates(dfs, dfnames, count_df)
