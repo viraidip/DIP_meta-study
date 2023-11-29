@@ -5,6 +5,7 @@ import os
 import sys
 
 import numpy as np
+import pandas as pd
 import scipy.stats as stats
 import matplotlib.pyplot as plt
 
@@ -12,7 +13,7 @@ from matplotlib.ticker import FixedLocator, FixedFormatter
 
 sys.path.insert(0, "..")
 from utils import load_all
-from utils import get_sequence, count_direct_repeats_overall, include_correction, get_p_value_symbol, create_nucleotide_ratio_matrix, plot_heatmap
+from utils import get_sequence, count_direct_repeats_overall, get_p_value_symbol, create_nucleotide_ratio_matrix, plot_heatmap
 from utils import SEGMENTS, RESULTSPATH, NUCLEOTIDES, CMAP
 
 
@@ -160,11 +161,8 @@ def plot_expected_vs_observed_direct_repeat_heatmaps(dfs: list, dfnames: list, e
             if n_samples == 0:
                 continue
 
-            seq = get_sequence(df_s["Strain"].unique()[0], s)
-            
+            seq = get_sequence(df_s["Strain"].unique()[0], s)            
             counts, _ = count_direct_repeats_overall(df_s, seq)
-            if name == "":
-                counts = include_correction(counts)
             
             for k, v in counts.items():
                 if k in final_d:
@@ -190,11 +188,13 @@ def plot_expected_vs_observed_direct_repeat_heatmaps(dfs: list, dfnames: list, e
         y.extend([f"{dfname} ({len(df)}) {symbol}" for _ in range(6)])
         vals.extend(final/final.sum() - expected_final/expected_final.sum())
 
-        for f_ob, f_ex, n_samples in zip(f_obs, f_exp, final_d.values()):
-            if int(n_samples) == 0:
+        for f, f_ex, n_samples in zip(final, f_exp, final_d.values()):
+            if n_samples == 0:
                 pval_symbol = ""
             else:
-                pvalue = stats.binomtest(int(n_samples * f_ob), int(n_samples), f_ex).pvalue
+                if pd.isna(f_ex):
+                    f_ex = 0.0
+                pvalue = stats.binomtest(f, n_samples, f_ex).pvalue
                 if pvalue < 0.00001:
                     pval_symbol = "**"
                 elif pvalue < 0.0001:

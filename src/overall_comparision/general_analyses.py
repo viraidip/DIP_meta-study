@@ -13,7 +13,7 @@ from scipy import stats
 from scipy.stats import chi2_contingency
 
 sys.path.insert(0, "..")
-from utils import load_all, get_seq_len, get_sequence, plot_heatmap, create_nucleotide_ratio_matrix, count_direct_repeats_overall, include_correction
+from utils import load_all, get_sequence, plot_heatmap, create_nucleotide_ratio_matrix, count_direct_repeats_overall
 from utils import SEGMENTS, RESULTSPATH, DATASET_STRAIN_DICT, CMAP, NUCLEOTIDES
 
 
@@ -455,9 +455,7 @@ def plot_direct_repeat_ratio_heatmaps(dfs: list, dfnames: list)-> None:
                 continue
             
             seq = get_sequence(df_s["Strain"].unique()[0], s)
-            
             counts, _ = count_direct_repeats_overall(df_s, seq)
-            counts = include_correction(counts)
             
             for k, v in counts.items():
                 if k in final_d:

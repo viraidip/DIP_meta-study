@@ -778,12 +778,6 @@ def load_kupke2020():
 
     return concat_df
 
-def join_data(df: pd.DataFrame)-> pd.DataFrame:
-    '''
-    
-    '''
-    return df.groupby(["Segment", "Start", "End"]).sum(["NGS_read_count"]).reset_index()
-
 def load_sheng2018():
     '''
     
@@ -1003,9 +997,13 @@ def load_all(expected: str=False):
     if expected:
         expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
 
-
-
     return dfs, dfnames, expected_dfs
+
+def join_data(df: pd.DataFrame)-> pd.DataFrame:
+    '''
+    
+    '''
+    return df.groupby(["Segment", "Start", "End"]).sum(["NGS_read_count"]).reset_index()
 
 
 def load_mapped_reads(experiment: str, strain: str):
@@ -1205,26 +1203,6 @@ def get_p_value_symbol(p: float)-> str:
     else:
         return ""
 
-def generate_sampling_data(seq: str, s: Tuple[int, int], e: Tuple[int, int],  n: int) -> object:
-    '''
-        Generates sampling data by creating random start and end points for
-        artificial deletion sites. Generated data is used to calculate the
-        expected values.
-        :param seq: RNA sequence
-        :param s: tuple with start and end point of the range for the artifical
-                  start point of the deletion site
-        :param e: tuple with start and end point of the range for the artifical
-                  end point of the deletion site
-        :param n: number of samples to generate
-
-        :return: dataframe with the artifical data set
-    '''
-    sampling = dict({"Start": [], "End": []})
-    for _ in range(n):
-        sampling["Start"].append(random.randint(s[0], s[1]))
-        sampling["End"].append(random.randint(e[0], e[1]))
-    return pd.DataFrame(data=sampling)
-
 def create_sequence_library(data_dict: dict)-> dict:
     '''
         Gets the raw loaded sequence data, which is a dict over all strains.
@@ -1322,31 +1300,6 @@ def count_direct_repeats_overall(df: pd.DataFrame,
 
     return nuc_overlap_dict, overlap_seq_dict
 
-
-def include_correction(nuc_overlap_dict: dict)-> dict:
-    '''
-        Adds a correction to the counting of the direct repeats. This is due to
-        the fact that at these sites the observations get merged towards higher
-        lengths of the direct repeat.
-        :param nuc_overlap_dict: counting dict of the direct repeats
-
-        :return: corrected counts of the direct repeats (same structure as
-                 input
-    '''
-    new = dict()
-    for idx in nuc_overlap_dict.keys():
-        orig_value = nuc_overlap_dict[idx]
-        if orig_value != 0:
-            divided_value = orig_value/(idx+1)
-            new[idx] = divided_value
-            for idx_2 in range(0, idx):
-                new[idx_2] = new[idx_2] + divided_value
-        else:
-            new[idx] = 0
-
-    return new
-
-
 #############################
 ### NUCLEOTIDE ENRICHMENT ###
 #############################
@@ -1400,33 +1353,36 @@ def count_nucleotide_occurrence_overall(df: pd.DataFrame,
 #####################
 ### expected data ###
 #####################
-def generate_expected_data(k, v):
+def generate_expected_data(strain: str, df: pd.DataFrame)-> pd.DataFrame:
     '''
     
     '''
     for seg in SEGMENTS:
-        df = v.loc[v["Segment"] == seg]
+        df = df.loc[df["Segment"] == seg]
         if len(df) == 0:
             continue
-        seq = get_sequence(k, seg)
-        s = (int(df.Start.quantile(QUANT)), int(df.Start.quantile(1-QUANT)))
-        e = (int(df.End.quantile(QUANT)), int(df.End.quantile(1-QUANT)))
+        seq = get_sequence(strain, seg)
+        start = int(df["Start"].mean())
+        end = int(df["End"].mean())
+        s = (max(start-200, 50), start+200)
+        e = (end-200, min(end+200, len(seq)-50))
+        assert s[1] < e[0], "Sampling: start and end positions are overlapping!"
         # skip if there is no range given
         # this would lead to oversampling of a single position
         if s[0] == s[1] or e[0] == e[1]:
             continue
         if "samp_df" in locals():
-            temp_df = generate_sampling_data(s, e, N_SAMPLES)
+            temp_df = generate_sampling_data(seq, s, e, N_SAMPLES)
             temp_df["Segment"] = seg
             samp_df = pd.concat([samp_df, temp_df], ignore_index=True)
         else:
-            samp_df = generate_sampling_data(s, e, N_SAMPLES)
+            samp_df = generate_sampling_data(seq, s, e, N_SAMPLES)
             samp_df["Segment"] = seg
     
     samp_df["NGS_read_count"] = 1
     return samp_df
 
-def generate_sampling_data(s: Tuple[int, int], e: Tuple[int, int],  n: int) -> object:
+def generate_sampling_data(seq: str, s: Tuple[int, int], e: Tuple[int, int],  n: int)-> pd.DataFrame:
     '''
         Generates sampling data by creating random start and end points for
         artificial deletion sites. Generated data is used to calculate the
@@ -1440,11 +1396,33 @@ def generate_sampling_data(s: Tuple[int, int], e: Tuple[int, int],  n: int) -> o
 
         :return: dataframe with the artifical data set
     '''
-    sampling = dict({"Start": [], "End": []})
-    for _ in range(n):
-        sampling["Start"].append(random.randint(s[0], s[1]))
-        sampling["End"].append(random.randint(e[0], e[1]))
-    return pd.DataFrame(data=sampling)
+    # create all combinations of start and end positions that are possible
+    combinations = [(x, y) for x in range(s[0], s[1] + 1) for y in range(e[0], e[1] + 1 )]
+
+    # create for each the DI Sequence
+    sequences = [seq[:start] + seq[end-1:] for (start, end) in combinations]
+
+    # filter out duplicate DI sequences while keeping the ones with highest start number
+    start, end = zip(*combinations)
+    temp_df = pd.DataFrame(data=dict({"Start": start, "End": end, "Sequence": sequences}))
+
+    # these are the direct repeat ratios that would be expected by chance overall
+    # I commented them out because they are not used here, but still important to validate 
+    #duplicates = temp_df.groupby('Sequence').size()
+    #dir_rep_counts = duplicates.groupby(duplicates).size()
+    #print(dir_rep_counts/sum(dir_rep_counts * dir_rep_counts.index))
+    
+    # Find the index of the row with the maximum value in the 'Start' column for each 'Sequence'
+    max_start_index = temp_df.groupby('Sequence')['Start'].idxmax()
+    # Use the index to select the corresponding rows from the original DataFrame
+    result_df = temp_df.loc[max_start_index]
+    # Replicate each row by the number of times it was found in the group
+    result_df = result_df.loc[result_df.index.repeat(temp_df.groupby('Sequence').size())]
+    df_no_duplicates = result_df.reset_index(drop=True).drop("Sequence", axis=1)
+
+    # sample n of the remaining possible DI RNAs
+    random_rows = df_no_duplicates.sample(n)
+    return random_rows
 
 
 #######################
