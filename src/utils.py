@@ -47,7 +47,17 @@ DATASET_STRAIN_DICT = dict({
     "Kupke2020": "PR8",
     "Sheng2018": "Brisbane",
     "Vasilijevic2017 swine": "swine",
-    "Vasilijevic2017 Cal09": "Cal09"
+    "Vasilijevic2017 Cal09": "Cal09",
+    "EBI2020": "PR8",
+    "Greninger_2_2023 B7C5": "B7C5",
+    "Greninger_2_2023 B7H4": "B7H4",
+    "Greninger_2_2023 B7N6": "B7N6",
+    "Greninger_2_2023 B8B1": "B8B1",
+    "Greninger_2_2023 B8E6": "B8E6",
+    "WRA2021_A": "Connecticut",
+    "WRA2021_B": "Victoria",
+    "Rattanaburi2022_H3N2": "Thailand"
+
 })
 
 ACCNUMDICT = dict({
@@ -323,7 +333,71 @@ ACCNUMDICT = dict({
         "SRR3743520": dict({}),
         "SRR3743521": dict({}),
         "SRR3743522": dict({}),
-        "SRR3743523": dict({}),
+        "SRR3743523": dict({})
+    }),
+    "EBI2020": dict({
+        "ERR4566024":  dict({}),
+        "ERR4566025":  dict({}),
+        "ERR4566028":  dict({}),
+        "ERR4566029":  dict({}),
+        "ERR4566032":  dict({}),
+        "ERR4566033":  dict({}),
+        "ERR4566036":  dict({}),
+        "ERR4566037":  dict({})
+    }),
+    "Greninger_2_2023": dict({
+        "SRR23634030": dict({"Strain": "B8E6"}),
+        "SRR23634031": dict({"Strain": "B8B1"}),
+        "SRR23634032": dict({"Strain": "B7N6"}),
+        "SRR23634033": dict({"Strain": "B7C5"}),
+        "SRR23634034": dict({"Strain": "B7H4"})
+    }),
+    "WRA2021_A": dict({
+        "SRR15182178":  dict({}),
+        "SRR15182177":  dict({}),
+        "SRR15182176":  dict({}),
+        "SRR15182175":  dict({}),
+        "SRR15182174":  dict({}),
+        "SRR15182173":  dict({}),
+        "SRR15182172":  dict({}),
+        "SRR15182171":  dict({})
+    }),
+    "WRA2021_B": dict({
+        "SRR15183338":  dict({}),
+        "SRR15183345":  dict({}),
+        "SRR15183344":  dict({}),
+        "SRR15183343":  dict({}),
+        "SRR15183342":  dict({}),
+        "SRR15183341":  dict({}),
+        "SRR15183340":  dict({}),
+        "SRR15183339":  dict({}),
+        "SRR15183352":  dict({}),
+        "SRR15183353":  dict({}),
+        "SRR15196408":  dict({}),
+        "SRR15196409":  dict({}),
+        "SRR15196410":  dict({}),
+        "SRR15196411":  dict({}),
+        "SRR15196412":  dict({}),
+        "SRR15196413":  dict({}),
+        "SRR15196414":  dict({}),
+        "SRR15196415":  dict({}),
+        "SRR15196416":  dict({}),
+        "SRR15196417":  dict({}),
+        "SRR15196419":  dict({}),
+        "SRR15196418":  dict({}),
+        "SRR15196420":  dict({}),
+        "SRR15196421":  dict({}),
+        "SRR15196422":  dict({}),
+        "SRR15196423":  dict({}),
+        "SRR15196424":  dict({}),
+        "SRR15196425":  dict({})
+    }),
+    "Rattanaburi2022_H3N2": dict({
+        "SRR10256717":  dict({}),
+        "SRR10256718":  dict({}),
+        "SRR10256719":  dict({}),
+        "SRR10256720":  dict({}),
+        "SRR10256721":  dict({})
     })
 })
 
@@ -449,10 +523,79 @@ SEGMENT_DICTS = dict({
         "JF915186.1": "NA",
         "JF915185.1": "M",
         "JF915191.1": "NS"
-    })
-
-
-
+    }),
+    "Greninger_2_2023": dict({
+        "OQ535342.1": "PB2",
+        "OQ535341.1": "PB1",
+        "OQ535340.1": "PA",
+        "OQ535335.1": "HA",
+        "OQ535338.1": "NP",
+        "OQ535337.1": "NA",
+        "OQ535336.1": "M",
+        "OQ535339.1": "NS",
+        "OQ535366.1": "PB2",
+        "OQ535365.1": "PB1",
+        "OQ535364.1": "PA",
+        "OQ535359.1": "HA",
+        "OQ535362.1": "NP",
+        "OQ535361.1": "NA",
+        "OQ535360.1": "M",
+        "OQ535363.1": "NS",
+        "OQ535350.1": "PB2",
+        "OQ535349.1": "PB1",
+        "OQ535348.1": "PA",
+        "OQ535343.1": "HA",
+        "OQ535346.1": "NP",
+        "OQ535345.1": "NA",
+        "OQ535344.1": "M",
+        "OQ535347.1": "NS",
+        "OQ535358.1": "PB2",
+        "OQ535357.1": "PB1",
+        "OQ535356.1": "PA",
+        "OQ535351.1": "HA",
+        "OQ535354.1": "NP",
+        "OQ535353.1": "NA",
+        "OQ535352.1": "M",
+        "OQ535355.1": "NS",
+        "OQ535374.1": "PB2",
+        "OQ535373.1": "PB1",
+        "OQ535372.1": "PA",
+        "OQ535367.1": "HA",
+        "OQ535370.1": "NP",
+        "OQ535369.1": "NA",
+        "OQ535368.1": "M",
+        "OQ535371.1": "NS"
+    }),
+    "Connecticut": dict({
+        "KM654658.1": "PB2",
+        "KM654706.1": "PB1",
+        "KM654754.1": "PA",
+        "KM654822.1": "HA",
+        "KM654847.1": "NP",
+        "KM654920.1": "NA",
+        "KM654969.1": "M",
+        "KM654612.1": "NS"
+    }),
+    "Victoria": dict({
+        "CY018660.1": "PB2",
+        "CY018659.1": "PB1",
+        "CY018658.1": "PA",
+        "CY018653.1": "HA",
+        "CY018656.1": "NP",
+        "CY018655.1": "NA",
+        "CY018654.1": "M",
+        "CY018657.1": "NS"
+    }),
+    "Thailand": dict({
+        "KP335735.1": "PB2",
+        "KP335793.1": "PB1",
+        "KP335851.1": "PA",
+        "KP335964.1": "HA",
+        "KP336026.1": "NP",
+        "KP336139.1": "NA",
+        "KP336201.1": "M",
+        "KP336259.1": "NS"
+    }),
 })
 
 # global colors for plotting
@@ -655,6 +798,77 @@ def load_sheng2018():
 
     return concat_df
 
+def load_ebi2020():
+    '''
+    
+    '''
+    acc_nums = ACCNUMDICT["EBI2020"]
+
+    dfs = list()
+    for acc_num, meta in acc_nums.items():
+        df = load_dataset("EBI2020", acc_num, SEGMENT_DICTS["PR8"])
+        dfs.append(df)
+    concat_df = pd.concat(dfs)
+
+    return concat_df
+
+def load_greninger_2_2023():
+    '''
+
+    '''    
+    acc_nums = ACCNUMDICT["Greninger_2_2023"]
+
+    dfs = list()
+    for acc_num, meta in acc_nums.items():
+        df = load_dataset("Greninger_2_2023", acc_num, SEGMENT_DICTS["Greninger_2_2023"])
+        df["Strain"] = meta["Strain"]
+        dfs.append(df)
+    concat_df = pd.concat(dfs)
+
+    return concat_df
+
+def load_WRA2021_A():
+    '''
+
+    '''    
+    acc_nums = ACCNUMDICT["WRA2021_A"]
+
+    dfs = list()
+    for acc_num, meta in acc_nums.items():
+        df = load_dataset("WRA2021_A", acc_num, SEGMENT_DICTS["Connecticut"])
+        dfs.append(df)
+    concat_df = pd.concat(dfs)
+
+    return concat_df
+
+def load_WRA2021_B():
+    '''
+
+    '''    
+    acc_nums = ACCNUMDICT["WRA2021_B"]
+
+    dfs = list()
+    for acc_num, meta in acc_nums.items():
+        df = load_dataset("WRA2021_B", acc_num, SEGMENT_DICTS["Victoria"])
+        dfs.append(df)
+    concat_df = pd.concat(dfs)
+
+    return concat_df
+
+def load_rattanaburi2022_h3n2():
+    '''
+
+    '''    
+    acc_nums = ACCNUMDICT["Rattanaburi2022_H3N2"]
+
+    dfs = list()
+    for acc_num, meta in acc_nums.items():
+        df = load_dataset("Rattanaburi2022_H3N2", acc_num, SEGMENT_DICTS["Thailand"])
+        dfs.append(df)
+    concat_df = pd.concat(dfs)
+
+    return concat_df
+
 def load_all(expected: str=False):
     '''
     
@@ -747,6 +961,49 @@ def load_all(expected: str=False):
     dfnames.append(f"Sheng2018")
     if expected:
         expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
+
+    ### EBI2020 ###
+    strain = "PR8"
+    df = join_data(load_ebi2020())
+    dfs.append(preprocess(strain, df, CUTOFF))
+    dfnames.append(f"EBI2020")
+    if expected:
+        expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
+
+    ### Greninger_2_2023 ###
+    df = load_greninger_2_2023()
+    for strain in ["B7C5", "B7H4", "B7N6", "B8B1", "B8E6"]:
+        s_df = df[df["Strain"] == strain].copy()
+        dfs.append(preprocess(strain, s_df, CUTOFF))
+        dfnames.append(f"Greninger_2_2023 {strain}")
+        if expected:
+            expected_dfs.append(preprocess(strain, generate_expected_data(strain, s_df), 1))
+
+    ### WRA2021_A ###
+    strain = "Connecticut"
+    df = join_data(load_WRA2021_A())
+    dfs.append(preprocess(strain, df, CUTOFF))
+    dfnames.append(f"WRA2021 A")
+    if expected:
+        expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
+
+    ### WRA2021_B ###
+    strain = "Victoria"
+    df = join_data(load_WRA2021_B())
+    dfs.append(preprocess(strain, df, CUTOFF))
+    dfnames.append(f"WRA2021 B")
+    if expected:
+        expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
+
+    ### Rattanaburi2022_H3N2 ###
+    strain = "Thailand"
+    df = join_data(load_rattanaburi2022_h3n2())
+    dfs.append(preprocess(strain, df, CUTOFF))
+    dfnames.append(f"Rattanaburi2022 H3N2")
+    if expected:
+        expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
+
+
 
     return dfs, dfnames, expected_dfs
 

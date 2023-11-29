@@ -80,7 +80,7 @@ def calculate_deletion_shifts(dfs: list, dfnames: list)-> None:
                              Default is "seq_around_deletion_junction".
     :return: None
     '''
-    fig, axs = plt.subplots(figsize=(12, 7), nrows=3, ncols=5)
+    fig, axs = plt.subplots(figsize=(12, 12), nrows=5, ncols=5)
     cm = plt.get_cmap(CMAP)
     colors = [cm(1.*i/3) for i in range(3)]
 
@@ -94,6 +94,10 @@ def calculate_deletion_shifts(dfs: list, dfnames: list)-> None:
         df["length"] = df["deleted_sequence"].apply(len)
         df["shift"] = df["length"] % 3
         shifts = df["shift"].value_counts()
+        for idx in [0, 1, 2]:
+            if idx not in shifts.index:
+                shifts.loc[idx] = 0
+
         sorted_shifts = shifts.loc[[0, 1, 2]]
         overall += sorted_shifts
         n += len(df)
