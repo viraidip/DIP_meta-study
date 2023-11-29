@@ -97,19 +97,40 @@ def analyze_max_overlap_candidates(dfs, dfnames, count_df):
     '''
     
     '''
+    plt.figure(figsize=(8, 6), tight_layout=True)
+    plot_data = list()
+    labels = [f"{name} ({df.shape[0]})" for name, df in zip(dfnames, dfs)]
+    for df in dfs:
+        plot_data.append(df["NGS_read_count"])
+    plt.boxplot(plot_data, labels=labels)
+    
+    x_p = [1, 2, 3, 4, 5]
     max_count = count_df["counts"].max()
-    print(max_count)
-
     for c in count_df[count_df["counts"] >= max_count]["DI"].tolist():
         print(f"### {c} ###")
+        y_p = list()
         for df, dfname in zip(dfs, dfnames):
             if c not in df["key"].tolist():
                 print(f"{c} not in {dfname}")
+                y_p.append(0)
             else:
                 ngs_count = df[df["key"] == c]["NGS_read_count"].values[0]
+                y_p.append(ngs_count)
                 percentile = percentileofscore(df["NGS_read_count"], ngs_count)
                 print(f"{dfname}\t{ngs_count}\t{percentile:.1f}")
-    
+
+        plt.scatter(x_p, y_p, marker="x", label=c, zorder=100)
+
+    plt.yscale("log")
+    plt.xticks(rotation=45) 
+    plt.xlabel("Datasets")
+    plt.ylabel("NGS read count (log scale)")
+    plt.legend()
+
+    save_path = os.path.join(RESULTSPATH, "intersection_analysis", "ngs_counts.png")
+    plt.savefig(save_path)
+    plt.close()
+
     # compare to the labels of Pelz et al.
     for c in count_df[count_df["counts"] >= max_count]["DI"].tolist():
         print(f"### {c} ###")  
@@ -131,8 +152,8 @@ def analyze_max_overlap_candidates(dfs, dfnames, count_df):
         t2 = "gain" if counts[0] < counts[-1] else "loss"
 
         print(f"{t1}{t2}")
-
-
+    
+    
 if __name__ == "__main__":
     plt.style.use("seaborn")
     dfs = list()
@@ -169,6 +190,6 @@ if __name__ == "__main__":
     dfnames.append("Kupke2020")
 
 
- #   generate_overlap_matrix_plot(dfs, dfnames)
+    generate_overlap_matrix_plot(dfs, dfnames)
     count_df = generate_max_overlap_candidates(dfs, dfnames)
     analyze_max_overlap_candidates(dfs, dfnames, count_df)
