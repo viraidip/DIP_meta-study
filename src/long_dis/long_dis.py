@@ -153,8 +153,8 @@ def start_end_positions(dfs: list, dfnames: list)-> None:
 
 if __name__ == "__main__":
     plt.style.use('seaborn')
-
-    dfs, dfnames, expected_dfs = load_all()
+    dfnames = DATASET_STRAIN_DICT.keys()
+    dfs, expected_dfs = load_all(dfnames)
 
     start_end_positions(dfs, dfnames)
  #   fraction_long_dis(dfs, dfnames)

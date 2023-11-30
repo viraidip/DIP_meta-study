@@ -13,6 +13,7 @@ from general_analyses import plot_distribution_over_segments, diff_start_end_len
 
 sys.path.insert(0, "..")
 from utils import load_all
+from utils import DATASET_STRAIN_DICT
 
 
 def split_by_reads(dfs, split):
@@ -51,7 +52,9 @@ def split_by_reads(dfs, split):
 
 if __name__ == "__main__":
     plt.style.use("seaborn")
-    dfs, dfnames, _ = load_all()
+    dfnames = DATASET_STRAIN_DICT.keys()
+    dfs, _ = load_all(dfnames)
+
     split = "10perc"
     high_dfs, low_dfs = split_by_reads(dfs, split)
 

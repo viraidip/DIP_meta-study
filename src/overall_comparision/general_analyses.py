@@ -315,6 +315,9 @@ def dataset_distributions(dfs: list, dfnames: list)-> None:
     '''
     
     '''
+#TODO: add here the number of mapped reads
+#      also add the fraction of DIPs found/ number of mapped reads
+
     ns = list()
     plot_data = list()
     means = list()
@@ -486,7 +489,8 @@ def plot_direct_repeat_ratio_heatmaps(dfs: list, dfnames: list)-> None:
 
 if __name__ == "__main__":
     plt.style.use("seaborn")
-    dfs, dfnames, expected_dfs = load_all()
+    dfnames = DATASET_STRAIN_DICT.keys()
+    dfs, expected_dfs = load_all(dfnames)
 
     dataset_distributions(dfs, dfnames)
     plot_distribution_over_segments(dfs, dfnames)
