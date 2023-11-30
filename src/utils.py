@@ -32,32 +32,34 @@ STRAINS = dict({
 })
 
 DATASET_STRAIN_DICT = dict({
-    "Alnaji2019 Cal07": "Cal07",
-    "Alnaji2019 NC" : "NC",
-    "Alnaji2019 Perth": "Perth",
-    "Alnaji2019 BLEE": "BLEE",
+    "Alnaji2019_Cal07": "Cal07",
+    "Alnaji2019_Cal07_time": "Cal07",
+    "Alnaji2019_NC" : "NC",
+    "Alnaji2019_Perth": "Perth",
+    "Alnaji2019_BLEE": "BLEE",
     "Alnaji2021": "PR8",
     "Pelz2021": "PR8",
     "Mendes2021": "WSN",
     "Wang2023": "PR8",
     "Lui2019": "Anhui",
-    "Wang2020 A549": "PR8",
-    "Wang2020 HBEpC": "PR8",
+    "Wang2020": "PR8",
     "Penn2022": "Turkey",
-    "Kupke2020": "PR8",
+ #   "Kupke2020": "PR8",
     "Sheng2018": "Brisbane",
-    "Vasilijevic2017 swine": "swine",
-    "Vasilijevic2017 Cal09": "Cal09",
+ #   "Vasilijevic2017 swine": "swine",
+  #  "Vasilijevic2017 Cal09": "Cal09",
     "EBI2020": "PR8",
-    "Greninger_2_2023 B7C5": "B7C5",
-    "Greninger_2_2023 B7H4": "B7H4",
-    "Greninger_2_2023 B7N6": "B7N6",
-    "Greninger_2_2023 B8B1": "B8B1",
-    "Greninger_2_2023 B8E6": "B8E6",
+#    "Greninger_2_2023 B7C5": "B7C5",
+ #   "Greninger_2_2023 B7H4": "B7H4",
+  #  "Greninger_2_2023 B7N6": "B7N6",
+   # "Greninger_2_2023 B8B1": "B8B1",
+    #"Greninger_2_2023 B8E6": "B8E6",
+    "Greninger_2_2023": "Greninger_cons",
     "WRA2021_A": "Connecticut",
     "WRA2021_B": "Victoria",
-    "Rattanaburi2022_H3N2": "Thailand"
-
+    "Rattanaburi2022_H3N2": "Thailand",
+    "Lauring2019": "BLEE",
+   # "Southgate2019": "Yamagata"
 })
 
 ACCNUMDICT = dict({
@@ -153,20 +155,20 @@ ACCNUMDICT = dict({
     "Alnaji2019_NC": dict({
         "SRR8754513": dict({"Lineage": "2", "Passage": "1"}),
         "SRR8754514": dict({"Lineage": "1", "Passage": "1"}),
-        "SRR8754527": dict({"Lineage": "1", "Passage": "6"}),
-        "SRR8754538": dict({"Lineage": "2", "Passage": "6"})
+   #     "SRR8754527": dict({"Lineage": "1", "Passage": "6"}),
+    #    "SRR8754538": dict({"Lineage": "2", "Passage": "6"})
     }),
     "Alnaji2019_Perth": dict({
-        "SRR8754517": dict({"Lineage": "2", "Passage": "8"}),
+     #   "SRR8754517": dict({"Lineage": "2", "Passage": "8"}),
         "SRR8754524": dict({"Lineage": "1", "Passage": "4"}),
         "SRR8754525": dict({"Lineage": "2", "Passage": "4"}),
-        "SRR8754526": dict({"Lineage": "1", "Passage": "8"})
+      #  "SRR8754526": dict({"Lineage": "1", "Passage": "8"})
     }),
     "Alnaji2019_BLEE": dict({
-        "SRR8754507": dict({"Lineage": "1", "Passage": "8"}),
+   #     "SRR8754507": dict({"Lineage": "1", "Passage": "8"}),
         "SRR8754508": dict({"Lineage": "2", "Passage": "7"}),
         "SRR8754509": dict({"Lineage": "1", "Passage": "7"}),
-        "SRR8754516": dict({"Lineage": "2", "Passage": "8"})
+    #    "SRR8754516": dict({"Lineage": "2", "Passage": "8"})
     }),
     "Lui2019": dict({
         "SRR8949705": dict({}),
@@ -336,14 +338,14 @@ ACCNUMDICT = dict({
         "SRR3743523": dict({})
     }),
     "EBI2020": dict({
-        "ERR4566024":  dict({}),
-        "ERR4566025":  dict({}),
-        "ERR4566028":  dict({}),
-        "ERR4566029":  dict({}),
-        "ERR4566032":  dict({}),
-        "ERR4566033":  dict({}),
-        "ERR4566036":  dict({}),
-        "ERR4566037":  dict({})
+        "ERR4566024":  dict({"Cell": "A549"}),
+        "ERR4566025":  dict({"Cell": "A549"}),
+        "ERR4566028":  dict({"Cell": "HEK293FT"}),
+        "ERR4566029":  dict({"Cell": "HEK293FT"}),
+        "ERR4566032":  dict({"Cell": "MRC5"}),
+        "ERR4566033":  dict({"Cell": "MRC5"}),
+        "ERR4566036":  dict({"Cell": "WI38"}),
+        "ERR4566037":  dict({"Cell": "WI38"})
     }),
     "Greninger_2_2023": dict({
         "SRR23634030": dict({"Strain": "B8E6"}),
@@ -398,6 +400,25 @@ ACCNUMDICT = dict({
         "SRR10256719":  dict({}),
         "SRR10256720":  dict({}),
         "SRR10256721":  dict({})
+    }),
+    "Lauring2019": dict({
+        "SRR10013210": dict({}),
+        "SRR10013205": dict({}),
+        "SRR10013181": dict({}),
+        "SRR10013264": dict({}),
+        "SRR10013191": dict({}),
+        "SRR10013228": dict({}),
+        "SRR10013249": dict({}),
+        "SRR10013260": dict({}),
+        "SRR10013239": dict({}),
+        "SRR10013211": dict({}),
+        "SRR10013203": dict({}),
+        "SRR10013255": dict({}),
+        "SRR10013170": dict({}),
+        "SRR10013175": dict({}),
+        "SRR10013284": dict({})
+    }),
+    "Southgate2019": dict({
     })
 })
 
@@ -566,6 +587,16 @@ SEGMENT_DICTS = dict({
         "OQ535368.1": "M",
         "OQ535371.1": "NS"
     }),
+    "Greninger_cons": dict({
+        "PB2": "PB2",
+        "PB1": "PB1",
+        "PA": "PA",
+        "HA": "HA",
+        "NP": "NP",
+        "NA": "NA",
+        "M": "M",
+        "NS": "NS"
+    }),
     "Connecticut": dict({
         "KM654658.1": "PB2",
         "KM654706.1": "PB1",
@@ -596,6 +627,9 @@ SEGMENT_DICTS = dict({
         "KP336201.1": "M",
         "KP336259.1": "NS"
     }),
+    "Yamagata":({
+        
+    })
 })
 
 # global colors for plotting
@@ -610,7 +644,10 @@ def load_dataset(exp: str, acc: str, segment_dict: dict)-> pd.DataFrame:
     
     '''
     path = os.path.join(DATAPATH, exp, f"{exp}_{acc}.csv")
-    df = pd.read_csv(path, dtype={"Segment": "string", "Start": "int64", "End": "int64", "NGS_read_count": "int64"})
+    df = pd.read_csv(path,
+                     dtype={"Segment": "string", "Start": "int64", "End": "int64", "NGS_read_count": "int64"},
+                     na_values=["", "None"],
+                     keep_default_na=False)
     df["Segment"] = df["Segment"].replace(segment_dict)
 
     return df
@@ -691,18 +728,79 @@ def load_pelz2021():
 
     return concat_df
 
-def load_alnaji2019(strain: str):
+def load_alnaji2019_BLEE():
     '''
 
     '''
-    acc_nums = ACCNUMDICT[f"Alnaji2019_{strain}"]
-
-    if strain == "Cal07_time":
-        strain = "Cal07"
+    acc_nums = ACCNUMDICT[f"Alnaji2019_BLEE"]
 
     dfs = list()
     for acc_num, meta in acc_nums.items():
-        df = load_dataset("Alnaji2019", acc_num, SEGMENT_DICTS[strain])
+        df = load_dataset("Alnaji2019_BLEE", acc_num, SEGMENT_DICTS["BLEE"])
+        df["Lineage"] = meta["Lineage"]
+        df["Passage"] = meta["Passage"]
+        dfs.append(df)
+    concat_df = pd.concat(dfs)
+
+    return concat_df
+
+def load_alnaji2019_Cal07(strain: str):
+    '''
+
+    '''
+    acc_nums = ACCNUMDICT[f"Alnaji2019_Cal07"]
+
+    dfs = list()
+    for acc_num, meta in acc_nums.items():
+        df = load_dataset("Alnaji2019_Cal07", acc_num, SEGMENT_DICTS["Cal07"])
+        df["Lineage"] = meta["Lineage"]
+        df["Passage"] = meta["Passage"]
+        dfs.append(df)
+    concat_df = pd.concat(dfs)
+
+    return concat_df
+
+def load_alnaji2019_Cal07_time():
+    '''
+
+    '''
+    acc_nums = ACCNUMDICT[f"Alnaji2019_Cal07_time"]
+
+    dfs = list()
+    for acc_num, meta in acc_nums.items():
+        df = load_dataset("Alnaji2019_Cal07_time", acc_num, SEGMENT_DICTS["Cal07"])
+        df["Lineage"] = meta["Lineage"]
+        df["Passage"] = meta["Passage"]
+        dfs.append(df)
+    concat_df = pd.concat(dfs)
+
+    return concat_df
+
+def load_alnaji2019_NC():
+    '''
+
+    '''
+    acc_nums = ACCNUMDICT[f"Alnaji2019_NC"]
+
+    dfs = list()
+    for acc_num, meta in acc_nums.items():
+        df = load_dataset("Alnaji2019_NC", acc_num, SEGMENT_DICTS["NC"])
+        df["Lineage"] = meta["Lineage"]
+        df["Passage"] = meta["Passage"]
+        dfs.append(df)
+    concat_df = pd.concat(dfs)
+
+    return concat_df
+
+def load_alnaji2019_Perth():
+    '''
+
+    '''
+    acc_nums = ACCNUMDICT[f"Alnaji2019_Perth"]
+
+    dfs = list()
+    for acc_num, meta in acc_nums.items():
+        df = load_dataset("Alnaji2019_Perth", acc_num, SEGMENT_DICTS["Perth"])
         df["Lineage"] = meta["Lineage"]
         df["Passage"] = meta["Passage"]
         dfs.append(df)
@@ -801,6 +899,7 @@ def load_ebi2020():
     dfs = list()
     for acc_num, meta in acc_nums.items():
         df = load_dataset("EBI2020", acc_num, SEGMENT_DICTS["PR8"])
+        df["Cell"] = meta["Cell"]
         dfs.append(df)
     concat_df = pd.concat(dfs)
 
@@ -863,6 +962,19 @@ def load_rattanaburi2022_h3n2():
 
     return concat_df
 
+def load_lauring2019():
+    '''
+
+    '''    
+    acc_nums = ACCNUMDICT["Lauring2019"]
+    dfs = list()
+    for acc_num, meta in acc_nums.items():
+        df = load_dataset("Lauring2019", acc_num, SEGMENT_DICTS["BLEE"])
+        dfs.append(df)
+    concat_df = pd.concat(dfs)
+
+    return concat_df
+
 def load_all(expected: str=False):
     '''
     
@@ -914,15 +1026,37 @@ def load_all(expected: str=False):
     if expected:
         expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
 
-    ### Alnaji2019 ###
-    for strain, p in [("Cal07", "6"), ("NC", "1"), ("Perth", "4") , ("BLEE", "7")]:
-        df = load_alnaji2019(strain)
-        df = df[df["Passage"] == p].copy()
-        df = join_data(df)
-        dfs.append(preprocess(strain, df, CUTOFF))
-        dfnames.append(f"Alnaji2019 {strain}")
-        if expected:
-            expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
+    ### Alnaji2019 Cal07 ###
+    strain = "Cal07"
+    df = join_data(load_alnaji2019_Cal07())
+    dfs.append(preprocess(strain, df, 5))
+    dfnames.append("Alnaji2019 Cal07")
+    if expected:
+        expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
+
+    ### Alnaji2019 NC ###
+    strain = "NC"
+    df = join_data(load_alnaji2019_NC())
+    dfs.append(preprocess(strain, df, 5))
+    dfnames.append("Alnaji2019 NC")
+    if expected:
+        expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
+    
+    ### Alnaji2019 Perth ###
+    strain = "Perth"
+    df = join_data(load_alnaji2019_Perth())
+    dfs.append(preprocess(strain, df, 5))
+    dfnames.append("Alnaji2019 Perth")
+    if expected:
+        expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
+
+    ### Alnaji2019 Perth ###
+    strain = "BLEE"
+    df = join_data(load_alnaji2019_BLEE())
+    dfs.append(preprocess(strain, df, 5))
+    dfnames.append("Alnaji2019 BLEE")
+    if expected:
+        expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
 
     ### Penn2022 ###
     strain = "Turkey"
@@ -963,15 +1097,26 @@ def load_all(expected: str=False):
     dfnames.append(f"EBI2020")
     if expected:
         expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
+    '''
+    ### EBI2020 ###
+    strain = "PR8"
+    df = load_ebi2020()
+    for cell in ["A549", "HEK293FT", "MRC5", "WI38"]:
+        c_df = df[df["Cell"] == cell].copy()
+        c_df = join_data(c_df)
+        dfs.append(preprocess(strain, c_df, CUTOFF))
+        dfnames.append(f"EBI2020 {cell}")
+        if expected:
+            expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
+    '''
 
     ### Greninger_2_2023 ###
+    strain = "Greninger_cons"
     df = load_greninger_2_2023()
-    for strain in ["B7C5", "B7H4", "B7N6", "B8B1", "B8E6"]:
-        s_df = df[df["Strain"] == strain].copy()
-        dfs.append(preprocess(strain, s_df, CUTOFF))
-        dfnames.append(f"Greninger_2_2023 {strain}")
-        if expected:
-            expected_dfs.append(preprocess(strain, generate_expected_data(strain, s_df), 1))
+    dfs.append(preprocess(strain, df, CUTOFF))
+    dfnames.append(f"Greninger_2_2023")
+    if expected:
+        expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
 
     ### WRA2021_A ###
     strain = "Connecticut"
@@ -997,6 +1142,14 @@ def load_all(expected: str=False):
     if expected:
         expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
 
+    ### Lauring2019 ###
+    strain = "BLEE"
+    df = join_data(load_lauring2019())
+    dfs.append(preprocess(strain, df, CUTOFF))
+    dfnames.append(f"Lauring 2019")
+    if expected:
+        expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
+
     return dfs, dfnames, expected_dfs
 
 def join_data(df: pd.DataFrame)-> pd.DataFrame:
@@ -1006,148 +1159,17 @@ def join_data(df: pd.DataFrame)-> pd.DataFrame:
     return df.groupby(["Segment", "Start", "End"]).sum(["NGS_read_count"]).reset_index()
 
 
-def load_mapped_reads(experiment: str, strain: str):
+def load_mapped_reads(experiment: str):
     '''
 
     '''
-    acc_num_dict = dict({
-        "Cal07": dict({"SRR8754522": dict({"Lineage": "1", "Passage": "6"}),
-                       "SRR8754523": dict({"Lineage": "2", "Passage": "6"})
-                       }),
-        "Cal07_time": dict({"SRR8754531": dict({"Lineage": "1", "Passage": "6"}),
-                            "SRR8754532": dict({"Lineage": "1", "Passage": "3"}),
-                            "SRR8754533": dict({"Lineage": "1", "Passage": "1"})
-                            }),
-        "NC": dict({"SRR8754513": dict({"Lineage": "2", "Passage": "1"}),
-                    "SRR8754514": dict({"Lineage": "1", "Passage": "1"}),
-                    "SRR8754527": dict({"Lineage": "1", "Passage": "6"}),
-                    "SRR8754538": dict({"Lineage": "2", "Passage": "6"})
-                    }),
-        "Perth": dict({"SRR8754517": dict({"Lineage": "2", "Passage": "8"}),
-                       "SRR8754524": dict({"Lineage": "1", "Passage": "4"}),
-                       "SRR8754525": dict({"Lineage": "2", "Passage": "4"}),
-                       "SRR8754526": dict({"Lineage": "1", "Passage": "8"})
-                       }),
-        "BLEE": dict({"SRR8754507": dict({"Lineage": "1", "Passage": "8"}),
-                      "SRR8754508": dict({"Lineage": "2", "Passage": "7"}),
-                      "SRR8754509": dict({"Lineage": "1", "Passage": "7"}),
-                      "SRR8754516": dict({"Lineage": "2", "Passage": "8"})
-                      }),
-        "Alnaji2021": dict({"SRR14352106": dict({"Replicate": "C", "Time": "24hpi"}),
-                            "SRR14352107": dict({"Replicate": "B", "Time": "24hpi"}),
-                            "SRR14352108": dict({"Replicate": "A", "Time": "24hpi"}),
-                            "SRR14352109": dict({"Replicate": "C", "Time": "6hpi"}),
-                            "SRR14352110": dict({"Replicate": "B", "Time": "6hpi"}),
-                            "SRR14352111": dict({"Replicate": "A", "Time": "6hpi"}),
-                            "SRR14352112": dict({"Replicate": "C", "Time": "3hpi"}),
-                            "SRR14352113": dict({"Replicate": "X", "Time": "0hpi"}),
-                            "SRR14352116": dict({"Replicate": "B", "Time": "3hpi"}),
-                            "SRR14352117": dict({"Replicate": "A", "Time": "3hpi"})
-                            }),
-        "Kupke2020": dict({"SRR10530642": dict({"Time": "pre"}),
-                           "SRR10530643": dict({"Time": "post"})
-                           }),
-        "Pelz2021": dict({"SRR15084902": dict({"Time": "8dpi"}),
-                          "SRR15084903": dict({"Time": "5.5dpi"}),
-                          "SRR15084904": dict({"Time": "5dpi"}),
-                          "SRR15084905": dict({"Time": "4.5dpi"}),
-                          "SRR15084906": dict({"Time": "4dpi"}),
-                          "SRR15084907": dict({"Time": "3.5dpi"}),
-                          "SRR15084908": dict({"Time": "1.4dpi"}),
-                          "SRR15084909": dict({"Time": "21dpi"}),
-                          "SRR15084910": dict({"Time": "20.4dpi"}),
-                          "SRR15084911": dict({"Time": "20dpi"}),
-                          "SRR15084912": dict({"Time": "19.5dpi"}),
-                          "SRR15084913": dict({"Time": "1dpi"}),
-                          "SRR15084914": dict({"Time": "18dpi"}),
-                          "SRR15084915": dict({"Time": "17.5dpi"}),
-                          "SRR15084916": dict({"Time": "17dpi"}),
-                          "SRR15084917": dict({"Time": "16dpi"}),
-                          "SRR15084918": dict({"Time": "13.5dpi"}),
-                          "SRR15084919": dict({"Time": "13dpi"}),
-                          "SRR15084921": dict({"Time": "12.4dpi"}),
-                          "SRR15084922": dict({"Time": "9.4dpi"}),
-                          "SRR15084923": dict({"Time": "9dpi"}),
-                          "SRR15084924": dict({"Time": "0.5dpi"}),
-                          "SRR15084925": dict({"Time": "seed"})
-                          }),
-        "Mendes2021": dict({"SRR15720520": dict({"Status": "enriched", "Virus": "1", "Replicate": "1"}),
-                            "SRR15720521": dict({"Status": "enriched", "Virus": "1", "Replicate": "2"}),
-                            "SRR15720522": dict({"Status": "enriched", "Virus": "2", "Replicate": "1"}),
-                            "SRR15720523": dict({"Status": "enriched", "Virus": "2", "Replicate": "2"}),
-                            "SRR15720524": dict({"Status": "depleted", "Virus": "1", "Replicate": "1"}),
-                            "SRR15720525": dict({"Status": "depleted", "Virus": "1", "Replicate": "2"}),
-                            "SRR15720526": dict({"Status": "depleted", "Virus": "2", "Replicate": "1"}),
-                            "SRR15720527": dict({"Status": "depleted", "Virus": "2", "Replicate": "2"})
-                            }),
-        "Wang2020": dict({"SRR7722028" : dict({"Cell": "A549", "Time": "6", "Replicate": "1"}),
-                          "SRR7722030" : dict({"Cell": "A549", "Time": "12", "Replicate": "1"}),
-                          "SRR7722032" : dict({"Cell": "A549", "Time": "24", "Replicate": "1"}),
-                          "SRR7722029" : dict({"Cell": "A549", "Time": "6", "Replicate": "2"}),
-                          "SRR7722031" : dict({"Cell": "A549", "Time": "12", "Replicate": "2"}),
-                          "SRR7722033" : dict({"Cell": "A549", "Time": "24", "Replicate": "2"}),
-
-                          "SRR7722036" : dict({"Cell": "HBEpC", "Time": "6", "Replicate": "1"}),
-                          "SRR7722038" : dict({"Cell": "HBEpC", "Time": "12", "Replicate": "1"}),
-                          "SRR7722040" : dict({"Cell": "HBEpC", "Time": "24", "Replicate": "1"}),
-                          "SRR7722037" : dict({"Cell": "HBEpC", "Time": "6", "Replicate": "2"}),
-                          "SRR7722039" : dict({"Cell": "HBEpC", "Time": "12", "Replicate": "2"}),
-                          "SRR7722041" : dict({"Cell": "HBEpC", "Time": "24", "Replicate": "2"})
-                          }),
-        "Wang2023": dict({"SRR16770171" : dict({"IFNAR": "1", "IFNLR": "0", "Replicate": "1"}),
-                          "SRR16770172" : dict({"IFNAR": "1", "IFNLR": "0", "Replicate": "1"}),
-                          "SRR16770173" : dict({"IFNAR": "1", "IFNLR": "0", "Replicate": "1"}),
-                          "SRR16770174" : dict({"IFNAR": "1", "IFNLR": "0", "Replicate": "1"}),
-                          "SRR16770175" : dict({"IFNAR": "1", "IFNLR": "0", "Replicate": "1"}),
-                          "SRR16770181" : dict({"IFNAR": "0", "IFNLR": "1", "Replicate": "1"}),
-                          "SRR16770182" : dict({"IFNAR": "0", "IFNLR": "1", "Replicate": "1"}),
-                          "SRR16770183" : dict({"IFNAR": "0", "IFNLR": "1", "Replicate": "1"}),
-                          "SRR16770184" : dict({"IFNAR": "0", "IFNLR": "1", "Replicate": "1"}),
-                          "SRR16770185" : dict({"IFNAR": "0", "IFNLR": "1", "Replicate": "1"}),
-                          "SRR16770186" : dict({"IFNAR": "0", "IFNLR": "1", "Replicate": "1"}),
-                          "SRR16770191" : dict({"IFNAR": "1", "IFNLR": "1", "Replicate": "1"}),
-                          "SRR16770192" : dict({"IFNAR": "1", "IFNLR": "1", "Replicate": "1"}),
-                          "SRR16770193" : dict({"IFNAR": "1", "IFNLR": "1", "Replicate": "1"}),
-                          "SRR16770197" : dict({"IFNAR": "1", "IFNLR": "0", "Replicate": "2"}),
-                          "SRR16770198" : dict({"IFNAR": "1", "IFNLR": "0", "Replicate": "2"}),
-                          "SRR16770201" : dict({"IFNAR": "1", "IFNLR": "0", "Replicate": "2"}),
-                          "SRR16770200" : dict({"IFNAR": "1", "IFNLR": "0", "Replicate": "2"}),
-                          "SRR16770199" : dict({"IFNAR": "1", "IFNLR": "0", "Replicate": "2"}),
-                          "SRR16770207" : dict({"IFNAR": "0", "IFNLR": "1", "Replicate": "2"}),
-                          "SRR16770208" : dict({"IFNAR": "0", "IFNLR": "1", "Replicate": "2"}),
-                          "SRR16770209" : dict({"IFNAR": "0", "IFNLR": "1", "Replicate": "2"}),
-                          "SRR16770210" : dict({"IFNAR": "0", "IFNLR": "1", "Replicate": "2"}),
-                          "SRR16770211" : dict({"IFNAR": "0", "IFNLR": "1", "Replicate": "2"}),
-                          "SRR16770212" : dict({"IFNAR": "0", "IFNLR": "1", "Replicate": "2"}),
-                          "SRR16770219" : dict({"IFNAR": "1", "IFNLR": "1", "Replicate": "2"}),
-                          "SRR16770218" : dict({"IFNAR": "1", "IFNLR": "1", "Replicate": "2"}),
-                          "SRR16770217" : dict({"IFNAR": "1", "IFNLR": "1", "Replicate": "2"})
-                          }),
-        "Penn2022": dict({"ERR10231074": dict({"Time": "24hpi", "Mode": "High", "Lineage": "1"}),
-                          "ERR10231075": dict({"Time": "48hpi", "Mode": "High", "Lineage": "1"}),
-                          "ERR10231076": dict({"Time": "6hpi", "Mode": "High", "Lineage": "1"}),
-                          "ERR10231077": dict({"Time": "96hpi", "Mode": "High", "Lineage": "1"}),
-                          "ERR10231078": dict({"Time": "24hpi", "Mode": "High", "Lineage": "2"}),
-                          "ERR10231079": dict({"Time": "48hpi", "Mode": "High", "Lineage": "2"}),
-                          "ERR10231080": dict({"Time": "6hpi", "Mode": "High", "Lineage": "2"}),
-                          "ERR10231081": dict({"Time": "96hpi", "Mode": "High", "Lineage": "2"}),
-                          "ERR10231089": dict({"Time": "96hpi", "Mode": "Low", "Lineage": "2"}),
-                          "ERR10231082": dict({"Time": "24hpi", "Mode": "Low", "Lineage": "1"}),
-                          "ERR10231085": dict({"Time": "96hpi", "Mode": "Low", "Lineage": "1"}),
-                          "ERR10231083": dict({"Time": "48hpi", "Mode": "Low", "Lineage": "1"}),
-                          "ERR10231084": dict({"Time": "6hpi", "Mode": "Low", "Lineage": "1"}),
-                          "ERR10231086": dict({"Time": "24hpi", "Mode": "Low", "Lineage": "2"}),
-                          "ERR10231087": dict({"Time": "48hpi", "Mode": "Low", "Lineage": "2"}),
-                          "ERR10231088": dict({"Time": "6hpi", "Mode": "Low", "Lineage": "2"})
-                          }),
-        "Lui2019": dict({"SRR8949705": dict({"Type": "bulk"})})
-    })
-
-    acc_nums = acc_num_dict[strain]
+    acc_nums = ACCNUMDICT[experiment]
 
     dfs = list()
     for acc_num, meta in acc_nums.items():
         path = os.path.join(DATAPATH, experiment, f"{acc_num}_mapped_reads_per_segment.csv")
+        if not os.path.exists(path):
+            path = os.path.join(DATAPATH, experiment, f"{acc_num}both_mapped_reads_per_segment.csv")
         df = pd.read_csv(path, dtype={"counts":"int64","segment": "string"}, na_values=["", "None"], keep_default_na=False)
         for m in meta.keys():
             df[m] = meta[m]
@@ -1155,6 +1177,17 @@ def load_mapped_reads(experiment: str, strain: str):
     concat_df = pd.concat(dfs)
 
     return concat_df
+
+
+def load_all_mapped_reads(dfnames):
+    '''
+    
+    '''
+    mr_dfs = list()
+    for experiment in dfnames:
+        df = load_mapped_reads(experiment)
+        mr_dfs.append(df)
+    return mr_dfs
 
 
 def get_sequence(strain: str, seg: str, full: bool=False)-> object:

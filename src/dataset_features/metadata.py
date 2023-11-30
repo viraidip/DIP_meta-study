@@ -10,49 +10,64 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
 sys.path.insert(0, "..")
-from utils import load_mapped_reads
-from utils import SEGMENTS, DATAPATH, RESULTSPATH, CMAP, ACCNUMDICT
+from utils import load_all_mapped_reads
+from utils import SEGMENTS, DATAPATH, RESULTSPATH, ACCNUMDICT, DATASET_STRAIN_DICT, CMAP
 
 
-def analyse_metadata(dfnames)-> None:
+def load_all_metadata(dfnames):
     '''
     
     '''
-    avgspotlenl = list()
-    readsl = list()
-    reads_suml = list()
-    for name in dfnames:
-        dir = os.path.join(DATAPATH, "metadata", f"{name}.csv")
-        data_df = pd.read_csv(dir)
-
-        if name == "Alnaji2019":
-            acc_nums = list()
-            for strain in ["Cal07", "NC", "Perth", "BLEE"]:
-                acc_nums.extend(ACCNUMDICT[f"Alnaji2019_{strain}"].keys())
-        else:
-            acc_nums = ACCNUMDICT[name].keys()
-        
+    dfs = list()
+    for dfname in dfnames:
+        file = os.path.join(DATAPATH, "metadata", f"{dfname}.csv")
+        data_df = pd.read_csv(file)
+        acc_nums = ACCNUMDICT[dfname].keys()
         df = data_df[data_df["Run"].isin(acc_nums)].copy()
+        dfs.append(df)
 
-        
+    return dfs
+
+
+def analyse_metadata(dfs, dfnames, mr_dfs)-> None:
+    '''
+    
+    '''
+    results = dict({"names": dfnames, "Reads mean": list(), "Reads sum": list()})
+
+    results["AvgSpotLen"] = list()
+    results["considered datasets"] = list()
+    for df, dfname in zip(dfs, dfnames):
+        results["considered datasets"].append(len(ACCNUMDICT[dfname]))
+
         if "AvgSpotLen" in df.columns:
-            avgspotlen = df["AvgSpotLen"].mean()
+            results["AvgSpotLen"].append(df["AvgSpotLen"].mean())
+        else:
+            print(f"{dfname}: spot length not given")
+            results["AvgSpotLen"].append(np.nan)
+
         if "Reads" not in df.columns:
             df["Reads"] = df["Bases"] / df["AvgSpotLen"]
-        reads = df["Reads"].mean()
-        reads_sum = df["Reads"].sum()
+        results["Reads mean"].append(df["Reads"].mean())
+        results["Reads sum"].append(df["Reads"].sum())
 
-        print(name)
-        print(avgspotlen)
-        print(reads)
+    for header in ["Assay Type", "Instrument", "Organism", "Host", "LibraryLayout", "LibrarySelection", "LibrarySource", "strain"]:
+        results[header] = list()
+        for df, dfname in zip(dfs, dfnames):
+            if header in df.columns:
+                results[header].append(" & ".join(df[header].unique()))
+            else:
+                print(f"{dfname}: {header} not given")
+                results[header].append(np.nan)
+        
+    results["mapped reads"] = list()
+    for mr_df in mr_dfs:
+        results["mapped reads"].append(mr_df["counts"].sum())
 
-        avgspotlenl.append(avgspotlen)
-        readsl.append(reads)
-        reads_suml.append(reads_sum)
-
-    result_df = pd.DataFrame({"name": dfnames, "avgspotlen": avgspotlenl, "reads": readsl, "reads_sum": reads_suml})
+    result_df = pd.DataFrame(results)
     pd.set_option('display.float_format', '{:.1f}'.format)
-    print(result_df)
+    path = os.path.join(RESULTSPATH, "metadata", "metadata.csv")
+    result_df.to_csv(path, float_format="%.2f", index=False)
 
 
 def mapped_reads_distribution(dfs: list, dfnames: list)-> None:
@@ -81,7 +96,7 @@ def mapped_reads_distribution(dfs: list, dfnames: list)-> None:
     axs.set_xticklabels(dfnames, rotation=45)
     axs.set_xlabel('Segment')
     axs.set_ylabel('Fraction')
-    axs.set_title('Fraction of Different Segments')
+    axs.set_title('Fraction of reads from different segments')
 
     handles, labels = axs.get_legend_handles_labels()
     unique_handles_labels = {}
@@ -89,24 +104,18 @@ def mapped_reads_distribution(dfs: list, dfnames: list)-> None:
         if label not in unique_handles_labels:
             unique_handles_labels[label] = handle
 
-    axs.legend(unique_handles_labels.values(), unique_handles_labels.keys())
+    box = axs.get_position()
+    axs.set_position([box.x0, box.y0 + box.height * 0.1, box.width, box.height * 0.9])
+    axs.legend(unique_handles_labels.values(), unique_handles_labels.keys(), loc="upper center", bbox_to_anchor=(0.5, 1.1), fancybox=True, shadow=True, ncol=8)
 
     plt.show()
 
-
 if __name__ == "__main__":
     plt.style.use("seaborn")
-    dfnames = list()
-    
-    dfnames.append(f"Alnaji2021")
-    dfnames.append(f"Pelz2021")
-    dfnames.append(f"Wang2023")
-    dfnames.append(f"Wang2020")
-    dfnames.append(f"Kupke2020")
-    dfnames.append(f"Alnaji2019")
-    dfnames.append(f"Penn2022")
-    dfnames.append(f"Lui2019")
-    dfnames.append(f"Mendes2021")
 
-    analyse_metadata(dfnames)
+    dfnames = DATASET_STRAIN_DICT.keys()
+    dfs = load_all_metadata(dfnames)
+    mr_dfs = load_all_mapped_reads(dfnames)
 
+    analyse_metadata(dfs, dfnames, mr_dfs)
+    mapped_reads_distribution(mr_dfs, dfnames)
