@@ -13,11 +13,11 @@ from scipy import stats
 from scipy.stats import chi2_contingency
 
 sys.path.insert(0, "..")
-from utils import load_all, get_sequence, plot_heatmap, create_nucleotide_ratio_matrix, count_direct_repeats_overall
-from utils import SEGMENTS, RESULTSPATH, DATASET_STRAIN_DICT, CMAP, NUCLEOTIDES
+from utils import load_all, get_sequence, plot_heatmap, create_nucleotide_ratio_matrix, count_direct_repeats_overall, load_dataset, preprocess, join_data
+from utils import SEGMENTS, RESULTSPATH, DATASET_STRAIN_DICT, CMAP, NUCLEOTIDES, CUTOFF
 
 
-def plot_distribution_over_segments(dfs: list, dfnames: list, name: str="")-> None:
+def plot_distribution_over_segments(dfs: list, dfnames: list, folder: str="general_analysis")-> None:
     '''
 
     Args:
@@ -59,17 +59,14 @@ def plot_distribution_over_segments(dfs: list, dfnames: list, name: str="")-> No
     axs.set_position([box.x0, box.y0 + box.height * 0.1, box.width, box.height * 0.9])
     axs.legend(loc="upper center", bbox_to_anchor=(0.5, 1.1), fancybox=True, shadow=True, ncol=8)
     
-    if name != "":
-        filename = f"fraction_segments_{name}.png"
-    else:
-        filename = "fraction_segments.png"
-
-    save_path = os.path.join(RESULTSPATH, "general_analysis", filename)
-    plt.savefig(save_path)
+    save_path = os.path.join(RESULTSPATH, folder)
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+    plt.savefig(os.path.join(save_path, "fraction_segments.png"))
     plt.close()
 
 
-def calculate_deletion_shifts(dfs: list, dfnames: list)-> None:
+def calculate_deletion_shifts(dfs: list, dfnames: list, folder: str="general_analysis")-> None:
     '''
 
     Args:
@@ -121,12 +118,14 @@ def calculate_deletion_shifts(dfs: list, dfnames: list)-> None:
     print(f"mean distribution:\n\t{overall/n}")
 
     plt.tight_layout()
-    save_path = os.path.join(RESULTSPATH, "general_analysis", "deletion_shifts.png")
-    plt.savefig(save_path)
+    save_path = os.path.join(RESULTSPATH, folder)
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+    plt.savefig(os.path.join(save_path, "deletion_shifts.png"))
     plt.close()
  
 
-def length_distribution_heatmap(dfs: list, dfnames: list)-> None:
+def length_distribution_heatmap(dfs: list, dfnames: list, folder: str="general_analysis")-> None:
     '''
     
     '''
@@ -167,13 +166,15 @@ def length_distribution_heatmap(dfs: list, dfnames: list)-> None:
                 axs[i].set_visible(False)
                 m = 0
 
+        save_path = os.path.join(RESULTSPATH, folder)
+        if not os.path.exists(save_path):
+            os.makedirs(save_path)
+        plt.savefig(os.path.join(save_path, f"{s}_length_del_hist.png"))
 
-        save_path = os.path.join(RESULTSPATH, "general_analysis", f"{s}_length_del_hist.png")
-        plt.savefig(save_path)
         plt.close()
 
 
-def length_distribution_violinplot(dfs: list, dfnames: list)-> None:
+def length_distribution_violinplot(dfs: list, dfnames: list, folder: str="general_analysis")-> None:
     '''
     
     '''
@@ -219,12 +220,14 @@ def length_distribution_violinplot(dfs: list, dfnames: list)-> None:
         axs.set_xlabel("Dataset")
         axs.set_ylabel("DVG sequence length")
 
-        save_path = os.path.join(RESULTSPATH, "general_analysis", f"{s}_length_del_violinplot.png")
-        plt.savefig(save_path)
+        save_path = os.path.join(RESULTSPATH, folder)
+        if not os.path.exists(save_path):
+            os.makedirs(save_path)
+        plt.savefig(os.path.join(save_path, f"{s}_length_del_violinplot.png"))
         plt.close()
 
 
-def start_vs_end_lengths(dfs, dfnames, limit: int=0)-> None:
+def start_vs_end_lengths(dfs, dfnames, limit: int=0, folder: str="general_analysis")-> None:
     '''
         Plots the length of the start against the length of the end of the DI
         RNA sequences as a scatter plot.
@@ -271,12 +274,14 @@ def start_vs_end_lengths(dfs, dfnames, limit: int=0)-> None:
         else:
             filename = f"{dfname}_length_start_end_{limit}.png"
 
-        save_path = os.path.join(RESULTSPATH, "general_analysis", filename)
-        plt.savefig(save_path)
+        save_path = os.path.join(RESULTSPATH, folder)
+        if not os.path.exists(save_path):
+            os.makedirs(save_path)
+        plt.savefig(os.path.join(save_path, filename))
         plt.close()
 
 
-def diff_start_end_lengths(dfs, dfnames, name: str="")-> None:
+def diff_start_end_lengths(dfs, dfnames, folder: str="general_analysis")-> None:
     '''
 
     '''
@@ -301,17 +306,14 @@ def diff_start_end_lengths(dfs, dfnames, name: str="")-> None:
     axs.set_ylabel("Start-End sequence lengths")
     axs.set_title(f"Difference of start to end sequence lengths (threshold={thresh})")
 
-    if name != "":
-        filename = f"diff_start_end_violinplot_{name}.png"
-    else:
-        filename = "diff_start_end_violinplot.png"
-
-    save_path = os.path.join(RESULTSPATH, "general_analysis", filename)
-    plt.savefig(save_path)
+    save_path = os.path.join(RESULTSPATH, folder)
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+    plt.savefig(os.path.join(save_path, "diff_start_end_violinplot.png"))
     plt.close()
 
 
-def dataset_distributions(dfs: list, dfnames: list)-> None:
+def dataset_distributions(dfs: list, dfnames: list, folder: str="general_analysis")-> None:
     '''
     
     '''
@@ -342,8 +344,10 @@ def dataset_distributions(dfs: list, dfnames: list)-> None:
     plt.xlabel("Datasets")
     plt.ylabel("NGS read count (log scale)")
 
-    save_path = os.path.join(RESULTSPATH, "general_analysis", "ngs_count_distribution.png")
-    plt.savefig(save_path)
+    save_path = os.path.join(RESULTSPATH, folder)
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+    plt.savefig(os.path.join(save_path, "ngs_count_distribution.png"))
     plt.close()
 
     stats_df = pd.DataFrame({"Dataset": dfnames,
@@ -353,11 +357,13 @@ def dataset_distributions(dfs: list, dfnames: list)-> None:
                              "Std. dev.": stddevs,
                              "Max": maxs})
 
-    save_path = os.path.join(RESULTSPATH, "general_analysis", "ngs_count_stats.csv")
-    stats_df.to_csv(save_path, index=False)
+    save_path = os.path.join(RESULTSPATH, folder)
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+    stats_df.to_csv(os.path.join(save_path, "ngs_count_stats.csv"), index=False)
 
 
-def plot_nucleotide_ratio_around_deletion_junction_heatmaps(dfs, dfnames):
+def plot_nucleotide_ratio_around_deletion_junction_heatmaps(dfs, dfnames, folder: str="general_analysis"):
     '''
         Plot heatmaps of nucleotide ratios around deletion junctions.
 
@@ -421,12 +427,14 @@ def plot_nucleotide_ratio_around_deletion_junction_heatmaps(dfs, dfnames):
           
     fig.subplots_adjust(top=0.9)
 
-    save_path = os.path.join(RESULTSPATH, "general_analysis", "nuc_occ.png")
-    plt.savefig(save_path)
+    save_path = os.path.join(RESULTSPATH, folder)
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+    plt.savefig(os.path.join(save_path, "nuc_occ.png"))
     plt.close()
 
 
-def plot_direct_repeat_ratio_heatmaps(dfs: list, dfnames: list)-> None:
+def plot_direct_repeat_ratio_heatmaps(dfs: list, dfnames: list, folder: str="general_analysis")-> None:
     '''
         Plot heatmaps of nucleotide ratios around deletion junctions.
 
@@ -482,16 +490,19 @@ def plot_direct_repeat_ratio_heatmaps(dfs: list, dfnames: list)-> None:
     axs.set_xticklabels(x_ticks)
     fig.tight_layout()
 
-    save_path = os.path.join(RESULTSPATH, "general_analysis", "dir_rep.png")
-    plt.savefig(save_path)
+    save_path = os.path.join(RESULTSPATH, folder)
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+    plt.savefig(os.path.join(save_path, "dir_rep.png"))
     plt.close()
 
 
 if __name__ == "__main__":
     plt.style.use("seaborn")
-    dfnames = DATASET_STRAIN_DICT.keys()
-    dfs, expected_dfs = load_all(dfnames)
 
+    dfnames = list(DATASET_STRAIN_DICT.keys())
+    dfs, _ = load_all(dfnames)
+    '''
     dataset_distributions(dfs, dfnames)
     plot_distribution_over_segments(dfs, dfnames)
     calculate_deletion_shifts(dfs, dfnames)
@@ -501,3 +512,47 @@ if __name__ == "__main__":
     plot_direct_repeat_ratio_heatmaps(dfs, dfnames)
     start_vs_end_lengths(dfs, dfnames, limit=600)
     diff_start_end_lengths(dfs, dfnames)
+    '''
+    ### in vivo datasets ###
+    in_vivo_dfnames = ["Wang2023", "Penn2022", "Lui2019", "WRA2021_A", "Rattanaburi2022_H3N2", "WRA2021_B", "Sheng2018", "Lauring2019"]
+    in_vivo_dfs = list()
+    for dfname in in_vivo_dfnames:
+        in_vivo_dfs.append(dfs[dfnames.index(dfname)])
+
+    folder = "in_vivo_datasets"
+    dataset_distributions(in_vivo_dfs, in_vivo_dfnames, folder=folder)
+    plot_distribution_over_segments(in_vivo_dfs, in_vivo_dfnames, folder=folder)
+    calculate_deletion_shifts(in_vivo_dfs, in_vivo_dfnames, folder=folder)
+    length_distribution_heatmap(in_vivo_dfs, in_vivo_dfnames, folder=folder)
+    length_distribution_violinplot(in_vivo_dfs, in_vivo_dfnames, folder=folder)
+    plot_nucleotide_ratio_around_deletion_junction_heatmaps(in_vivo_dfs, in_vivo_dfnames, folder=folder)
+    plot_direct_repeat_ratio_heatmaps(in_vivo_dfs, in_vivo_dfnames, folder=folder)
+    start_vs_end_lengths(in_vivo_dfs, in_vivo_dfnames, limit=600, folder=folder)
+    diff_start_end_lengths(in_vivo_dfs, in_vivo_dfnames, folder=folder)
+
+
+    ### different cell types, only PR8 datasets ### 
+    cell_dfs = list()
+    cell_dfnames = list()
+    for dfname in ["Alnaji2021", "Pelz2021", "Wang2020", "EBI2020"]:
+        df = load_dataset(dfname)
+        if "Cell" in df.columns:
+            for cell_type in df["Cell"].unique():
+                c_df = df[df["Cell"] == cell_type].copy()
+
+                cell_dfs.append(preprocess(DATASET_STRAIN_DICT[dfname], join_data(c_df), CUTOFF))
+                cell_dfnames.append(f"{dfname} {cell_type}")
+        else:
+            cell_dfs.append(preprocess(DATASET_STRAIN_DICT[dfname], join_data(df), CUTOFF))
+            cell_dfnames.append(f"{dfname} MDCK")
+
+    folder = "cell_datasets"
+    dataset_distributions(cell_dfs, cell_dfnames, folder=folder)
+    plot_distribution_over_segments(cell_dfs, cell_dfnames, folder=folder)
+    calculate_deletion_shifts(cell_dfs, cell_dfnames, folder=folder)
+    length_distribution_heatmap(cell_dfs, cell_dfnames, folder=folder)
+    length_distribution_violinplot(cell_dfs, cell_dfnames, folder=folder)
+    plot_nucleotide_ratio_around_deletion_junction_heatmaps(cell_dfs, cell_dfnames, folder=folder)
+    plot_direct_repeat_ratio_heatmaps(cell_dfs, cell_dfnames, folder=folder)
+    start_vs_end_lengths(cell_dfs, cell_dfnames, limit=600, folder=folder)
+    diff_start_end_lengths(cell_dfs, cell_dfnames, folder=folder)

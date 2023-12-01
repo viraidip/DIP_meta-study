@@ -13,11 +13,15 @@ from matplotlib.ticker import FixedLocator, FixedFormatter
 
 sys.path.insert(0, "..")
 from utils import load_all
-from utils import get_sequence, count_direct_repeats_overall, get_p_value_symbol, create_nucleotide_ratio_matrix, plot_heatmap
-from utils import SEGMENTS, RESULTSPATH, NUCLEOTIDES, CMAP, DATASET_STRAIN_DICT
+from utils import get_sequence, count_direct_repeats_overall, get_p_value_symbol, create_nucleotide_ratio_matrix, plot_heatmap, load_dataset, preprocess, join_data, generate_expected_data
+from utils import SEGMENTS, RESULTSPATH, NUCLEOTIDES, CMAP, DATASET_STRAIN_DICT, CUTOFF
 
 
-def plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs, dfnames, expected_dfs, name: str=""):
+def plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs,
+                                                             dfnames,
+                                                             expected_dfs,
+                                                             compared: str,
+                                                             folder: str="compare_expected"):
     '''
         Plot difference of expected vs observed nucleotide enrichment around deletion junctions as heatmap.
 
@@ -115,19 +119,21 @@ def plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs, dfnames, expec
             else:
                 xlabel.set_color("grey")   
 
+    fig.suptitle(f"nuc. occ. difference ({compared})")
     fig.subplots_adjust(top=0.9)
 
-    if name != "":
-        filename = f"nuc_occ_diff_{name}.png"
-    else:
-        filename = f"nuc_occ_diff.png"
-
-    save_path = os.path.join(RESULTSPATH, "compare_expected", filename)
-    plt.savefig(save_path)
+    save_path = os.path.join(RESULTSPATH, folder)
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+    plt.savefig(os.path.join(save_path, "nuc_occ_diff.png"))
     plt.close()
 
 
-def plot_expected_vs_observed_direct_repeat_heatmaps(dfs: list, dfnames: list, expected_dfs: list, compared: str, name: str="")-> None:
+def plot_expected_vs_observed_direct_repeat_heatmaps(dfs: list,
+                                                     dfnames: list,
+                                                     expected_dfs: list,
+                                                     compared: str,
+                                                     folder: str="compare_expected")-> None:
     '''
         Plot difference of expected vs observed nucleotide enrichment around deletion junctions as heatmap.
 
@@ -218,17 +224,17 @@ def plot_expected_vs_observed_direct_repeat_heatmaps(dfs: list, dfnames: list, e
     axs.set_xticklabels(x_ticks)
     fig.tight_layout()
 
-    if name != "":
-        filename = f"dir_rep_diff_{name}.png"
-    else:
-        filename = f"dir_rep_diff.png"
-
-    save_path = os.path.join(RESULTSPATH, "compare_expected", filename)
-    plt.savefig(save_path)
+    save_path = os.path.join(RESULTSPATH, folder)
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+    plt.savefig(os.path.join(save_path, "dir_rep_diff.png"))
     plt.close()
 
 
-def direct_repeat_composition(dfs: list, dfnames: list, expected_dfs: list, name: str=""):
+def direct_repeat_composition(dfs: list,
+                              dfnames: list,
+                              expected_dfs: list,
+                              folder: str="compare_expected"):
     '''
     
     '''
@@ -296,13 +302,10 @@ def direct_repeat_composition(dfs: list, dfnames: list, expected_dfs: list, name
         plt.gca().xaxis.set_major_formatter(FixedFormatter(labels))
         fig.tight_layout()
 
-        if name != "":
-            filename = f"nucleotides_direct_repeats_{name}_{dfname}.png"
-        else:
-            filename = f"nucleotides_direct_repeats_{dfname}.png"
-
-        save_path = os.path.join(RESULTSPATH, "compare_expected", filename)
-        plt.savefig(save_path)
+        save_path = os.path.join(RESULTSPATH, folder)
+        if not os.path.exists(save_path):
+            os.makedirs(save_path)
+        plt.savefig(os.path.join(save_path, f"nucleotides_direct_repeats_{dfname}.png"))
         plt.close()
 
         # make a bar plot to compare orig. data, expected data, composition of full sequence (so I have two references)
@@ -348,13 +351,10 @@ def direct_repeat_composition(dfs: list, dfnames: list, expected_dfs: list, name
         axs.set_xlabel("data")
         fig.tight_layout()
 
-        if name != "":
-            filename = f"nucleotides_direct_repeats_compared_{name}_{dfname}.png"
-        else:
-            filename = f"nucleotides_direct_repeats_compared_{dfname}.png"
-
-        save_path = os.path.join(RESULTSPATH, "compare_expected", filename)
-        plt.savefig(save_path)
+        save_path = os.path.join(RESULTSPATH, folder)
+        if not os.path.exists(save_path):
+            os.makedirs(save_path)
+        plt.savefig(os.path.join(save_path, f"nucleotides_direct_repeats_compared_{dfname}.png"))
         plt.close()
 
 
@@ -363,6 +363,44 @@ if __name__ == "__main__":
     dfnames = DATASET_STRAIN_DICT.keys()
     dfs, expected_dfs = load_all(dfnames, expected=True)
 
-    plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs, dfnames, expected_dfs)
+    plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs, dfnames, expected_dfs, "observed-expected")
     plot_expected_vs_observed_direct_repeat_heatmaps(dfs, dfnames, expected_dfs, "observed-expected")
     direct_repeat_composition(dfs, dfnames, expected_dfs)
+
+    ### in vivo datasets ###
+    in_vivo_dfnames = ["Wang2023", "Penn2022", "Lui2019", "WRA2021_A", "Rattanaburi2022_H3N2", "WRA2021_B", "Sheng2018", "Lauring2019"]
+    in_vivo_dfs = list()
+    expected_in_vivo_dfs = list()
+    for dfname in in_vivo_dfnames:
+        in_vivo_dfs.append(dfs[dfnames.index(dfname)])
+        expected_in_vivo_dfs.append(expected_dfs[dfnames.index(dfname)])
+
+    folder = "in_vivo_datasets"
+    plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs, dfnames, expected_dfs, folder)
+    plot_expected_vs_observed_direct_repeat_heatmaps(dfs, dfnames, expected_dfs, "observed-expected", folder)
+    direct_repeat_composition(dfs, dfnames, expected_dfs, folder)
+
+    ### different cell types, only PR8 datasets ### 
+    cell_dfs = list()
+    cell_dfnames = list()
+    expected_cell_dfnames = list()
+    for dfname in ["Alnaji2021", "Pelz2021", "Wang2020", "EBI2020"]:
+        df = load_dataset(dfname)
+        if "Cell" in df.columns:
+            for cell_type in df["Cell"].unique():
+                strain = DATASET_STRAIN_DICT[dfname]
+                c_df = df[df["Cell"] == cell_type].copy()
+                cell_dfs.append(preprocess(strain, join_data(c_df), CUTOFF))
+                cell_dfnames.append(f"{dfname} {cell_type}")
+                expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
+
+        else:
+            strain = DATASET_STRAIN_DICT[dfname]
+            cell_dfs.append(preprocess(strain, join_data(df), CUTOFF))
+            cell_dfnames.append(f"{dfname} MDCK")
+            expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
+
+    folder = "cell_datasets"
+    plot_expected_vs_observed_nucleotide_enrichment_heatmaps(cell_dfs, cell_dfnames, expected_cell_dfnames, folder)
+    plot_expected_vs_observed_direct_repeat_heatmaps(cell_dfs, cell_dfnames, expected_cell_dfnames, "observed-expected", folder)
+    direct_repeat_composition(cell_dfs, cell_dfnames, expected_cell_dfnames, folder)
