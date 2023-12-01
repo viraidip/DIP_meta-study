@@ -12,9 +12,9 @@ from collections import Counter
 from scipy.stats import percentileofscore
 
 sys.path.insert(0, "..")
-from utils import join_data, load_alnaji2021, load_pelz2021, load_wang2023, load_wang2020, load_kupke2020, load_dataset
+from utils import join_data, load_dataset, load_single_dataset
 from utils import preprocess, calculate_direct_repeat, get_sequence
-from utils import CUTOFF, RESULTSPATH, SEGMENT_DICTS, ACCNUMDICT
+from utils import CUTOFF, RESULTSPATH, SEGMENT_DICTS, ACCNUMDICT, DATASET_STRAIN_DICT
 
 
 def generate_overlap_matrix_plot(dfs: list, dfnames: list):
@@ -83,9 +83,7 @@ def generate_max_overlap_candidates(dfs: list, dfnames: list):
             counts.append(count)
             dir_reps.append(dir_rep)
 
-
-    d = dict({"DI": candidates, "counts": counts, "dir_reps": dir_reps})
-    count_df = pd.DataFrame(d)
+    count_df = pd.DataFrame(dict({"DI": candidates, "counts": counts, "dir_reps": dir_reps}))
 
     count_df[["Segment", "Start", "End"]] = count_df["DI"].str.split("_", expand=True)
     print(df.groupby(["Segment"]).size().reset_index(name='count'))
@@ -104,7 +102,7 @@ def analyze_max_overlap_candidates(dfs, dfnames, count_df):
         plot_data.append(df["NGS_read_count"])
     plt.boxplot(plot_data, labels=labels)
     
-    x_p = [1, 2, 3, 4, 5]
+    x_p = range(1, len(dfs)+1)
     max_count = count_df["counts"].max()
     for c in count_df[count_df["counts"] >= max_count]["DI"].tolist():
         print(f"### {c} ###")
@@ -136,7 +134,7 @@ def analyze_max_overlap_candidates(dfs, dfnames, count_df):
         print(f"### {c} ###")  
         counts = list()  
         for accnum, meta in ACCNUMDICT["Pelz2021"].items():
-            t_df = load_dataset("Pelz2021", accnum, SEGMENT_DICTS["PR8"])
+            t_df = load_single_dataset("Pelz2021", accnum, SEGMENT_DICTS["PR8"])
             t_df["key"] = t_df["Segment"] + "_" + t_df["Start"].map(str) + "_" + t_df["End"].map(str)
             
             count = t_df[t_df["key"] == c]["NGS_read_count"]
@@ -156,40 +154,16 @@ def analyze_max_overlap_candidates(dfs, dfnames, count_df):
     
 if __name__ == "__main__":
     plt.style.use("seaborn")
+    
     dfs = list()
-    dfnames = list()
-
-    ### Alnaji2021 ###
-    strain = "PR8"
-    df = join_data(load_alnaji2021())
-    dfs.append(preprocess(strain, df, CUTOFF))
-    dfnames.append("Alnaji2021")
-
-    ### Pelz2021 ###
-    strain = "PR8"
-    df = join_data(load_pelz2021())
-    dfs.append(preprocess(strain, df, CUTOFF))
-    dfnames.append("Pelz2021")
-
-    ### Wang2023 ###
-    strain = "PR8"
-    df = join_data(load_wang2023())
-    dfs.append(preprocess(strain, df, CUTOFF))
-    dfnames.append(f"Wang2023")
-
-    ### Wang2020 ###
-    strain = "PR8"
-    df = load_wang2020()
-    dfs.append(preprocess(strain, join_data(df), CUTOFF))
-    dfnames.append(f"Wang2020")
-        
-    ### Kupke2020 ###
-    strain = "PR8"
-    df = join_data(load_kupke2020())
-    dfs.append(preprocess(strain, df, 5))
-    dfnames.append("Kupke2020")
-
+    dfnames = ["Alnaji2021", "Pelz2021", "Wang2023", "Wang2020", "Kupke2020", "EBI2020"]
+    for dataset in dfnames:
+        strain = DATASET_STRAIN_DICT[dataset]
+        df = join_data(load_dataset(dataset))
+        dfs.append(preprocess(strain, df, CUTOFF))
 
     generate_overlap_matrix_plot(dfs, dfnames)
     count_df = generate_max_overlap_candidates(dfs, dfnames)
+    print(count_df)
+    # TODO: only select PB2 candidates
     analyze_max_overlap_candidates(dfs, dfnames, count_df)
