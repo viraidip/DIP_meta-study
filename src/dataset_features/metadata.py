@@ -33,25 +33,21 @@ def analyse_metadata(dfs, dfnames, mr_dfs)-> None:
     '''
     
     '''
-    results = dict({"names": dfnames, "Reads mean": list(), "Reads sum": list()})
+    results = dict({"names": dfnames, "Reads mean": list(), "Reads sum": list(), "AvgSpotLen": list(), "considered datasets": list()})
 
-    results["AvgSpotLen"] = list()
-    results["considered datasets"] = list()
     for df, dfname in zip(dfs, dfnames):
         results["considered datasets"].append(len(ACCNUMDICT[dfname]))
 
-        if "AvgSpotLen" in df.columns:
-            results["AvgSpotLen"].append(df["AvgSpotLen"].mean())
-        else:
-            print(f"{dfname}: spot length not given")
-            results["AvgSpotLen"].append(np.nan)
+        if "AvgSpotLen" not in df.columns:
+            df["AvgSpotLen"] = df["Bases"] / df["Reads"]
+        results["AvgSpotLen"].append(df["AvgSpotLen"].mean())
 
         if "Reads" not in df.columns:
             df["Reads"] = df["Bases"] / df["AvgSpotLen"]
         results["Reads mean"].append(df["Reads"].mean())
         results["Reads sum"].append(df["Reads"].sum())
 
-    for header in ["Assay Type", "Instrument", "Organism", "Host", "LibraryLayout", "LibrarySelection", "LibrarySource", "strain"]:
+    for header in ["Assay Type", "Instrument", "Organism", "Host", "system type", "LibraryLayout", "LibrarySelection", "LibrarySource", "strain", "subtype"]:
         results[header] = list()
         for df, dfname in zip(dfs, dfnames):
             if header in df.columns:
@@ -118,4 +114,4 @@ if __name__ == "__main__":
     mr_dfs = load_all_mapped_reads(dfnames)
 
     analyse_metadata(dfs, dfnames, mr_dfs)
-    mapped_reads_distribution(mr_dfs, dfnames)
+#    mapped_reads_distribution(mr_dfs, dfnames)
