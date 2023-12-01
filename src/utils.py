@@ -32,34 +32,36 @@ STRAINS = dict({
 })
 
 DATASET_STRAIN_DICT = dict({
+    # H1N1
+    "Alnaji2021": "PR8",
+    "Pelz2021": "PR8",
+    "Wang2023": "PR8",
+    "Wang2020": "PR8",
+ #   "Kupke2020": "PR8",
+    "EBI2020": "PR8",
+ #   "Vasilijevic2017 swine": "swine",
+  #  "Vasilijevic2017 Cal09": "Cal09",
     "Alnaji2019_Cal07": "Cal07",
     "Alnaji2019_Cal07_time": "Cal07",
     "Alnaji2019_NC" : "NC",
-    "Alnaji2019_Perth": "Perth",
-    "Alnaji2019_BLEE": "BLEE",
-    "Alnaji2021": "PR8",
-    "Pelz2021": "PR8",
     "Mendes2021": "WSN",
-    "Wang2023": "PR8",
-    "Lui2019": "Anhui",
-    "Wang2020": "PR8",
-    "Penn2022": "Turkey",
- #   "Kupke2020": "PR8",
-    "Sheng2018": "Brisbane",
- #   "Vasilijevic2017 swine": "swine",
-  #  "Vasilijevic2017 Cal09": "Cal09",
-    "EBI2020": "PR8",
-#    "Greninger_2_2023 B7C5": "B7C5",
- #   "Greninger_2_2023 B7H4": "B7H4",
-  #  "Greninger_2_2023 B7N6": "B7N6",
-   # "Greninger_2_2023 B8B1": "B8B1",
-    #"Greninger_2_2023 B8E6": "B8E6",
-    "Greninger_2_2023": "Greninger_cons",
+    # H3N2
+    "Alnaji2019_Perth": "Perth",
     "WRA2021_A": "Connecticut",
-    "WRA2021_B": "Victoria",
     "Rattanaburi2022_H3N2": "Thailand",
+    # H5N1
+    "Penn2022": "Turkey",
+    # H7N9
+    "Lui2019": "Anhui",
+    # B 
+    "Alnaji2019_BLEE": "BLEE",
+    "WRA2021_B": "Victoria",
+    "Sheng2018": "Brisbane",
+    # n.a.
+    "Greninger_2_2023": "Greninger_cons",
     "Lauring2019": "BLEE",
-   # "Southgate2019": "Yamagata"
+
+    # "Southgate2019": "Yamagata"
 })
 
 ACCNUMDICT = dict({
