@@ -37,7 +37,7 @@ DATASET_STRAIN_DICT = dict({
     "Pelz2021": "PR8",
     "Wang2023": "PR8",
     "Wang2020": "PR8",
- #   "Kupke2020": "PR8",
+    "Kupke2020": "PR8",
     "EBI2020": "PR8",
  #   "Vasilijevic2017 swine": "swine",
   #  "Vasilijevic2017 Cal09": "Cal09",
@@ -56,12 +56,13 @@ DATASET_STRAIN_DICT = dict({
     # B 
     "Alnaji2019_BLEE": "BLEE",
     "WRA2021_B": "Victoria",
+    "WRA2021_B_yamagata": "Yamagata",
     "Sheng2018": "Brisbane",
+    "Southgate2019": "Yamagata",
+
     # n.a.
     "Greninger_2_2023": "Greninger_cons",
     "Lauring2019": "BLEE",
-
-    # "Southgate2019": "Yamagata"
 })
 
 ACCNUMDICT = dict({
@@ -390,7 +391,7 @@ ACCNUMDICT = dict({
         "SRR15196424":  dict({}),
         "SRR15196425":  dict({})
     }),
-        "WRA2021_B_yamagata": dict({
+    "WRA2021_B_yamagata": dict({
         "SRR15183338":  dict({}),
         "SRR15183343":  dict({}),
         "SRR15183342":  dict({}),
@@ -423,6 +424,64 @@ ACCNUMDICT = dict({
         "SRR10013284": dict({})
     }),
     "Southgate2019": dict({
+        "ERR3474616": dict({}),
+        "ERR3474621": dict({}),
+        "ERR3474642": dict({}),
+        "ERR3474643": dict({}),
+        "ERR3474658": dict({}),
+        "ERR3474661": dict({}),
+        "ERR3474662": dict({}),
+        "ERR3474663": dict({}),
+        "ERR3474664": dict({}),
+        "ERR3474666": dict({}),
+        "ERR3474671": dict({}),
+        "ERR3474674": dict({}),
+        "ERR3474675": dict({}),
+        "ERR3474676": dict({}),
+        "ERR3474679": dict({}),
+        "ERR3474684": dict({}),
+        "ERR3474685": dict({}),
+        "ERR3474686": dict({}),
+        "ERR3474687": dict({}),
+        "ERR3474689": dict({}),
+        "ERR3474692": dict({}),
+        "ERR3474693": dict({}),
+        "ERR3474694": dict({}),
+        "ERR3474695": dict({}),
+        "ERR3474697": dict({}),
+        "ERR3474698": dict({}),
+        "ERR3474699": dict({}),
+        "ERR3474701": dict({}),
+        "ERR3474702": dict({}),
+        "ERR3474703": dict({}),
+        "ERR3474704": dict({}),
+        "ERR3474705": dict({}),
+        "ERR3474706": dict({}),
+        "ERR3474707": dict({}),
+        "ERR3474709": dict({}),
+        "ERR3474710": dict({}),
+        "ERR3474712": dict({}),
+        "ERR3474713": dict({}),
+        "ERR3474714": dict({}),
+        "ERR3474715": dict({}),
+        "ERR3474716": dict({}),
+        "ERR3474717": dict({}),
+        "ERR3474718": dict({}),
+        "ERR3474719": dict({}),
+        "ERR3474720": dict({}),
+        "ERR3474721": dict({}),
+        "ERR3474722": dict({}),
+        "ERR3474723": dict({}),
+        "ERR3474724": dict({}),
+        "ERR3474725": dict({}),
+        "ERR3474726": dict({}),
+        "ERR3474728": dict({}),
+        "ERR3474729": dict({}),
+        "ERR3474750": dict({}),
+        "ERR3474751": dict({}),
+        "ERR3474781": dict({}),
+        "ERR3474796": dict({}),
+        "ERR3474809": dict({})
     })
 })
 
@@ -632,7 +691,14 @@ SEGMENT_DICTS = dict({
         "KP336259.1": "NS"
     }),
     "Yamagata":({
-        
+        "OQ034430.1": "PB2",
+        "OQ034429.1": "PB1",
+        "OQ034431.1": "PA",
+        "OQ034432.1": "HA",
+        "OQ034433.1": "NP",
+        "OQ034434.1": "NA",
+        "OQ034435.1": "M",
+        "OQ034436.1": "NS"
     })
 })
 

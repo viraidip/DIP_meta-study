@@ -158,16 +158,13 @@ def dataset_distributions(dfs: list, dfnames: list)-> None:
 if __name__ == "__main__":
     plt.style.use("seaborn")
 
-    '''
-    dfnames = DATASET_STRAIN_DICT.keys()
-    dfs = load_all_metadata(dfnames)
+    dfnames = list(DATASET_STRAIN_DICT.keys())
+    meta_dfs = load_all_metadata(dfnames)
     mr_dfs = load_all_mapped_reads(dfnames)
 
-    analyse_metadata(dfs, dfnames, mr_dfs)
+    analyse_metadata(meta_dfs, dfnames, mr_dfs)
     mapped_reads_distribution(mr_dfs, dfnames)
-    '''
     
-    dfnames = list(DATASET_STRAIN_DICT.keys())
     dfs, _ = load_all(dfnames)
     
     dataset_distributions(dfs, dfnames)

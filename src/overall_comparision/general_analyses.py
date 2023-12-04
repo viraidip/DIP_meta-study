@@ -126,7 +126,7 @@ def calculate_deletion_shifts(dfs: list, dfnames: list, folder: str="general_ana
     plt.close()
  
 
-def length_distribution_heatmap(dfs: list, dfnames: list, folder: str="general_analysis")-> None:
+def length_distribution_histrogram(dfs: list, dfnames: list, folder: str="general_analysis")-> None:
     '''
     
     '''
@@ -149,7 +149,7 @@ def length_distribution_heatmap(dfs: list, dfnames: list, folder: str="general_a
         overall_count_dict[dfname] = count_dict
 
     for s in SEGMENTS:
-        fig, axs = plt.subplots(len(dfnames), 1, figsize=(10, 15), tight_layout=True)
+        fig, axs = plt.subplots(len(dfnames), 1, figsize=(10, len(dfnames)*1.5), tight_layout=True)
         for i, dfname in enumerate(dfnames):
             count_dict = overall_count_dict[dfname]
             if len(count_dict[s].keys()) > 1:
@@ -495,18 +495,16 @@ if __name__ == "__main__":
     dfnames = list(DATASET_STRAIN_DICT.keys())
     dfs, _ = load_all(dfnames)
 
-    '''
     plot_distribution_over_segments(dfs, dfnames)
     calculate_deletion_shifts(dfs, dfnames)
-    length_distribution_heatmap(dfs, dfnames)
+    length_distribution_histrogram(dfs, dfnames)
     length_distribution_violinplot(dfs, dfnames)
     plot_nucleotide_ratio_around_deletion_junction_heatmaps(dfs, dfnames)
     plot_direct_repeat_ratio_heatmaps(dfs, dfnames)
     start_vs_end_lengths(dfs, dfnames, limit=600)
     diff_start_end_lengths(dfs, dfnames)
-    deletion_site_motifs(dfs, dfnames, w_len=2)
+    deletion_site_motifs(dfs, dfnames, w_len=2)    
     '''
-
     ### different cell types, only PR8 datasets ### 
     cell_dfs = list()
     cell_dfnames = list()
@@ -525,9 +523,10 @@ if __name__ == "__main__":
     folder = "cell_datasets"
     plot_distribution_over_segments(cell_dfs, cell_dfnames, folder=folder)
     calculate_deletion_shifts(cell_dfs, cell_dfnames, folder=folder)
-    length_distribution_heatmap(cell_dfs, cell_dfnames, folder=folder)
+    length_distribution_histrogram(cell_dfs, cell_dfnames, folder=folder)
     length_distribution_violinplot(cell_dfs, cell_dfnames, folder=folder)
     plot_nucleotide_ratio_around_deletion_junction_heatmaps(cell_dfs, cell_dfnames, folder=folder)
     plot_direct_repeat_ratio_heatmaps(cell_dfs, cell_dfnames, folder=folder)
     start_vs_end_lengths(cell_dfs, cell_dfnames, limit=600, folder=folder)
     diff_start_end_lengths(cell_dfs, cell_dfnames, folder=folder)
+    '''

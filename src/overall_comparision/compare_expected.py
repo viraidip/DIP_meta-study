@@ -254,7 +254,6 @@ def direct_repeat_composition(dfs: list,
 
             seq = get_sequence(strain, s)
             
-            # TODO: maybe include a correction of the direct repeat sequences ???
             _ , dr_sequences = count_direct_repeats_overall(df_s, seq)          
             if "_" in dr_sequences:
                 del dr_sequences["_"]
