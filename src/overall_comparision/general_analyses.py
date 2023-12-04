@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
 from scipy import stats
+from collections import Counter
 from scipy.stats import chi2_contingency
 
 sys.path.insert(0, "..")
@@ -447,11 +448,53 @@ def plot_direct_repeat_ratio_heatmaps(dfs: list, dfnames: list, folder: str="gen
     plt.close()
 
 
+def deletion_site_motifs(dfs, dfnames, w_len):
+    '''
+    
+    '''
+    results = dict({
+        "name": dfnames,
+        "start": list(),
+        "start prct.": list(),
+        "end": list(),
+        "end prct.": list()
+    })
+    for df, dfname in zip(dfs, dfnames):
+        s_motifs = list()
+        e_motifs = list()
+
+        for i, r in df.iterrows():
+            seq = r["full_seq"]
+            s = r["Start"]
+            e = r["End"]
+            s_window = seq[s-5:s+5]
+            e_window = seq[e-(w_len+1):e+(w_len-1)]
+            s_motifs.append(s_window[:w_len])
+            e_motifs.append(e_window[:w_len])
+
+        s_motifs_counts = Counter(s_motifs)
+        start_motif = s_motifs_counts.most_common(1)[0]
+        e_motifs_counts = Counter(e_motifs)
+        end_motif = e_motifs_counts.most_common(1)[0]
+
+        results["start"].append(start_motif[0])
+        results["start prct."].append(start_motif[1]/df.shape[0])
+        results["end"].append(end_motif[0])
+        results["end prct."].append(end_motif[1]/df.shape[0])
+
+    results_df = pd.DataFrame(results)
+
+    print(results_df)
+    print(Counter(results["start"]))
+    print(Counter(results["end"]))
+
+
 if __name__ == "__main__":
     plt.style.use("seaborn")
-
+    
     dfnames = list(DATASET_STRAIN_DICT.keys())
     dfs, _ = load_all(dfnames)
+
     '''
     plot_distribution_over_segments(dfs, dfnames)
     calculate_deletion_shifts(dfs, dfnames)
@@ -461,6 +504,7 @@ if __name__ == "__main__":
     plot_direct_repeat_ratio_heatmaps(dfs, dfnames)
     start_vs_end_lengths(dfs, dfnames, limit=600)
     diff_start_end_lengths(dfs, dfnames)
+    deletion_site_motifs(dfs, dfnames, w_len=2)
     '''
 
     ### different cell types, only PR8 datasets ### 

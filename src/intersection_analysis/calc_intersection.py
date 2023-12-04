@@ -75,20 +75,31 @@ def generate_max_overlap_candidates(dfs: list):
     candidates = list()
     counts = list()
     dir_reps = list()
+    s_motifs = list()
+    e_motifs = list()
+
     print("candidate\tcount\tdir_rep")
     for cand, count in candidate_counts.items():
         if count >= max_count-1:
             seg, s, e = cand.split("_")
+            s = int(s)
+            e = int(e)
             seq = get_sequence("PR8", seg)
-            dir_rep, _ = calculate_direct_repeat(seq, int(s), int(e), w_len=10)
-            print(f"{cand}:\t{count}\t{dir_rep}")
+            dir_rep, _ = calculate_direct_repeat(seq, s, e, w_len=10)
+
+            w_len = 2
+            s_motif = seq[s-w_len:s]
+            e_motif = seq[e-(w_len+1):e-1]
+
+            print(f"{cand}:\t{count}\t{dir_rep}\t{s_motif}\t{e_motif}")
 
             candidates.append(cand)
             counts.append(count)
             dir_reps.append(dir_rep)
+            s_motifs.append(s_motif)
+            e_motifs.append(e_motif)
 
     count_df = pd.DataFrame(dict({"DI": candidates, "counts": counts, "dir_reps": dir_reps}))
-
     count_df[["Segment", "Start", "End"]] = count_df["DI"].str.split("_", expand=True)
     print(count_df.groupby(["Segment"]).size().reset_index(name='count'))
 
@@ -154,14 +165,14 @@ def analyze_max_overlap_candidates(dfs, dfnames, count_df, name: str=""):
             else:
                 counts.append(count.values[0])
 
-        print(counts)
+        #print(counts)
 
         t1 = "de novo " if counts[0] == 0 else ""
         t2 = "gain" if counts[0] < counts[-1] else "loss"
 
         print(f"{t1}{t2}")
-    
-    
+
+
 if __name__ == "__main__":
     plt.style.use("seaborn")
     
@@ -184,3 +195,10 @@ if __name__ == "__main__":
     generate_overlap_matrix_plot(pb2_dfs, dfnames, name="PB2")
     count_df = generate_max_overlap_candidates(pb2_dfs)
     analyze_max_overlap_candidates(pb2_dfs, dfnames, count_df, name="PB2")
+
+
+
+#"PB2_129_2176", "PB2_217_2204", "PB2_269_2202" # loss, gain, de novo gain; tested in Pelz et al.
+#"PB1_139_2056", "PA_164_2028", "PA_138_1948", "PA_244_2074", "PA_163_1990", "PA_137_1916" # top gain candidates form Final_CutOff_OnlyShortDeletions15%_FractionValues.xlsx
+#"PB1_113_1897", "PB2_206_2152", "PB2_269_2202", "PA_124_1940", "PB1_218_2091" # top de novo gain candidates form Final_CutOff_OnlyShortDeletions15%_FractionValues.xlsx
+
