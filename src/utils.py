@@ -367,14 +367,8 @@ ACCNUMDICT = dict({
         "SRR15182171":  dict({})
     }),
     "WRA2021_B": dict({
-        "SRR15183338":  dict({}),
         "SRR15183345":  dict({}),
         "SRR15183344":  dict({}),
-        "SRR15183343":  dict({}),
-        "SRR15183342":  dict({}),
-        "SRR15183341":  dict({}),
-        "SRR15183340":  dict({}),
-        "SRR15183339":  dict({}),
         "SRR15183352":  dict({}),
         "SRR15183353":  dict({}),
         "SRR15196408":  dict({}),
@@ -395,6 +389,14 @@ ACCNUMDICT = dict({
         "SRR15196423":  dict({}),
         "SRR15196424":  dict({}),
         "SRR15196425":  dict({})
+    }),
+        "WRA2021_B_yamagata": dict({
+        "SRR15183338":  dict({}),
+        "SRR15183343":  dict({}),
+        "SRR15183342":  dict({}),
+        "SRR15183341":  dict({}),
+        "SRR15183340":  dict({}),
+        "SRR15183339":  dict({})
     }),
     "Rattanaburi2022_H3N2": dict({
         "SRR10256717":  dict({}),
