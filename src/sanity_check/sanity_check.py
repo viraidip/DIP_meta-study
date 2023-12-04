@@ -9,7 +9,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 sys.path.insert(0, "..")
-from utils import load_dataset, load_alnaji2019, join_data
+from utils import load_dataset, join_data
 from utils import SEGMENTS, RESULTSPATH, DATAPATH, CUTOFF, CMAP, SEGMENT_DICTS
 
 
@@ -122,7 +122,10 @@ def load_lui2019_sanity(name: str)-> dict:
                             keep_default_na=False
                             )
     
-    return join_data(data)
+    data = join_data(data)
+    #data = data[(data["End"] - data["Start"]) >= 10]
+
+    return data
 
 
 def compare_datasets(d1, d2, thresh=1)-> float:
