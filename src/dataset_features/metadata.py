@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
 sys.path.insert(0, "..")
-from utils import load_all_mapped_reads
+from utils import load_all_mapped_reads, load_mapped_reads, load_all
 from utils import SEGMENTS, DATAPATH, RESULTSPATH, ACCNUMDICT, DATASET_STRAIN_DICT, CMAP
 
 
@@ -106,12 +106,68 @@ def mapped_reads_distribution(dfs: list, dfnames: list)-> None:
 
     plt.show()
 
+
+def dataset_distributions(dfs: list, dfnames: list)-> None:
+    '''
+    
+    '''
+    stats = dict({"Dataset": dfnames,
+                  "Size": list(),
+                  "Mean": list(),
+                  "Median": list(),
+                  "Std. dev.": list(),
+                  "Max": list(),
+                  "Mapped reads": list(),
+                  "NGS/MR": list()})
+    plot_data = list()
+    
+    for df, dfname in zip(dfs, dfnames):
+        counts = df["NGS_read_count"]
+        plot_data.append(counts)
+        stats["Size"].append(df.shape[0])
+        stats["Mean"].append(counts.mean())
+        stats["Median"].append(counts.median())
+        stats["Std. dev."].append(counts.std())
+        stats["Max"].append(counts.max())
+
+        # load mapped reads
+        mr_df = load_mapped_reads(dfname)
+        mr_sum = mr_df["counts"].sum()
+
+        stats["Mapped reads"].append(mr_sum)
+        stats["NGS/MR"].append(counts.sum() / mr_sum)
+
+    labels = [f"{name} ({n})" for name, n in zip(dfnames, stats["Size"])]
+    plt.figure(figsize=(8, 6), tight_layout=True)
+    plt.boxplot(plot_data, labels=labels, vert=False, notch=True)
+    plt.xscale("log")
+    plt.xlabel("NGS read count (log scale)")
+    plt.ylabel("Datasets")
+
+    save_path = os.path.join(RESULTSPATH, "metadata")
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+    plt.savefig(os.path.join(save_path, "dataset_distribution.png"))
+    plt.close()
+
+    stats_df = pd.DataFrame(stats)
+
+    stats_df.to_csv(os.path.join(save_path, "dataset_stats.csv"), float_format="%.2f", index=False)
+
+
 if __name__ == "__main__":
     plt.style.use("seaborn")
 
+    '''
     dfnames = DATASET_STRAIN_DICT.keys()
     dfs = load_all_metadata(dfnames)
     mr_dfs = load_all_mapped_reads(dfnames)
 
     analyse_metadata(dfs, dfnames, mr_dfs)
-#    mapped_reads_distribution(mr_dfs, dfnames)
+    mapped_reads_distribution(mr_dfs, dfnames)
+    '''
+    
+    dfnames = list(DATASET_STRAIN_DICT.keys())
+    dfs, _ = load_all(dfnames)
+    
+    dataset_distributions(dfs, dfnames)

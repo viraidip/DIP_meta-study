@@ -313,56 +313,6 @@ def diff_start_end_lengths(dfs, dfnames, folder: str="general_analysis")-> None:
     plt.close()
 
 
-def dataset_distributions(dfs: list, dfnames: list, folder: str="general_analysis")-> None:
-    '''
-    
-    '''
-#TODO: add here the number of mapped reads
-#      also add the fraction of DIPs found/ number of mapped reads
-
-    ns = list()
-    plot_data = list()
-    means = list()
-    medians = list()
-    stddevs = list()
-    maxs = list()
-    
-    for df in dfs:
-        ns.append(df.shape[0])
-        counts = df["NGS_read_count"]
-        plot_data.append(counts)
-        means.append(counts.mean())
-        medians.append(counts.median())
-        stddevs.append(counts.std())
-        maxs.append(counts.max())
-
-    labels = [f"{name} ({n})" for name, n in zip(dfnames, ns)]
-    plt.figure(figsize=(8, 6), tight_layout=True)
-    plt.boxplot(plot_data, labels=labels)
-    plt.yscale("log")
-    plt.xticks(rotation=45) 
-    plt.xlabel("Datasets")
-    plt.ylabel("NGS read count (log scale)")
-
-    save_path = os.path.join(RESULTSPATH, folder)
-    if not os.path.exists(save_path):
-        os.makedirs(save_path)
-    plt.savefig(os.path.join(save_path, "ngs_count_distribution.png"))
-    plt.close()
-
-    stats_df = pd.DataFrame({"Dataset": dfnames,
-                             "Size": ns,
-                             "Mean": means,
-                             "Median": medians,
-                             "Std. dev.": stddevs,
-                             "Max": maxs})
-
-    save_path = os.path.join(RESULTSPATH, folder)
-    if not os.path.exists(save_path):
-        os.makedirs(save_path)
-    stats_df.to_csv(os.path.join(save_path, "ngs_count_stats.csv"), index=False)
-
-
 def plot_nucleotide_ratio_around_deletion_junction_heatmaps(dfs, dfnames, folder: str="general_analysis"):
     '''
         Plot heatmaps of nucleotide ratios around deletion junctions.
@@ -503,7 +453,6 @@ if __name__ == "__main__":
     dfnames = list(DATASET_STRAIN_DICT.keys())
     dfs, _ = load_all(dfnames)
     '''
-    dataset_distributions(dfs, dfnames)
     plot_distribution_over_segments(dfs, dfnames)
     calculate_deletion_shifts(dfs, dfnames)
     length_distribution_heatmap(dfs, dfnames)
@@ -513,23 +462,6 @@ if __name__ == "__main__":
     start_vs_end_lengths(dfs, dfnames, limit=600)
     diff_start_end_lengths(dfs, dfnames)
     '''
-    ### in vivo datasets ###
-    in_vivo_dfnames = ["Wang2023", "Penn2022", "Lui2019", "WRA2021_A", "Rattanaburi2022_H3N2", "WRA2021_B", "Sheng2018", "Lauring2019"]
-    in_vivo_dfs = list()
-    for dfname in in_vivo_dfnames:
-        in_vivo_dfs.append(dfs[dfnames.index(dfname)])
-
-    folder = "in_vivo_datasets"
-    dataset_distributions(in_vivo_dfs, in_vivo_dfnames, folder=folder)
-    plot_distribution_over_segments(in_vivo_dfs, in_vivo_dfnames, folder=folder)
-    calculate_deletion_shifts(in_vivo_dfs, in_vivo_dfnames, folder=folder)
-    length_distribution_heatmap(in_vivo_dfs, in_vivo_dfnames, folder=folder)
-    length_distribution_violinplot(in_vivo_dfs, in_vivo_dfnames, folder=folder)
-    plot_nucleotide_ratio_around_deletion_junction_heatmaps(in_vivo_dfs, in_vivo_dfnames, folder=folder)
-    plot_direct_repeat_ratio_heatmaps(in_vivo_dfs, in_vivo_dfnames, folder=folder)
-    start_vs_end_lengths(in_vivo_dfs, in_vivo_dfnames, limit=600, folder=folder)
-    diff_start_end_lengths(in_vivo_dfs, in_vivo_dfnames, folder=folder)
-
 
     ### different cell types, only PR8 datasets ### 
     cell_dfs = list()
@@ -547,7 +479,6 @@ if __name__ == "__main__":
             cell_dfnames.append(f"{dfname} MDCK")
 
     folder = "cell_datasets"
-    dataset_distributions(cell_dfs, cell_dfnames, folder=folder)
     plot_distribution_over_segments(cell_dfs, cell_dfnames, folder=folder)
     calculate_deletion_shifts(cell_dfs, cell_dfnames, folder=folder)
     length_distribution_heatmap(cell_dfs, cell_dfnames, folder=folder)
