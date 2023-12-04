@@ -49,7 +49,7 @@ if __name__ == "__main__":
 
 
         dfs.append(preprocess(strain, stat_df, CUTOFF))
-        dfnames.append(f"Mendes {stat}")
+        dfnames.append(f"Wanf2023 {stat}")
 
 
 
