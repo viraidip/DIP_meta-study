@@ -89,7 +89,7 @@ def mapped_reads_distribution(dfs: list, dfnames: list)-> None:
         x += 1
 
     axs.set_xticks(range(len(dfnames)))
-    axs.set_xticklabels(dfnames, rotation=45)
+    axs.set_xticklabels(dfnames, rotation=90)
     axs.set_xlabel('Segment')
     axs.set_ylabel('Fraction')
     axs.set_title('Fraction of reads from different segments')

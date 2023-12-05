@@ -217,7 +217,7 @@ def length_distribution_violinplot(dfs: list, dfnames: list, folder: str="genera
         
         axs.violinplot(plot_list, position_list, points=1000, showmedians=True)
         axs.set_xticks(range(1, len(dfnames)+1))
-        axs.set_xticklabels(labels, rotation=45)
+        axs.set_xticklabels(labels, rotation=90)
         axs.set_xlabel("Dataset")
         axs.set_ylabel("DVG sequence length")
 
@@ -302,7 +302,7 @@ def diff_start_end_lengths(dfs, dfnames, folder: str="general_analysis")-> None:
 
     axs.violinplot(plot_list, position_list, points=1000, showmedians=True)
     axs.set_xticks(position_list)
-    axs.set_xticklabels(labels, rotation=25)
+    axs.set_xticklabels(labels, rotation=90)
     axs.set_xlabel("Dataset")
     axs.set_ylabel("Start-End sequence lengths")
     axs.set_title(f"Difference of start to end sequence lengths (threshold={thresh})")
