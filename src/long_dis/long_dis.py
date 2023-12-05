@@ -46,14 +46,20 @@ def fraction_long_dis(dfs: list, dfnames: list):
     res_df = pd.DataFrame(dict({"names": dfnames, "fraction DIs": fractions}))
     print(res_df)
 
-    filepath = os.path.join(RESULTSPATH, "long_dis", "fractions.csv")
-    res_df.to_csv(filepath, index=False)
+    save_path = os.path.join(RESULTSPATH, "long_dis")
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+    res_df.to_csv(os.path.join(save_path, "fractions.csv"), float_format="%.2f", index=False)
 
 
 def lengths_long_dis(dfs, dfnames):
     '''
     
     '''
+    save_path = os.path.join(RESULTSPATH, "long_dis")
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+    
     for df, dfname in zip(dfs, dfnames):
         for s in SEGMENTS:
             long_df = get_long_dis(df[df["Segment"] == s].copy())
@@ -67,9 +73,7 @@ def lengths_long_dis(dfs, dfnames):
             plt.xlabel("DI length")
             plt.ylabel("Frequency")
             plt.title(f"{dfname} {s}")
-
-            save_path = os.path.join(RESULTSPATH, "long_dis", f"lengths_{dfname}_{s}.png")
-            plt.savefig(save_path)
+            plt.savefig(os.path.join(save_path, f"lengths_{dfname}_{s}.png"))
             plt.close()
 
 
@@ -120,6 +124,7 @@ def create_start_end_connection_plot(df: pd.DataFrame,
     ax.set_xticks(np.arange(0, max_val, 200))
     ax.set_yticks([])
     ax.set_xlabel("Nucleotide position")
+    ax.set_title(dfname)
 
     def align_yaxis(ax1, v1, ax2, v2):
         _, y1 = ax1.transData.transform((0, v1))
@@ -135,8 +140,10 @@ def create_start_end_connection_plot(df: pd.DataFrame,
 
     # save figure
     plt.tight_layout()
-    save_path = os.path.join(RESULTSPATH, "start_end", dfname, f"{segment}.png")
-    plt.savefig(save_path)
+    save_path = os.path.join(RESULTSPATH, "start_end", dfname)
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+    plt.savefig(os.path.join(save_path, f"{segment}.png"))
     plt.close()
 
 
@@ -154,8 +161,8 @@ def start_end_positions(dfs: list, dfnames: list)-> None:
 if __name__ == "__main__":
     plt.style.use('seaborn')
     dfnames = DATASET_STRAIN_DICT.keys()
-    dfs, expected_dfs = load_all(dfnames)
+    dfs, _ = load_all(dfnames)
 
     start_end_positions(dfs, dfnames)
- #   fraction_long_dis(dfs, dfnames)
-  #  lengths_long_dis(dfs, dfnames) 
+    fraction_long_dis(dfs, dfnames)
+    lengths_long_dis(dfs, dfnames) 

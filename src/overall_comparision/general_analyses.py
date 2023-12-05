@@ -30,7 +30,7 @@ def plot_distribution_over_segments(dfs: list, dfnames: list, folder: str="gener
 
     :return: None
     '''
-    fig, axs = plt.subplots(figsize=(len(dfs), 5), nrows=1, ncols=1)
+    fig, axs = plt.subplots(figsize=(len(dfs)*0.7, 5), nrows=1, ncols=1)
     cm = plt.get_cmap(CMAP)
     colors = [cm(1.*i/len(SEGMENTS)) for i in range(len(SEGMENTS))]
 
@@ -54,7 +54,7 @@ def plot_distribution_over_segments(dfs: list, dfnames: list, folder: str="gener
     
     axs.set_ylabel("relative occurrence of segment")
     axs.set_xlabel("dataset")
-    plt.xticks(range(len(dfnames)), dfnames, rotation=25)
+    plt.xticks(range(len(dfnames)), [f"{dfname} ({len(df)})" for dfname, df in zip(dfnames, dfs)], rotation=90)
 
     box = axs.get_position()
     axs.set_position([box.x0, box.y0 + box.height * 0.1, box.width, box.height * 0.9])
@@ -126,13 +126,11 @@ def calculate_deletion_shifts(dfs: list, dfnames: list, folder: str="general_ana
     plt.close()
  
 
-def length_distribution_histrogram(dfs: list, dfnames: list, folder: str="general_analysis")-> None:
+def calc_DI_lengths(dfs: list, dfnames: list)-> dict:
     '''
     
     '''
-    plt.rc("font", size=16)
     overall_count_dict = dict()
-
     for df, dfname in zip(dfs, dfnames):
         # create a dict for each segment including the NGS read count
         count_dict = dict()
@@ -147,6 +145,16 @@ def length_distribution_histrogram(dfs: list, dfnames: list, folder: str="genera
                 count_dict[r["Segment"]][DVG_Length] = 1
 
         overall_count_dict[dfname] = count_dict
+    
+    return overall_count_dict
+    
+
+def length_distribution_histrogram(dfs: list, dfnames: list, folder: str="general_analysis")-> None:
+    '''
+    
+    '''
+    plt.rc("font", size=16)
+    overall_count_dict = calc_DI_lengths(dfs, dfnames)
 
     for s in SEGMENTS:
         fig, axs = plt.subplots(len(dfnames), 1, figsize=(10, len(dfnames)*1.5), tight_layout=True)
@@ -180,22 +188,7 @@ def length_distribution_violinplot(dfs: list, dfnames: list, folder: str="genera
     
     '''
     plt.rc("font", size=16)
-    overall_count_dict = dict()
-
-    for df, dfname in zip(dfs, dfnames):
-        # create a dict for each segment including the NGS read count
-        count_dict = dict()
-        for s in SEGMENTS:
-            count_dict[s] = dict()
-
-        for _, r in df.iterrows():
-            DVG_Length = len(r["seq"])-len(r["deleted_sequence"])
-            if DVG_Length in count_dict[r["Segment"]]:
-                count_dict[r["Segment"]][DVG_Length] += 1
-            else:
-                count_dict[r["Segment"]][DVG_Length] = 1
-
-        overall_count_dict[dfname] = count_dict
+    overall_count_dict = calc_DI_lengths(dfs, dfnames)
 
     for s in SEGMENTS:
         fig, axs = plt.subplots(1, 1, figsize=(10, 7), tight_layout=True)
@@ -504,7 +497,7 @@ if __name__ == "__main__":
     start_vs_end_lengths(dfs, dfnames, limit=600)
     diff_start_end_lengths(dfs, dfnames)
     deletion_site_motifs(dfs, dfnames, w_len=2)    
-    '''
+    
     ### different cell types, only PR8 datasets ### 
     cell_dfs = list()
     cell_dfnames = list()
@@ -529,4 +522,4 @@ if __name__ == "__main__":
     plot_direct_repeat_ratio_heatmaps(cell_dfs, cell_dfnames, folder=folder)
     start_vs_end_lengths(cell_dfs, cell_dfnames, limit=600, folder=folder)
     diff_start_end_lengths(cell_dfs, cell_dfnames, folder=folder)
-    '''
+    

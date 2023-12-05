@@ -8,12 +8,11 @@ import numpy as np
 import scipy.stats as stats
 import matplotlib.pyplot as plt
 
-from compare_expected import plot_expected_vs_observed_nucleotide_enrichment_heatmaps, plot_expected_vs_observed_direct_repeat_heatmaps
-from general_analyses import plot_distribution_over_segments, diff_start_end_lengths
-
 sys.path.insert(0, "..")
-from utils import load_all, load_dataset, preprocess, join_data
-from utils import DATASET_STRAIN_DICT, CUTOFF
+from utils import load_all
+from utils import DATASET_STRAIN_DICT
+from overall_comparision.compare_expected import plot_expected_vs_observed_nucleotide_enrichment_heatmaps, plot_expected_vs_observed_direct_repeat_heatmaps
+from overall_comparision.general_analyses import plot_distribution_over_segments, diff_start_end_lengths
 
 
 def split_by_reads(dfs, split):
@@ -68,18 +67,3 @@ if __name__ == "__main__":
     
     plot_distribution_over_segments(low_dfs, dfnames, folder=f"{name}_low")
     diff_start_end_lengths(low_dfs, dfnames, folder=f"{name}_low")
-
-    ### compare two Wang2020 cell types ###
-    df_dict = dict({})
-    dfname = "Wang2020"
-    cell_dfnames = list([dfname])
-    df = load_dataset(dfname)
-
-    for cell_type in ["A549", "HBEpC"]:
-        c_df = df[df["Cell"] == cell_type].copy()
-        
-        df_dict[cell_type] = [preprocess(DATASET_STRAIN_DICT[dfname], join_data(c_df), CUTOFF)]
-    
-    folder = "Wang_cells_compared"
-    plot_expected_vs_observed_nucleotide_enrichment_heatmaps(df_dict["A549"], cell_dfnames, df_dict["HBEpC"], "A549 - HBEpC", folder=folder)
-    plot_expected_vs_observed_direct_repeat_heatmaps(df_dict["A549"], cell_dfnames, df_dict["HBEpC"], "A549 - HBEpC", folder=folder)

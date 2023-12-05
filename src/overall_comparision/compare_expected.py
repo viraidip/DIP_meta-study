@@ -87,8 +87,10 @@ def plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs,
                 else:
                     pval_symbol = ""
                 val_labels.append(pval_symbol)
-                
-        m = abs(min(vals)) if abs(min(vals)) > max(vals) else max(vals)
+        if len(vals) != 0:        
+            m = abs(min(vals)) if abs(min(vals)) > max(vals) else max(vals)
+        else:
+            m = 0
         axs[i] = plot_heatmap(x,y,vals, axs[i], format=".1e", cbar=True, vmin=-m, vmax=m, cbar_kws={"pad": 0.01})
         for v_idx, val_label in enumerate(axs[i].texts):
             val_label.set_text(val_labels[v_idx])
@@ -201,9 +203,9 @@ def plot_expected_vs_observed_direct_repeat_heatmaps(dfs: list,
                 if pd.isna(f_ex):
                     f_ex = 0.0
                 pvalue = stats.binomtest(f, n_samples, f_ex).pvalue
-                if pvalue < 0.00001:
+                if pvalue < 0.000001:
                     pval_symbol = "**"
-                elif pvalue < 0.0001:
+                elif pvalue < 0.00001:
                     pval_symbol = "*"
                 else:
                     pval_symbol = ""
@@ -238,6 +240,7 @@ def direct_repeat_composition(dfs: list,
     '''
     
     '''
+    return # do not make this analysis rigth now
     plt.set_cmap(CMAP) 
     # calculate direct repeats
     for dfname, df, expected_df in zip(dfnames, dfs, expected_dfs):
@@ -359,47 +362,10 @@ def direct_repeat_composition(dfs: list,
 
 if __name__ == "__main__":
     plt.style.use("seaborn")
+
     dfnames = DATASET_STRAIN_DICT.keys()
     dfs, expected_dfs = load_all(dfnames, expected=True)
 
     plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs, dfnames, expected_dfs, "observed-expected")
     plot_expected_vs_observed_direct_repeat_heatmaps(dfs, dfnames, expected_dfs, "observed-expected")
     direct_repeat_composition(dfs, dfnames, expected_dfs)
-
-    ### in vivo datasets ###
-    in_vivo_dfnames = ["Wang2023", "Penn2022", "Lui2019", "WRA2021_A", "Rattanaburi2022_H3N2", "WRA2021_B", "Sheng2018", "Lauring2019"]
-    in_vivo_dfs = list()
-    expected_in_vivo_dfs = list()
-    for dfname in in_vivo_dfnames:
-        in_vivo_dfs.append(dfs[dfnames.index(dfname)])
-        expected_in_vivo_dfs.append(expected_dfs[dfnames.index(dfname)])
-
-    folder = "in_vivo_datasets"
-    plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs, dfnames, expected_dfs, folder)
-    plot_expected_vs_observed_direct_repeat_heatmaps(dfs, dfnames, expected_dfs, "observed-expected", folder)
-    direct_repeat_composition(dfs, dfnames, expected_dfs, folder)
-
-    ### different cell types, only PR8 datasets ### 
-    cell_dfs = list()
-    cell_dfnames = list()
-    expected_cell_dfnames = list()
-    for dfname in ["Alnaji2021", "Pelz2021", "Wang2020", "EBI2020"]:
-        df = load_dataset(dfname)
-        if "Cell" in df.columns:
-            for cell_type in df["Cell"].unique():
-                strain = DATASET_STRAIN_DICT[dfname]
-                c_df = df[df["Cell"] == cell_type].copy()
-                cell_dfs.append(preprocess(strain, join_data(c_df), CUTOFF))
-                cell_dfnames.append(f"{dfname} {cell_type}")
-                expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
-
-        else:
-            strain = DATASET_STRAIN_DICT[dfname]
-            cell_dfs.append(preprocess(strain, join_data(df), CUTOFF))
-            cell_dfnames.append(f"{dfname} MDCK")
-            expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
-
-    folder = "cell_datasets"
-    plot_expected_vs_observed_nucleotide_enrichment_heatmaps(cell_dfs, cell_dfnames, expected_cell_dfnames, folder)
-    plot_expected_vs_observed_direct_repeat_heatmaps(cell_dfs, cell_dfnames, expected_cell_dfnames, "observed-expected", folder)
-    direct_repeat_composition(cell_dfs, cell_dfnames, expected_cell_dfnames, folder)

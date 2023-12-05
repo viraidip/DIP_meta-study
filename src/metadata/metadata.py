@@ -139,7 +139,7 @@ def dataset_distributions(dfs: list, dfnames: list)-> None:
 
     labels = [f"{name} ({n})" for name, n in zip(dfnames, stats["Size"])]
     plt.figure(figsize=(8, 6), tight_layout=True)
-    plt.boxplot(plot_data, labels=labels, vert=False, notch=True)
+    plt.boxplot(plot_data, labels=labels, vert=False)
     plt.xscale("log")
     plt.xlabel("NGS read count (log scale)")
     plt.ylabel("Datasets")

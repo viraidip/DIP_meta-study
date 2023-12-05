@@ -39,8 +39,9 @@ DATASET_STRAIN_DICT = dict({
     "Wang2020": "PR8",
     "Kupke2020": "PR8",
     "EBI2020": "PR8",
- #   "Vasilijevic2017 swine": "swine",
-  #  "Vasilijevic2017 Cal09": "Cal09",
+    "IRC2015": "PR8",
+#    "Vasilijevic2017 swine": "swine",
+#    "Vasilijevic2017 Cal09": "Cal09",
     "Alnaji2019_Cal07": "Cal07",
     "Alnaji2019_Cal07_time": "Cal07",
     "Alnaji2019_NC" : "NC",
@@ -48,7 +49,7 @@ DATASET_STRAIN_DICT = dict({
     # H3N2
     "Alnaji2019_Perth": "Perth",
     "WRA2021_A": "Connecticut",
-    "Rattanaburi2022_H3N2": "Thailand",
+#    "Rattanaburi2022_H3N2": "Thailand",
     # H5N1
     "Penn2022": "Turkey",
     # H7N9
@@ -482,6 +483,10 @@ ACCNUMDICT = dict({
         "ERR3474781": dict({}),
         "ERR3474796": dict({}),
         "ERR3474809": dict({})
+    }),
+    "IRC2015": dict({
+        "SRR1757953": dict({}),
+        "SRR1758027": dict({})
     })
 })
 

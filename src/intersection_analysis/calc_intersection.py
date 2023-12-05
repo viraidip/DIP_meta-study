@@ -56,8 +56,11 @@ def generate_overlap_matrix_plot(dfs: list, dfnames: list, name: str=""):
     else:
         filename = "intersection_matrix_PR8.png"
 
-    save_path = os.path.join(RESULTSPATH, "intersection_analysis", filename)
-    plt.savefig(save_path)
+    save_path = os.path.join(RESULTSPATH, "intersection_analysis")
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+
+    plt.savefig(os.path.join(save_path, filename))
     plt.close()
 
 
@@ -145,9 +148,11 @@ def analyze_max_overlap_candidates(dfs, dfnames, count_df, name: str=""):
         filename = f"{name}_ngs_counts.png"
     else:
         filename = "ngs_counts.png"
+    save_path = os.path.join(RESULTSPATH, "intersection_analysis")
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
 
-    save_path = os.path.join(RESULTSPATH, "intersection_analysis", filename)
-    plt.savefig(save_path)
+    plt.savefig(os.path.join(save_path, filename))
     plt.close()
 
     # compare to the labels of Pelz et al.
