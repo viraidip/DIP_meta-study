@@ -19,7 +19,7 @@ RESULTSPATH = json.load(open("../../.config.json"))["RESULTSPATH"]
 
 # segments, nuclotides, and strains
 CMAP = "Accent"
-CUTOFF = 15
+CUTOFF = 13
 SEGMENTS = list(["PB2", "PB1", "PA", "HA", "NP", "NA", "M", "NS"])
 NUCLEOTIDES = dict({"A": "Adenine", "C": "Cytosin", "G": "Guanine", "U": "Uracil"})
 STRAINS = dict({
@@ -43,7 +43,6 @@ DATASET_STRAIN_DICT = dict({
 #    "Vasilijevic2017 swine": "swine",
 #    "Vasilijevic2017 Cal09": "Cal09",
     "Alnaji2019_Cal07": "Cal07",
-    "Alnaji2019_Cal07_time": "Cal07",
     "Alnaji2019_NC" : "NC",
     "Mendes2021": "WSN",
     # H3N2
@@ -149,30 +148,28 @@ ACCNUMDICT = dict({
     }),
     "Alnaji2019_Cal07": dict({
         "SRR8754522": dict({"Lineage": "1", "Passage": "6"}),
-        "SRR8754523": dict({"Lineage": "2", "Passage": "6"})
-    }),
-    "Alnaji2019_Cal07_time": dict({
-        "SRR8754531": dict({"Lineage": "1", "Passage": "6"}),
-        "SRR8754532": dict({"Lineage": "1", "Passage": "3"}),
-        "SRR8754533": dict({"Lineage": "1", "Passage": "1"})
+        "SRR8754523": dict({"Lineage": "2", "Passage": "6"}),
+        "SRR8754531": dict({"Lineage": "1", "Passage": "6_t"}),
+        "SRR8754532": dict({"Lineage": "1", "Passage": "3_t"}),
+        "SRR8754533": dict({"Lineage": "1", "Passage": "1_t"})
     }),
     "Alnaji2019_NC": dict({
         "SRR8754513": dict({"Lineage": "2", "Passage": "1"}),
         "SRR8754514": dict({"Lineage": "1", "Passage": "1"}),
-   #     "SRR8754527": dict({"Lineage": "1", "Passage": "6"}),
-    #    "SRR8754538": dict({"Lineage": "2", "Passage": "6"})
+        "SRR8754527": dict({"Lineage": "1", "Passage": "6"}),
+        "SRR8754538": dict({"Lineage": "2", "Passage": "6"})
     }),
     "Alnaji2019_Perth": dict({
-     #   "SRR8754517": dict({"Lineage": "2", "Passage": "8"}),
+        "SRR8754517": dict({"Lineage": "2", "Passage": "8"}),
         "SRR8754524": dict({"Lineage": "1", "Passage": "4"}),
         "SRR8754525": dict({"Lineage": "2", "Passage": "4"}),
-      #  "SRR8754526": dict({"Lineage": "1", "Passage": "8"})
+        "SRR8754526": dict({"Lineage": "1", "Passage": "8"})
     }),
     "Alnaji2019_BLEE": dict({
-   #     "SRR8754507": dict({"Lineage": "1", "Passage": "8"}),
+        "SRR8754507": dict({"Lineage": "1", "Passage": "8"}),
         "SRR8754508": dict({"Lineage": "2", "Passage": "7"}),
         "SRR8754509": dict({"Lineage": "1", "Passage": "7"}),
-    #    "SRR8754516": dict({"Lineage": "2", "Passage": "8"})
+        "SRR8754516": dict({"Lineage": "2", "Passage": "8"})
     }),
     "Lui2019": dict({
         "SRR8949705": dict({}),
@@ -713,6 +710,24 @@ COLORS = dict({"A": "deepskyblue", "C": "gold", "G": "springgreen", "U": "salmon
 # parameters for the sampling
 QUANT = 0.1
 N_SAMPLES = 2000
+
+
+def get_dataset_names(cutoff=0, selection: str=""):
+    '''
+    
+    '''
+    if cutoff == 0:
+        return list(DATASET_STRAIN_DICT.keys())
+    # load metadata csv
+    path = os.path.join(RESULTSPATH, "metadata", "dataset_stats.csv")
+    df = pd.read_csv(path)
+    # get all names
+    names = df[df["Size"] >= cutoff]["Dataset"].to_list()
+
+    # make selection based on in vivo/cells etc.
+    if selection == "":
+        return names
+
 
 def load_single_dataset(exp: str, acc: str, segment_dict: dict)-> pd.DataFrame:
     '''

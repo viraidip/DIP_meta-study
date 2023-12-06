@@ -9,7 +9,7 @@ import scipy.stats as stats
 import matplotlib.pyplot as plt
 
 sys.path.insert(0, "..")
-from utils import load_all
+from utils import load_all, get_dataset_names
 from utils import DATASET_STRAIN_DICT
 from overall_comparision.compare_expected import plot_expected_vs_observed_nucleotide_enrichment_heatmaps, plot_expected_vs_observed_direct_repeat_heatmaps
 from overall_comparision.general_analyses import plot_distribution_over_segments, diff_start_end_lengths
@@ -51,7 +51,7 @@ def split_by_reads(dfs, split):
 
 if __name__ == "__main__":
     plt.style.use("seaborn")
-    dfnames = DATASET_STRAIN_DICT.keys()
+    dfnames = get_dataset_names(cutoff=50)
     dfs, _ = load_all(dfnames)
 
     ### split by NGS count ###

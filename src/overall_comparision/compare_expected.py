@@ -13,7 +13,7 @@ from matplotlib.ticker import FixedLocator, FixedFormatter
 
 sys.path.insert(0, "..")
 from utils import load_all
-from utils import get_sequence, count_direct_repeats_overall, get_p_value_symbol, create_nucleotide_ratio_matrix, plot_heatmap, load_dataset, preprocess, join_data, generate_expected_data
+from utils import get_sequence, count_direct_repeats_overall, get_p_value_symbol, create_nucleotide_ratio_matrix, plot_heatmap, load_dataset, preprocess, join_data, generate_expected_data, get_dataset_names
 from utils import SEGMENTS, RESULTSPATH, NUCLEOTIDES, CMAP, DATASET_STRAIN_DICT, CUTOFF
 
 
@@ -363,7 +363,7 @@ def direct_repeat_composition(dfs: list,
 if __name__ == "__main__":
     plt.style.use("seaborn")
 
-    dfnames = DATASET_STRAIN_DICT.keys()
+    dfnames = get_dataset_names(cutoff=50)
     dfs, expected_dfs = load_all(dfnames, expected=True)
 
     plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs, dfnames, expected_dfs, "observed-expected")

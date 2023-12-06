@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
 sys.path.insert(0, "..")
-from utils import load_all_mapped_reads, load_mapped_reads, load_all
+from utils import load_all_mapped_reads, load_mapped_reads, load_all, get_dataset_names
 from utils import SEGMENTS, DATAPATH, RESULTSPATH, ACCNUMDICT, DATASET_STRAIN_DICT, CMAP
 
 
@@ -158,7 +158,7 @@ def dataset_distributions(dfs: list, dfnames: list)-> None:
 if __name__ == "__main__":
     plt.style.use("seaborn")
 
-    dfnames = list(DATASET_STRAIN_DICT.keys())
+    dfnames = get_dataset_names()
     meta_dfs = load_all_metadata(dfnames)
     mr_dfs = load_all_mapped_reads(dfnames)
 

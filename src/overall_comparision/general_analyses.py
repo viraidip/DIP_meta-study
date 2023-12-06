@@ -14,7 +14,7 @@ from collections import Counter
 from scipy.stats import chi2_contingency
 
 sys.path.insert(0, "..")
-from utils import load_all, get_sequence, plot_heatmap, create_nucleotide_ratio_matrix, count_direct_repeats_overall, load_dataset, preprocess, join_data
+from utils import load_all, get_sequence, plot_heatmap, create_nucleotide_ratio_matrix, count_direct_repeats_overall, load_dataset, preprocess, join_data, get_dataset_names
 from utils import SEGMENTS, RESULTSPATH, DATASET_STRAIN_DICT, CMAP, NUCLEOTIDES, CUTOFF
 
 
@@ -485,7 +485,7 @@ def deletion_site_motifs(dfs, dfnames, w_len):
 if __name__ == "__main__":
     plt.style.use("seaborn")
     
-    dfnames = list(DATASET_STRAIN_DICT.keys())
+    dfnames = get_dataset_names(cutoff=50)
     dfs, _ = load_all(dfnames)
 
     plot_distribution_over_segments(dfs, dfnames)
@@ -496,8 +496,8 @@ if __name__ == "__main__":
     plot_direct_repeat_ratio_heatmaps(dfs, dfnames)
     start_vs_end_lengths(dfs, dfnames, limit=600)
     diff_start_end_lengths(dfs, dfnames)
-    deletion_site_motifs(dfs, dfnames, w_len=2)    
-    
+    deletion_site_motifs(dfs, dfnames, w_len=2)
+
     ### different cell types, only PR8 datasets ### 
     cell_dfs = list()
     cell_dfnames = list()

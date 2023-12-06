@@ -9,9 +9,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
-
 sys.path.insert(0, "..")
-from utils import load_all, get_seq_len
+from utils import load_all, get_seq_len, get_dataset_names
 from utils import RESULTSPATH, SEGMENTS, DATASET_STRAIN_DICT, CMAP
 
 
@@ -163,7 +162,7 @@ def start_end_positions(dfs: list, dfnames: list)-> None:
 
 if __name__ == "__main__":
     plt.style.use('seaborn')
-    dfnames = DATASET_STRAIN_DICT.keys()
+    dfnames = get_dataset_names(cutoff=50)
     dfs, _ = load_all(dfnames)
 
     start_end_positions(dfs, dfnames)
