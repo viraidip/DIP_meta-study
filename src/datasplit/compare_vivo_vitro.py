@@ -24,9 +24,9 @@ def compare_DI_lengths(vitro_dict, vivo_dict):
         x_vitro = [key for key, value in vitro_dict[s].items() for _ in range(value)]
         x_vivo = [key for key, value in vivo_dict[s].items() for _ in range(value)]
 
-        plt.hist(x_vitro, alpha=0.5, label="vitro", bins=20, density=True)
-        plt.hist(x_vivo, alpha=0.5, label="vivo", bins=20, density=True)
-    
+        plt.hist(x_vitro, alpha=0.5, label="in vitro", bins=20, density=True)
+        plt.hist(x_vivo, alpha=0.5, label="in vivo", bins=20, density=True)
+        plt.legend()
         plt.title(s)
 
         plt.show()
@@ -35,7 +35,7 @@ def compare_DI_lengths(vitro_dict, vivo_dict):
 if __name__ == "__main__":
     plt.style.use("seaborn")
 
-    vitro_dfnames = ["Alnaji2021", "Pelz2021"]
+    vitro_dfnames = ["Alnaji2021", "Pelz2021", "Wang2020", "Alnaji2019_Cal07", "Alnaji2019_NC", "Alnaji2019_Perth", "Alnaji2019_BLEE", "Mendes2021"]
     vitro_dfs, _ = load_all(vitro_dfnames)
     vitro_lengths_dict = calc_DI_lengths(vitro_dfs, vitro_dfnames)
     vitro_dict = dict({"PB2": Counter(), "PB1": Counter(), "PA": Counter(), "HA": Counter(), "NP": Counter(), "NA": Counter(), "M": Counter(), "NS": Counter()})
@@ -43,7 +43,7 @@ if __name__ == "__main__":
         for s in vitro_dict.keys():
             vitro_dict[s] += Counter(d[s])
     
-    vivo_dfnames = ["Southgate2019"]
+    vivo_dfnames = ["Wang2023", "Lauring2019", "WRA2021_B", "WRA2021_A", "WRA2021_B_yamagata", "Southgate2019"]
     vivo_dfs, _ = load_all(vivo_dfnames)
     vivo_lengths_dict = calc_DI_lengths(vivo_dfs, vivo_dfnames)
     vivo_dict = dict({"PB2": Counter(), "PB1": Counter(), "PA": Counter(), "HA": Counter(), "NP": Counter(), "NA": Counter(), "M": Counter(), "NS": Counter()})
