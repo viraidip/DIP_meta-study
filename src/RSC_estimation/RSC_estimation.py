@@ -9,11 +9,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 sys.path.insert(0, "..")
-from utils import load_dataset, join_data
+from utils import load_single_dataset, join_data
 from utils import SEGMENTS, RESULTSPATH, DATAPATH, CUTOFF, CMAP, SEGMENT_DICTS
 
 
-def load_pelz2021_sanity()-> dict:
+def load_pelz2021_rsc()-> dict:
     '''
         Loads the data from Pelz et al 2021 publication.
         Is structured the same way as data from Alnaji 2019.
@@ -25,7 +25,7 @@ def load_pelz2021_sanity()-> dict:
         :return: dictionary with one key, value pair
     '''
     filename = "ShortDeletions_by_timepoints.xlsx"
-    file_path = os.path.join(DATAPATH, "sanity_check", filename)
+    file_path = os.path.join(DATAPATH, "RSC_estimation", filename)
     data_dict = pd.read_excel(io=file_path,
                               sheet_name=None,
                               header=0,
@@ -35,23 +35,23 @@ def load_pelz2021_sanity()-> dict:
     return data_dict
 
 
-def load_alnaji2021_sanity()-> dict:
+def load_alnaji2021_rsc()-> dict:
     '''
         Loads the data set of Alnaji et al. 2021. Returns a dictionary with the
         data.
 
         :return: dictionary with strain name as key and data frame as value
     '''
-    path = os.path.join(DATAPATH, "sanity_check", "Early_DIs_mbio.xlsx")
+    path = os.path.join(DATAPATH, "RSC_estimation", "Early_DIs_mbio.xlsx")
     data = pd.read_excel(path, na_values=["", "None"], keep_default_na=False)
     dic = dict({"PR8": data})
     return dic
 
 
-def load_alnaji2019_sanity()-> dict:
+def load_alnaji2019_rsc()-> dict:
     '''
     '''
-    file_path = os.path.join(DATAPATH, "sanity_check", "DI_Influenza_FA_JVI.xlsx")
+    file_path = os.path.join(DATAPATH, "RSC_estimation", "DI_Influenza_FA_JVI.xlsx")
     data_dict = pd.read_excel(io=file_path,
                               sheet_name=None,
                               header=1,
@@ -76,7 +76,7 @@ def load_alnaji2019_sanity()-> dict:
     return cleaned_data_dict
 
 
-def load_mendes2021_sanity(name: str)-> dict:
+def load_mendes2021_rsc(name: str)-> dict:
     '''
         :param de_novo: if True only de novo candidates are taken
         :param long_dirna: if True loads data set that includes long DI RNA
@@ -86,12 +86,11 @@ def load_mendes2021_sanity(name: str)-> dict:
         :return: dictionary with one key, value pair
     '''
     if name == "v12enriched":
-
         filename = "Virus-1-2_enriched_junctions.tsv"
     elif name == "v21depleted":
         filename = "Virus-2-1_depleted_junctions.tsv"
     
-    file_path = os.path.join(DATAPATH, "sanity_check", filename)
+    file_path = os.path.join(DATAPATH, "RSC_estimation", filename)
     data = pd.read_csv(file_path,
                             header=0,
                             na_values=["", "None"],
@@ -101,7 +100,7 @@ def load_mendes2021_sanity(name: str)-> dict:
     return data
 
 
-def load_lui2019_sanity(name: str)-> dict:
+def load_lui2019_rsc(name: str)-> dict:
     '''
         :param de_novo: if True only de novo candidates are taken
         :param long_dirna: if True loads data set that includes long DI RNA
@@ -115,7 +114,7 @@ def load_lui2019_sanity(name: str)-> dict:
     elif name == "illumina":
         filename = "Lui2019_Illumina.csv"
     
-    file_path = os.path.join(DATAPATH, "sanity_check", filename)
+    file_path = os.path.join(DATAPATH, "RSC_estimation", filename)
     data = pd.read_csv(file_path,
                             header=0,
                             na_values=["", "None"],
@@ -148,7 +147,7 @@ def compare_datasets(d1, d2, thresh=1)-> float:
     return n_intersect, n1, n2
 
 
-def loop_threshs(d1, d2)-> None:
+def loop_threshs(d1, d2, name)-> int:
     '''
     
     '''
@@ -157,6 +156,7 @@ def loop_threshs(d1, d2)-> None:
     ns_new = list()
     ns_orig = list()
     above_thresh = False
+    rsc = np.nan
     for t in threshs:
         n_inter, n_new, n_orig = compare_datasets(d1, d2, t)
         frac = 2 * n_inter / (n_new + n_orig)
@@ -164,106 +164,162 @@ def loop_threshs(d1, d2)-> None:
         ns_new.append(n_new)
         ns_orig.append(n_orig)
 
-        if frac > 0.85 and not above_thresh:
-            x = t
+        if frac > 0.5 and not above_thresh:
+            rsc = t
             above_thresh = True
 
     plt.plot(threshs, fracs)
     if above_thresh:
-        plt.axvline(x=x, color='r', linestyle='--')
-        plt.text(x, 0.5, f'x={x}', ha='center')
+        plt.axvline(x=rsc, color='r', linestyle='--')
+        plt.text(rsc, 0.5, f'rsc={rsc}', ha='center')
     plt.ylim(0, 1.1)
     plt.ylabel("ratio of common DVGs")
     plt.xlabel("cutoff value")
-    plt.show()
+    save_path = os.path.join(RESULTSPATH, "RSC_estimation")
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+    plt.savefig(os.path.join(save_path, f"{name}_common_DVGs.png"))
     plt.close()
 
     plt.plot(threshs, ns_new, label="selfm")
     plt.plot(threshs, ns_orig, label="orig")
     if above_thresh:
-        plt.axvline(x=x, color='r', linestyle='--')
-        plt.text(x, n_orig, f'x={x}', ha='center')
+        plt.axvline(x=rsc, color='r', linestyle='--')
+        plt.text(rsc, n_orig, f'x={rsc}', ha='center')
     plt.legend()
     plt.ylabel("number of unique DVGs")
     plt.xlabel("cutoff value")
-    plt.show()
+
+    save_path = os.path.join(RESULTSPATH, "RSC_estimation")
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+    plt.savefig(os.path.join(save_path, f"{name}_unique_DVGs.png"))
     plt.close()
+
+    return rsc
  
 
 if __name__ == "__main__":
-    d = dict({
-        "AF389115.1": "PB2",
-        "AF389116.1": "PB1",
-        "AF389117.1": "PA",
-        "AF389118.1": "HA",
-        "AF389119.1": "NP",
-        "AF389120.1": "NA",
-        "AF389121.1": "M",
-        "AF389122.1": "NS"
-    })
-    '''
+    rscs = list()
+    ns = list()
+
     ### Pelz seed ###
-    seed = load_dataset("Pelz2021", "SRR15084925", d)
-    orig_pelz = load_pelz2021_sanity()
+    name = "pelz_seed"
+    seed = load_single_dataset("Pelz2021", "SRR15084925", SEGMENT_DICTS["PR8"])
+    ns.append(seed.shape[0])
+    orig_pelz = load_pelz2021_rsc()
     orig_seed = orig_pelz["PR8"].iloc[:, :4].copy()
     orig_seed = orig_seed[orig_seed["VB3-Saat"] != 0]
     orig_seed = orig_seed.rename(columns={"VB3-Saat": "NGS_read_count"})
-    print("### Pelz seed virus ###")
-    loop_threshs(seed, orig_seed)
-
-    vb3_15 = load_dataset("Pelz2021", "SRR15084925", d)
+    print(f"### {name} ###")
+    rscs.append(loop_threshs(seed, orig_seed, name))
+    
+    name = "pelz_VB3-15"
+    vb3_15 = load_single_dataset("Pelz2021", "SRR15084925", SEGMENT_DICTS["PR8"])
+    ns.append(vb3_15.shape[0])
     orig_data = orig_pelz["PR8"].iloc[:, :10].copy()
     orig_data = orig_data[orig_data["VB3-15"] != 0]
     orig_data = orig_data.rename(columns={"VB3-15": "NGS_read_count"})
-    print("### Pelz VB3-15 ###")
-    loop_threshs(vb3_15, orig_seed)
+    print(f"### {name} ###")
+    rscs.append(loop_threshs(vb3_15, orig_seed, name))
 
     ### Alnaji2021 ###
-    repB_6hpi = load_dataset("Alnaji2021", "SRR14352110", d)
-    orig_alnaji2021 = load_alnaji2021_sanity()["PR8"]
+    name = "alnaji2021_repB6"
+    repB_6hpi = load_single_dataset("Alnaji2021", "SRR14352110", SEGMENT_DICTS["PR8"])
+    ns.append(repB_6hpi.shape[0])
+    orig_alnaji2021 = load_alnaji2021_rsc()["PR8"]
     org_B_6 = orig_alnaji2021[(orig_alnaji2021["Replicate"] == "Rep2") & (orig_alnaji2021["Timepoint"] == "6hpi")]
-    print("### Rep B 6 hpi ###")
-    loop_threshs(repB_6hpi, org_B_6)
+    print(f"### {name} ###")
+    rscs.append(loop_threshs(repB_6hpi, org_B_6, name))
 
-    repC_3hpi = load_dataset("Alnaji2021", "SRR14352112", d)
+    name = "alnaji2021_repC3"
+    repC_3hpi = load_single_dataset("Alnaji2021", "SRR14352112", SEGMENT_DICTS["PR8"])
+    ns.append(repC_3hpi.shape[0])
     org_C_3 = orig_alnaji2021[(orig_alnaji2021["Replicate"] == "Rep3") & (orig_alnaji2021["Timepoint"] == "3hpi")]
-    print("### Rep C 3 hpi ###")
-    loop_threshs(repC_3hpi, org_C_3)
-    
-    ### Alnaji2019 ###
-    pas_d = dict({"Cal07": "6", "NC": "1", "Perth": "4", "BLEE": "7"})
-    orig_alnaji2019 = load_alnaji2019_sanity()
-    for st in ["Cal07", "NC", "Perth", "BLEE"]:
-        df = load_alnaji2019(st)
-        df = df[df["NGS_read_count"] >= 5]
-        print(f"\n### {st} ###")
-        for pas in df["Passage"].unique():
-            pas_df = df[df["Passage"] == pas].copy()
-            print(f"# passage {pas} #")
-            for l in df["Lineage"].unique():
-                l_df = pas_df[pas_df["Lineage"] == l]
-                orig = orig_alnaji2019[f"{st}_l{l}"]
-#                inter, n1, n2 = compare_datasets(l_df, orig)
-#                print(f"lineage {l}")
- #               print(f"orig {n2}")
-  #              print(f"self {n1}")
-   #             print(f"intersection {inter}")
-                if pas_d[st] == pas:    
-                    loop_threshs(l_df, orig)
+    print(f"### {name} ###")
+    rscs.append(loop_threshs(repC_3hpi, org_C_3, name))
+
+    orig_alnaji2019 = load_alnaji2019_rsc()
+    ### Alnaji2019 Cal07 ###
+    strain = "Cal07"
+    for l in [1, 2]:
+        name = f"alnaji2019{strain}{l}"
+        if l == 1:
+            accnum = "SRR8754522"
+        elif l == 2:
+            accnum = "SRR8754523"
+        df = load_single_dataset(f"Alnaji2019_{strain}", accnum, SEGMENT_DICTS[strain])
+        ns.append(df.shape[0])
+        orig = orig_alnaji2019[f"{strain}_l{l}"]
+        print(f"### {name} ###")
+        rscs.append(loop_threshs(df, orig, name))
+
+    ### Alnaji2019 NC ###
+    strain = "NC"
+    for l in [1, 2]:
+        name = f"alnaji2019{strain}{l}"
+        if l == 1:
+            accnum = "SRR8754514"
+        elif l == 2:
+            accnum = "SRR8754513"
+        df = load_single_dataset(f"Alnaji2019_{strain}", accnum, SEGMENT_DICTS[strain])
+        ns.append(df.shape[0])
+        orig = orig_alnaji2019[f"{strain}_l{l}"]
+        print(f"### {name} ###")
+        rscs.append(loop_threshs(df, orig, name))
+
+    ### Alnaji2019 Perth ###
+    strain = "Perth"
+    for l in [1, 2]:
+        name = f"alnaji2019{strain}{l}"
+        if l == 1:
+            accnum = "SRR8754524"
+        elif l == 2:
+            accnum = "SRR8754525"
+        df = load_single_dataset(f"Alnaji2019_{strain}", accnum, SEGMENT_DICTS[strain])
+        ns.append(df.shape[0])
+        orig = orig_alnaji2019[f"{strain}_l{l}"]
+        print(f"### {name} ###")
+        rscs.append(loop_threshs(df, orig, name))
+
+    ### Alnaji2019 BLEE ###
+    strain = "BLEE"
+    for l in [1, 2]:
+        name = f"alnaji2019{strain}{l}"
+        if l == 1:
+            accnum = "SRR8754509"
+        elif l == 2:
+            accnum = "SRR8754508"
+        df = load_single_dataset(f"Alnaji2019_{strain}", accnum, SEGMENT_DICTS[strain])
+        ns.append(df.shape[0])
+        orig = orig_alnaji2019[f"{strain}_l{l}"]
+        print(f"### {name} ###")
+        rscs.append(loop_threshs(df, orig, name))
 
     ### Mendes 2021 ###
-    v12enriched = load_dataset("Mendes2021", "SRR15720521", dict({s: s for s in SEGMENTS}))
-    orig_mendes = load_mendes2021_sanity("v12enriched")
-    print("### Mendes V-1-2 enriched###")
-    loop_threshs(v12enriched, orig_mendes)
+    name = "mendes_v12enr"
+    v12enriched = load_single_dataset("Mendes2021", "SRR15720521", dict({s: s for s in SEGMENTS}))
+    ns.append(v12enriched.shape[0])
+    orig_mendes = load_mendes2021_rsc("v12enriched")
+    print(f"### {name} ###")
+    rscs.append(loop_threshs(v12enriched, orig_mendes, name))
 
-    v21depleted = load_dataset("Mendes2021", "SRR15720526", dict({s: s for s in SEGMENTS}))
-    orig_mendes = load_mendes2021_sanity("v21depleted")
-    print("### Mendes V-2-1 enriched###")
-    loop_threshs(v21depleted, orig_mendes)
-    '''
+    name = "mendes_v21depl"
+    v21depleted = load_single_dataset("Mendes2021", "SRR15720526", dict({s: s for s in SEGMENTS}))
+    ns.append(v21depleted.shape[0])
+    orig_mendes = load_mendes2021_rsc("v21depleted")
+    print(f"### {name} ###")
+    rscs.append(loop_threshs(v21depleted, orig_mendes, name))
+    
     ### Lui 2019 ###
-    illumina = load_dataset("Lui2019", "SRR8949705", SEGMENT_DICTS["Anhui"])
-    orig_lui = load_lui2019_sanity("illumina")
-    print("### Lui 2019 Illumina ###")
-    loop_threshs(illumina, orig_lui)
+    name = "lui2019"
+    illumina = load_single_dataset("Lui2019", "SRR8949705", SEGMENT_DICTS["Anhui"])
+    ns.append(illumina.shape[0])
+    orig_lui = load_lui2019_rsc("illumina")
+    print(f"### {name} ###")
+    rscs.append(loop_threshs(illumina, orig_lui, name))
+
+    # this shows that no dependences between dataset size and RCS is given
+    plt.plot(ns, rscs)
+    plt.show()
+    plt.close()
