@@ -22,7 +22,7 @@ def get_long_dis(df):
     
     '''
     df["len_full"] = df["full_seq"].apply(len)
-    df["len_di"] = df["deleted_sequence"].apply(len)
+    df["len_di"] = df["len_full"] - df["deleted_sequence"].apply(len)
     df["len_ratio"] = df["len_di"] / df["len_full"]
 
     final_df = df[df["len_ratio"] > THRESH].copy()
@@ -35,15 +35,18 @@ def fraction_long_dis(dfs: list, dfnames: list):
     '''
     
     '''
+    counts = list()
     fractions = list()
+    
     for df, dfname in zip(dfs, dfnames):
         n_all_dis = len(df)
         n_long_dis = len(get_long_dis(df))
        
         f = n_long_dis/n_all_dis * 100
+        counts.append(n_long_dis)
         fractions.append(f)
         
-    res_df = pd.DataFrame(dict({"names": dfnames, "fraction DIs": fractions}))
+    res_df = pd.DataFrame(dict({"names": dfnames, "long DIs": counts, "fraction DIs": fractions}))
     print(res_df)
 
     save_path = os.path.join(RESULTSPATH, "long_dis")
