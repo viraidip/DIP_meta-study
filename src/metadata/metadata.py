@@ -7,11 +7,10 @@ import sys
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import matplotlib.patches as patches
 
 sys.path.insert(0, "..")
 from utils import load_all_mapped_reads, load_mapped_reads, load_all, get_dataset_names
-from utils import SEGMENTS, DATAPATH, RESULTSPATH, ACCNUMDICT, DATASET_STRAIN_DICT, CMAP
+from utils import SEGMENTS, DATAPATH, RESULTSPATH, ACCNUMDICT, CMAP
 
 
 def load_all_metadata(dfnames):
