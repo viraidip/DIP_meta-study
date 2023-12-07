@@ -114,7 +114,7 @@ def load_lui2019_rsc(name: str)-> dict:
     elif name == "illumina":
         filename = "Lui2019_Illumina.csv"
     
-    file_path = os.path.join(DATAPATH, "RSC_estimation", filename)
+    file_path = os.path.join(DATAPATH, "validation_estimation", filename)
     data = pd.read_csv(file_path,
                             header=0,
                             na_values=["", "None"],
@@ -175,7 +175,7 @@ def loop_threshs(d1, d2, name)-> int:
     plt.ylim(0, 1.1)
     plt.ylabel("ratio of common DVGs")
     plt.xlabel("cutoff value")
-    save_path = os.path.join(RESULTSPATH, "RSC_estimation")
+    save_path = os.path.join(RESULTSPATH, "validation_estimation")
     if not os.path.exists(save_path):
         os.makedirs(save_path)
     plt.savefig(os.path.join(save_path, f"{name}_common_DVGs.png"))
@@ -190,7 +190,7 @@ def loop_threshs(d1, d2, name)-> int:
     plt.ylabel("number of unique DVGs")
     plt.xlabel("cutoff value")
 
-    save_path = os.path.join(RESULTSPATH, "RSC_estimation")
+    save_path = os.path.join(RESULTSPATH, "validation_estimation")
     if not os.path.exists(save_path):
         os.makedirs(save_path)
     plt.savefig(os.path.join(save_path, f"{name}_unique_DVGs.png"))
@@ -200,8 +200,11 @@ def loop_threshs(d1, d2, name)-> int:
  
 
 if __name__ == "__main__":
+    plt.style.use("seaborn")
+    RESULTSPATH = os.path.dirname(RESULTSPATH)
     rscs = list()
     ns = list()
+    
 
     ### Pelz seed ###
     name = "pelz_seed"

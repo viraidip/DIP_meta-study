@@ -61,8 +61,11 @@ def analyse_metadata(dfs, dfnames, mr_dfs)-> None:
 
     result_df = pd.DataFrame(results)
     pd.set_option('display.float_format', '{:.1f}'.format)
-    path = os.path.join(RESULTSPATH, "metadata", "metadata.csv")
-    result_df.to_csv(path, float_format="%.2f", index=False)
+    
+    save_path = os.path.join(RESULTSPATH, "metadata")
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+    result_df.to_csv(os.path.join(save_path, "metadata.csv"), float_format="%.2f", index=False)
 
 
 def mapped_reads_distribution(dfs: list, dfnames: list)-> None:

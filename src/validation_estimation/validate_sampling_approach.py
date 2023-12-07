@@ -44,7 +44,7 @@ def plot_distribution(pos_dict: dict,
 
     fig.suptitle("Distribution of randomly sampled start positions")
     fname = f"{name}_distribution_sampling.png"
-    savepath = os.path.join(RESULTSPATH, "general_validation", fname)
+    savepath = os.path.join(RESULTSPATH, "validation_estimation", fname)
     plt.savefig(savepath)
     plt.close()
 
@@ -113,7 +113,7 @@ def test_sampling_approach(dfs: list,
         axs.set_title(f"{dfname}")
         axs.legend()
         
-        save_path = os.path.join(RESULTSPATH, "general_validation")
+        save_path = os.path.join(RESULTSPATH, "validation_estimation")
         if not os.path.exists(save_path):
             os.makedirs(save_path)
         fname = f"{dfname}_testing_sampling.png"
@@ -125,8 +125,9 @@ def test_sampling_approach(dfs: list,
 
 
 if __name__ == "__main__":
+    plt.style.use("seaborn")
+    RESULTSPATH = os.path.dirname(RESULTSPATH)
 
-    dfnames = ["Alnaji2021"]
     dfnames = get_dataset_names(cutoff=50)
     dfs, _ = load_all(dfnames)
 
