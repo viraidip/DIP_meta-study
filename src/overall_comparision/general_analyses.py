@@ -14,7 +14,7 @@ from collections import Counter
 from scipy.stats import chi2_contingency
 
 sys.path.insert(0, "..")
-from utils import load_all, get_sequence, plot_heatmap, create_nucleotide_ratio_matrix, count_direct_repeats_overall, load_dataset, preprocess, join_data, get_dataset_names
+from utils import load_all, get_sequence, get_seq_len, get_p_value_symbol, plot_heatmap, create_nucleotide_ratio_matrix, count_direct_repeats_overall, load_dataset, preprocess, join_data, get_dataset_names
 from utils import SEGMENTS, RESULTSPATH, DATASET_STRAIN_DICT, CMAP, NUCLEOTIDES, CUTOFF
 
 
@@ -34,16 +34,21 @@ def plot_distribution_over_segments(dfs: list, dfnames: list, folder: str="gener
     cm = plt.get_cmap(CMAP)
     colors = [cm(1.*i/len(SEGMENTS)) for i in range(len(SEGMENTS))]
 
+    pvalues = list()
     x = np.arange(0, len(dfs))
-
     y = dict({s: list() for s in SEGMENTS})
-    for df in dfs:
-        fractions = df["Segment"].value_counts() / len(df)
+    for df, dfname in zip(dfs, dfnames):
+        fractions = df["Segment"].value_counts() / len(df) * 100
         for s in SEGMENTS:
             if s not in fractions:
-                y[s].append(0.0)
-            else:
-                y[s].append(fractions[s])
+                fractions[s] = 0.0
+            y[s].append(fractions[s])
+        
+        f_obs = fractions
+        full_seqs = np.array([get_seq_len(DATASET_STRAIN_DICT[dfname], seg) for seg in SEGMENTS])
+        f_exp = full_seqs / sum(full_seqs) * 100
+        _, pvalue = stats.chisquare(f_obs, f_exp)
+        pvalues.append(pvalue)
 
     bar_width = 0.7
     bottom = np.zeros(len(dfs))
@@ -52,9 +57,9 @@ def plot_distribution_over_segments(dfs: list, dfnames: list, folder: str="gener
         axs.bar(x, y[s], bar_width, color=colors[i], label=s, bottom=bottom)
         bottom += y[s]
     
-    axs.set_ylabel("relative occurrence of segment")
+    axs.set_ylabel("segment occurrence [%]")
     axs.set_xlabel("dataset")
-    plt.xticks(range(len(dfnames)), [f"{dfname} ({len(df)})" for dfname, df in zip(dfnames, dfs)], rotation=90)
+    plt.xticks(range(len(dfnames)), [f"{dfname}\n({len(df)}) {get_p_value_symbol(p)}" for dfname, df, p in zip(dfnames, dfs, pvalues)], rotation=90)
 
     box = axs.get_position()
     axs.set_position([box.x0, box.y0 + box.height * 0.1, box.width, box.height * 0.9])
@@ -78,45 +83,41 @@ def calculate_deletion_shifts(dfs: list, dfnames: list, folder: str="general_ana
                              Default is "seq_around_deletion_junction".
     :return: None
     '''
-    fig, axs = plt.subplots(figsize=(12, 12), nrows=5, ncols=5)
+    fig, axs = plt.subplots(figsize=(5, 7))
     cm = plt.get_cmap(CMAP)
     colors = [cm(1.*i/3) for i in range(3)]
 
-    i = 0
-    j = 0
-    overall = np.array([0, 0, 0])
-    n = 0
-    li = list()
-
-    for df, dfname in zip(dfs, dfnames):
+    pvalues = list()
+    x = np.arange(0, len(dfs))
+    y = dict({n: list() for n in [0, 1, 2]})
+    for df in dfs:
         df["length"] = df["deleted_sequence"].apply(len)
         df["shift"] = df["length"] % 3
         shifts = df["shift"].value_counts()
+        n = df.shape[0]
         for idx in [0, 1, 2]:
             if idx not in shifts.index:
-                shifts.loc[idx] = 0
+                shifts.loc[idx] = 0    
+            y[idx].append(shifts.loc[idx] / n * 100)
 
-        sorted_shifts = shifts.loc[[0, 1, 2]]
-        overall += sorted_shifts
-        n += len(df)
-        li.append(shifts)
-        shifts = shifts / len(df)
+        f_obs = shifts / sum(shifts) * 100
+        f_exp = [33.3333333, 33.3333333, 33.3333333]
+        _, pvalue = stats.chisquare(f_obs, f_exp)
+        pvalues.append(pvalue)
 
-        axs[i,j].set_title(dfname)
-        labels = list(["in-frame", "shift +1", "shift -1"])
-        axs[i,j].pie(sorted_shifts, labels=labels, autopct="%1.1f%%", colors=colors, textprops={"size": 14})
-
-        j += 1
-        if j == 5:
-            i += 1
-            j = 0
-
-    table = np.array(li)
- #   statistic, pvalue, dof, expected_freq = chi2_contingency(table)
-  #  print(statistic)
-   # print(pvalue)
-
-    print(f"mean distribution:\n\t{overall/n}")
+    bar_width = 0.7
+    bottom = np.zeros(len(dfs))
+    labels = list(["in-frame", "shift +1", "shift -1"])
+    for i, label in zip([0, 1, 2], labels):
+        axs.bar(x, y[i], bar_width, color=colors[i], label=label, bottom=bottom)
+        bottom += y[i]
+    
+    axs.set_ylabel("deletion shift [%]")
+    axs.set_xlabel("dataset")
+    plt.xticks(range(len(dfnames)), [f"{dfname} (n={len(df)}, pval.={p:.2})" for dfname, df, p in zip(dfnames, dfs, pvalues)], rotation=90)
+    box = axs.get_position()
+    axs.set_position([box.x0, box.y0 + box.height * 0.1, box.width, box.height * 0.9])
+    axs.legend(loc="upper center", bbox_to_anchor=(0.5, 1.1), fancybox=True, shadow=True, ncol=8)
 
     plt.tight_layout()
     save_path = os.path.join(RESULTSPATH, folder)
@@ -489,7 +490,9 @@ if __name__ == "__main__":
     dfs, _ = load_all(dfnames)
 
     plot_distribution_over_segments(dfs, dfnames)
+    exit()
     calculate_deletion_shifts(dfs, dfnames)
+    
     length_distribution_histrogram(dfs, dfnames)
     length_distribution_violinplot(dfs, dfnames)
     plot_nucleotide_ratio_around_deletion_junction_heatmaps(dfs, dfnames)

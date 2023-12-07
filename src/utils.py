@@ -500,7 +500,6 @@ ACCNUMDICT = dict({
     })
 })
 
-
 SEGMENT_DICTS = dict({
     "PR8": dict({
         "AF389115.1": "PB2",
