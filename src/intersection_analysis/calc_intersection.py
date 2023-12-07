@@ -13,7 +13,7 @@ from scipy.stats import percentileofscore
 
 sys.path.insert(0, "..")
 from utils import join_data, load_dataset, load_single_dataset
-from utils import preprocess, calculate_direct_repeat, get_sequence
+from utils import preprocess, calculate_direct_repeat, get_sequence, generate_sampling_data
 from utils import CUTOFF, RESULTSPATH, SEGMENT_DICTS, ACCNUMDICT, DATASET_STRAIN_DICT
 
 
@@ -64,7 +64,7 @@ def generate_overlap_matrix_plot(dfs: list, dfnames: list, name: str=""):
     plt.close()
 
 
-def generate_max_overlap_candidates(dfs: list):
+def generate_max_overlap_candidates(dfs: list, thresh: int=0):
     '''
     
     '''
@@ -73,7 +73,8 @@ def generate_max_overlap_candidates(dfs: list):
         all_candidates.extend(df["key"].tolist())
 
     candidate_counts = Counter(all_candidates)
-    max_count = max(candidate_counts.values())
+    if thresh == 0:
+        thresh = max(candidate_counts.values())-1
 
     candidates = list()
     counts = list()
@@ -83,7 +84,7 @@ def generate_max_overlap_candidates(dfs: list):
 
     print("candidate\tcount\tdir_rep")
     for cand, count in candidate_counts.items():
-        if count >= max_count-1:
+        if count >= thresh:
             seg, s, e = cand.split("_")
             s = int(s)
             e = int(e)
@@ -170,8 +171,6 @@ def analyze_max_overlap_candidates(dfs, dfnames, count_df, name: str=""):
             else:
                 counts.append(count.values[0])
 
-        #print(counts)
-
         t1 = "de novo " if counts[0] == 0 else ""
         t2 = "gain" if counts[0] < counts[-1] else "loss"
 
@@ -186,24 +185,63 @@ if __name__ == "__main__":
     for dataset in dfnames:
         strain = DATASET_STRAIN_DICT[dataset]
         df = join_data(load_dataset(dataset))
+        df = df[df["Segment"].isin(["PB2", "PB1", "PA"])]
         if dataset in ["Wang2020", "Kupke2020", "EBI2020"]:
             dfs.append(preprocess(strain, df, 2))    
         else:
             dfs.append(preprocess(strain, df, CUTOFF))
 
-    generate_overlap_matrix_plot(dfs, dfnames)
-    count_df = generate_max_overlap_candidates(dfs)
-    analyze_max_overlap_candidates(dfs, dfnames, count_df)
+    original_stdout = sys.stdout
+    file_path = os.path.join(RESULTSPATH, "intersection_analysis", "intersection_analysis.log")
+    with open(file_path, 'w') as file:
+        sys.stdout = file
+        generate_overlap_matrix_plot(dfs, dfnames)
+        count_df = generate_max_overlap_candidates(dfs)
+        analyze_max_overlap_candidates(dfs, dfnames, count_df)
+        count_df = count_df[count_df["DI"].str.startswith("PB2")]
+        print("### only PB2 Candidates ###")
+        analyze_max_overlap_candidates(dfs, dfnames, count_df, name="only_PB2")
+    sys.stdout = original_stdout
+    
+    ### make validation with sampling data ###
+    original_stdout = sys.stdout
+    file_path = os.path.join(RESULTSPATH, "intersection_analysis", "control_analysis.log")
+    file = open(file_path, 'w')
+    sys.stdout = file
+    strain = "PR8"
+    for i in range(5):
+        sampl_dfs = list()
+        print(f"##### round {i} #####")
+        for df in dfs:
+            for seg in ["PB2", "PB1", "PA"]:
+                s_df = df.loc[df["Segment"] == seg]
+                n = s_df.shape[0]
+                if n == 0:
+                    continue
+                seq = get_sequence(strain, seg)
+                start = int(s_df["Start"].mean())
+                end = int(s_df["End"].mean())
+                s = (max(start-200, 50), start+200)
+                e = (end-200, min(end+200, len(seq)-50))
+                assert s[1] < e[0], "Sampling: start and end positions are overlapping!"
+                # skip if there is no range given
+                # this would lead to oversampling of a single position
+                if s[0] == s[1] or e[0] == e[1]:
+                    continue
+                if "samp_df" in locals():
+                    temp_df = generate_sampling_data(seq, s, e, n)
+                    temp_df["Segment"] = seg
+                    samp_df = pd.concat([samp_df, temp_df], ignore_index=True)
+                else:
+                    samp_df = generate_sampling_data(seq, s, e, n)
+                    samp_df["Segment"] = seg
+            
+            samp_df["NGS_read_count"] = 1
+            sampl_dfs.append(preprocess(strain, samp_df, 1))
+            del samp_df
 
-    ### only check PB2 candidates ###
-    pb2_dfs = [df[df["Segment"] == "PB2"] for df in dfs]
-    generate_overlap_matrix_plot(pb2_dfs, dfnames, name="PB2")
-    count_df = generate_max_overlap_candidates(pb2_dfs)
-    analyze_max_overlap_candidates(pb2_dfs, dfnames, count_df, name="PB2")
-
-
-
-#"PB2_129_2176", "PB2_217_2204", "PB2_269_2202" # loss, gain, de novo gain; tested in Pelz et al.
-#"PB1_139_2056", "PA_164_2028", "PA_138_1948", "PA_244_2074", "PA_163_1990", "PA_137_1916" # top gain candidates form Final_CutOff_OnlyShortDeletions15%_FractionValues.xlsx
-#"PB1_113_1897", "PB2_206_2152", "PB2_269_2202", "PA_124_1940", "PB1_218_2091" # top de novo gain candidates form Final_CutOff_OnlyShortDeletions15%_FractionValues.xlsx
-
+        generate_overlap_matrix_plot(sampl_dfs, dfnames, name="testing")
+        count_df = generate_max_overlap_candidates(sampl_dfs, thresh=3)
+    
+    sys.stdout = original_stdout
+    file.close()

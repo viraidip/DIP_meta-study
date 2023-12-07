@@ -1034,7 +1034,7 @@ def generate_expected_data(strain: str, df: pd.DataFrame)-> pd.DataFrame:
             samp_df["Segment"] = seg
     
     samp_df["NGS_read_count"] = 1
-    return samp_df
+    return samp_df.reset_index()
 
 def generate_sampling_data(seq: str, s: Tuple[int, int], e: Tuple[int, int],  n: int)-> pd.DataFrame:
     '''
