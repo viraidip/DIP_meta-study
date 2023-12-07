@@ -708,8 +708,7 @@ SEGMENT_DICTS = dict({
 COLORS = dict({"A": "deepskyblue", "C": "gold", "G": "springgreen", "U": "salmon"})
 
 # parameters for the sampling
-QUANT = 0.1
-N_SAMPLES = 2000
+N_SAMPLES = 5000
 
 
 def get_dataset_names(cutoff=0, selection: str=""):
@@ -880,9 +879,9 @@ def create_sequence_library(data_dict: dict)-> dict:
     return data_dict
 
 
-#####################
-### DIRECT REPATS ###
-#####################
+######################
+### DIRECT REPEATS ###
+######################
 def calculate_direct_repeat(seq: str,
                             s: int,
                             e: int,
@@ -1051,8 +1050,22 @@ def generate_sampling_data(seq: str, s: Tuple[int, int], e: Tuple[int, int],  n:
 
         :return: dataframe with the artifical data set
     '''
+    df_no_duplicates = create_sampling_space(seq, s, e)
+    return df_no_duplicates.sample(n)
+
+
+def create_sampling_space(seq: str, s: Tuple[int, int], e: Tuple[int, int])-> pd.DataFrame:
+    '''
+        :param seq: RNA sequence
+        :param s: tuple with start and end point of the range for the artifical
+                  start point of the deletion site
+        :param e: tuple with start and end point of the range for the artifical
+                  end point of the deletion site
+        
+        :return: dataframe with possible DI RNA candidates
+    '''
     # create all combinations of start and end positions that are possible
-    combinations = [(x, y) for x in range(s[0], s[1] + 1) for y in range(e[0], e[1] + 1 )]
+    combinations = [(x, y) for x in range(s[0], s[1]+1) for y in range(e[0], e[1]+1)]
 
     # create for each the DI Sequence
     sequences = [seq[:start] + seq[end-1:] for (start, end) in combinations]
@@ -1061,23 +1074,14 @@ def generate_sampling_data(seq: str, s: Tuple[int, int], e: Tuple[int, int],  n:
     start, end = zip(*combinations)
     temp_df = pd.DataFrame(data=dict({"Start": start, "End": end, "Sequence": sequences}))
 
-    # these are the direct repeat ratios that would be expected by chance overall
-    # I commented them out because they are not used here, but still important to validate 
-    #duplicates = temp_df.groupby('Sequence').size()
-    #dir_rep_counts = duplicates.groupby(duplicates).size()
-    #print(dir_rep_counts/sum(dir_rep_counts * dir_rep_counts.index))
-    
     # Find the index of the row with the maximum value in the 'Start' column for each 'Sequence'
     max_start_index = temp_df.groupby('Sequence')['Start'].idxmax()
-    # Use the index to select the corresponding rows from the original DataFrame
     result_df = temp_df.loc[max_start_index]
     # Replicate each row by the number of times it was found in the group
     result_df = result_df.loc[result_df.index.repeat(temp_df.groupby('Sequence').size())]
     df_no_duplicates = result_df.reset_index(drop=True).drop("Sequence", axis=1)
 
-    # sample n of the remaining possible DI RNAs
-    random_rows = df_no_duplicates.sample(n)
-    return random_rows
+    return df_no_duplicates
 
 
 #######################
