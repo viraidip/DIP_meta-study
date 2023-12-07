@@ -187,29 +187,14 @@ def plot_expected_vs_observed_direct_repeat_heatmaps(dfs: list,
 
         final = np.array(list(final_d.values()))
         expected_final = np.array(list(expected_final_d.values()))
-        f_obs = final/final.sum()
-        f_exp = expected_final/expected_final.sum()
-        _, pvalue = stats.chisquare(f_obs, f_exp)
+        f_obs = final/final.sum() * 100 # normalize to percentage
+        f_exp = expected_final/expected_final.sum() * 100 # normalize to percentage
+        _, pvalue = stats.chisquare(f_obs, f_exp) # as in Boussier et al. 2020
 
         symbol = get_p_value_symbol(pvalue)
         x.extend(final_d.keys())
         y.extend([f"{dfname} ({len(df)}) {symbol}" for _ in range(6)])
         vals.extend(final/final.sum() - expected_final/expected_final.sum())
-
-        for f, f_ex, n_samples in zip(final, f_exp, final_d.values()):
-            if n_samples == 0:
-                pval_symbol = ""
-            else:
-                if pd.isna(f_ex):
-                    f_ex = 0.0
-                pvalue = stats.binomtest(f, n_samples, f_ex).pvalue
-                if pvalue < 0.000001:
-                    pval_symbol = "**"
-                elif pvalue < 0.00001:
-                    pval_symbol = "*"
-                else:
-                    pval_symbol = ""
-            val_labels.append(pval_symbol)
 
     m = abs(min(vals)) if abs(min(vals)) > max(vals) else max(vals)
     axs = plot_heatmap(x,y,vals, axs, vmin=-m, vmax=m, cbar=True, format=".5f")
@@ -218,7 +203,7 @@ def plot_expected_vs_observed_direct_repeat_heatmaps(dfs: list,
     axs.set_xlabel("direct repeat length")
 
     for v_idx, val_label in enumerate(axs.texts):
-        val_label.set_text(f"{val_label.get_text()}\n{val_labels[v_idx]}")
+        val_label.set_text(f"{val_label.get_text()}")
 
     x_ticks = axs.get_xticklabels()
     label = x_ticks[-2].get_text()
