@@ -460,7 +460,7 @@ def deletion_site_motifs(dfs, dfnames, w_len):
             seq = r["full_seq"]
             s = r["Start"]
             e = r["End"]
-            s_window = seq[s-5:s+5]
+            s_window = seq[s-w_len:s+w_len]
             e_window = seq[e-(w_len+1):e+(w_len-1)]
             s_motifs.append(s_window[:w_len])
             e_motifs.append(e_window[:w_len])
