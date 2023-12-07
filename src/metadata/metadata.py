@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 sys.path.insert(0, "..")
 from utils import load_all_mapped_reads, load_mapped_reads, load_all, get_dataset_names
-from utils import SEGMENTS, DATAPATH, RESULTSPATH, ACCNUMDICT, CMAP
+from utils import SEGMENTS, DATAPATH, RESULTSPATH, ACCNUMDICT, CMAP, CUTOFF
 
 
 def load_all_metadata(dfnames):
@@ -102,8 +102,12 @@ def mapped_reads_distribution(dfs: list, dfnames: list)-> None:
     box = axs.get_position()
     axs.set_position([box.x0, box.y0 + box.height * 0.1, box.width, box.height * 0.9])
     axs.legend(unique_handles_labels.values(), unique_handles_labels.keys(), loc="upper center", bbox_to_anchor=(0.5, 1.1), fancybox=True, shadow=True, ncol=8)
-
-    plt.show()
+    
+    save_path = os.path.join(RESULTSPATH, "metadata")
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+    plt.savefig(os.path.join(save_path, f"mapped_reads.png"))
+    plt.close()
 
 
 def dataset_distributions(dfs: list, dfnames: list)-> None:
@@ -146,12 +150,12 @@ def dataset_distributions(dfs: list, dfnames: list)-> None:
     save_path = os.path.join(RESULTSPATH, "metadata")
     if not os.path.exists(save_path):
         os.makedirs(save_path)
-    plt.savefig(os.path.join(save_path, "dataset_distribution.png"))
+    plt.savefig(os.path.join(save_path, f"dataset_distribution_{CUTOFF}.png"))
     plt.close()
 
     stats_df = pd.DataFrame(stats)
 
-    stats_df.to_csv(os.path.join(save_path, "dataset_stats.csv"), float_format="%.2f", index=False)
+    stats_df.to_csv(os.path.join(save_path, f"dataset_stats_{CUTOFF}.csv"), float_format="%.2f", index=False)
 
 
 if __name__ == "__main__":
