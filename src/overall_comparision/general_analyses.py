@@ -490,7 +490,6 @@ if __name__ == "__main__":
     dfs, _ = load_all(dfnames)
 
     plot_distribution_over_segments(dfs, dfnames)
-    exit()
     calculate_deletion_shifts(dfs, dfnames)
     
     length_distribution_histrogram(dfs, dfnames)
