@@ -181,12 +181,12 @@ if __name__ == "__main__":
     plt.style.use("seaborn")
     
     dfs = list()
-    dfnames = ["Alnaji2021", "Pelz2021", "Wang2023", "Wang2020", "Kupke2020", "EBI2020"]
+    dfnames = ["Alnaji2021", "Pelz2021", "Wang2023", "Wang2020", "Kupke2020", "EBI2020", "IRC2015"]
     for dataset in dfnames:
         strain = DATASET_STRAIN_DICT[dataset]
         df = join_data(load_dataset(dataset))
         df = df[df["Segment"].isin(["PB2", "PB1", "PA"])]
-        if dataset in ["Wang2020", "Kupke2020", "EBI2020"]:
+        if dataset in ["Wang2020", "Kupke2020", "EBI2020", "IRC2015"]:
             dfs.append(preprocess(strain, df, 2))    
         else:
             dfs.append(preprocess(strain, df, CUTOFF))

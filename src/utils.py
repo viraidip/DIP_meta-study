@@ -20,6 +20,7 @@ RESULTSPATH = json.load(open("../../.config.json"))["RESULTSPATH"]
 # segments, nuclotides, and strains
 CMAP = "Accent"
 CUTOFF = 13
+RESULTSPATH = os.path.join(RESULTSPATH, f"cutoff_{CUTOFF}")
 SEGMENTS = list(["PB2", "PB1", "PA", "HA", "NP", "NA", "M", "NS"])
 NUCLEOTIDES = dict({"A": "Adenine", "C": "Cytosin", "G": "Guanine", "U": "Uracil"})
 STRAINS = dict({
@@ -40,15 +41,14 @@ DATASET_STRAIN_DICT = dict({
     "Kupke2020": "PR8",
     "EBI2020": "PR8",
     "IRC2015": "PR8",
-#    "Vasilijevic2017 swine": "swine",
-#    "Vasilijevic2017 Cal09": "Cal09",
     "Alnaji2019_Cal07": "Cal07",
     "Alnaji2019_NC" : "NC",
     "Mendes2021": "WSN",
+    "Rattanaburi2022_H1N1": "H1N1_Thailand",
     # H3N2
     "Alnaji2019_Perth": "Perth",
     "WRA2021_A": "Connecticut",
-#    "Rattanaburi2022_H3N2": "Thailand",
+    "Rattanaburi2022_H3N2": "Thailand",
     # H5N1
     "Penn2022": "Turkey",
     # H7N9
@@ -59,7 +59,6 @@ DATASET_STRAIN_DICT = dict({
     "WRA2021_B_yamagata": "Yamagata",
     "Sheng2018": "Brisbane",
     "Southgate2019": "Yamagata",
-
     # n.a.
     "Greninger_2_2023": "Greninger_cons",
     "Lauring2019": "BLEE",
@@ -484,6 +483,20 @@ ACCNUMDICT = dict({
     "IRC2015": dict({
         "SRR1757953": dict({}),
         "SRR1758027": dict({})
+    }),
+    "Rattanaburi2022_H1N1": dict({
+        "SRR10256704": dict({}),
+        "SRR10256705": dict({}),
+        "SRR10256706": dict({}),
+        "SRR10256707": dict({}),
+        "SRR10256708": dict({}),
+        "SRR10256709": dict({}),
+        "SRR10256710": dict({}),
+        "SRR10256713": dict({}),
+        "SRR10256722": dict({}),
+        "SRR10256723": dict({}),
+        "SRR10256724": dict({}),
+        "SRR10256725": dict({})
     })
 })
 
@@ -701,6 +714,26 @@ SEGMENT_DICTS = dict({
         "OQ034434.1": "NA",
         "OQ034435.1": "M",
         "OQ034436.1": "NS"
+    }),
+    "H1N1_Thailand":({
+        "KU051428.1": "PB2",
+        "KU051429.1": "PB1",
+        "KU051430.1": "PA",
+        "KU051431.1": "HA",
+        "KU051432.1": "NP",
+        "KU051433.1": "NA",
+        "KU051434.1": "M",
+        "KU051435.1": "NS"
+    }),
+    "Malaysia":({
+        "CY040456.1": "PB2",
+        "CY040455.1": "PB1",
+        "CY040454.1": "PA",
+        "CY040449.1": "HA",
+        "CY040452.1": "NP",
+        "CY040451.1": "NA",
+        "CY040450.1": "M",
+        "CY040453.1": "NS"
     })
 })
 
@@ -718,7 +751,7 @@ def get_dataset_names(cutoff=0, selection: str=""):
     if cutoff == 0:
         return list(DATASET_STRAIN_DICT.keys())
     # load metadata csv
-    path = os.path.join(RESULTSPATH, "metadata", "dataset_stats.csv")
+    path = os.path.join(RESULTSPATH, "metadata", f"dataset_stats_{CUTOFF}.csv")
     df = pd.read_csv(path)
     # get all names
     names = df[df["Size"] >= cutoff]["Dataset"].to_list()
