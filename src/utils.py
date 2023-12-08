@@ -761,6 +761,8 @@ def get_dataset_names(cutoff=0, selection: str=""):
         select_names = ["Alnaji2021", "Pelz2021", "Wang2020", "Kupke2020", "EBI2020", "IRC2015", "Alnaji2019_Cal07" ,"Alnaji2019_NC", "Mendes2021", "Rattanaburi2022_H1N1", "Alnaji2019_Perth", "Rattanaburi2022_H3N2", "Alnaji2019_BLEE", "Sheng2018",]
     elif selection == "in vivo human":
         select_names = ["Berry2021_A", "Berry2021_B", "Berry2021_B_yamagata", "Southgate2019", "Valesano2020"]
+    else:
+        select_names = names
 
     names = list(set(names) & set(select_names))
     return names
