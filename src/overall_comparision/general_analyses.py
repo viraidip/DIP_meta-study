@@ -276,24 +276,33 @@ def start_vs_end_lengths(dfs, dfnames, limit: int=0, folder: str="general_analys
         plt.close()
 
 
-def diff_start_end_lengths(dfs, dfnames, folder: str="general_analysis")-> None:
+def calc_start_end_lengths(dfs, dfnames, thresh=300):
     '''
-
+    
     '''
-    fig, axs = plt.subplots(1, 1, figsize=(10, 7), tight_layout=True)
     plot_list = list()
-    position_list = np.arange(0, len(dfs))
     labels = list()
-
     for df, dfname in zip(dfs, dfnames):
         df["End_L"] = df["full_seq"].str.len() - df["End"]
         l = (df["Start"] - df["End_L"]).to_list()
-        thresh = 300
+        
         l = [x for x in l if x <= thresh]
         l = [x for x in l if x >= -thresh]
         plot_list.append(l)
         labels.append(f"{dfname} (n={df.shape[0]})")
 
+    return plot_list, labels
+
+
+def diff_start_end_lengths(dfs, dfnames, folder: str="general_analysis")-> None:
+    '''
+
+    '''
+    fig, axs = plt.subplots(1, 1, figsize=(10, 7), tight_layout=True)
+    thresh = 300
+    plot_list, labels = calc_start_end_lengths(dfs, dfnames, thresh)
+
+    position_list = np.arange(0, len(dfs))
     axs.violinplot(plot_list, position_list, points=1000, showmedians=True)
     axs.set_xticks(position_list)
     axs.set_xticklabels(labels, rotation=90)

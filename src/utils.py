@@ -47,7 +47,7 @@ DATASET_STRAIN_DICT = dict({
     "Rattanaburi2022_H1N1": "H1N1_Thailand",
     # H3N2
     "Alnaji2019_Perth": "Perth",
-    "WRA2021_A": "Connecticut",
+    "Berry2021_A": "Connecticut",
     "Rattanaburi2022_H3N2": "Thailand",
     # H5N1
     "Penn2022": "Turkey",
@@ -55,13 +55,13 @@ DATASET_STRAIN_DICT = dict({
     "Lui2019": "Anhui",
     # B 
     "Alnaji2019_BLEE": "BLEE",
-    "WRA2021_B": "Victoria",
-    "WRA2021_B_yamagata": "Yamagata",
+    "Berry2021_B": "Victoria",
+    "Berry2021_B_yamagata": "Yamagata",
     "Sheng2018": "Brisbane",
     "Southgate2019": "Yamagata",
     # n.a.
     "Greninger_2_2023": "Greninger_cons",
-    "Lauring2019": "BLEE",
+    "Valesano2020": "BLEE",
 })
 
 ACCNUMDICT = dict({
@@ -354,7 +354,7 @@ ACCNUMDICT = dict({
         "SRR23634033": dict({"Strain": "B7C5"}),
         "SRR23634034": dict({"Strain": "B7H4"})
     }),
-    "WRA2021_A": dict({
+    "Berry2021_A": dict({
         "SRR15182178":  dict({}),
         "SRR15182177":  dict({}),
         "SRR15182176":  dict({}),
@@ -364,7 +364,7 @@ ACCNUMDICT = dict({
         "SRR15182172":  dict({}),
         "SRR15182171":  dict({})
     }),
-    "WRA2021_B": dict({
+    "Berry2021_B": dict({
         "SRR15183345":  dict({}),
         "SRR15183344":  dict({}),
         "SRR15183352":  dict({}),
@@ -388,7 +388,7 @@ ACCNUMDICT = dict({
         "SRR15196424":  dict({}),
         "SRR15196425":  dict({})
     }),
-    "WRA2021_B_yamagata": dict({
+    "Berry2021_B_yamagata": dict({
         "SRR15183338":  dict({}),
         "SRR15183343":  dict({}),
         "SRR15183342":  dict({}),
@@ -403,7 +403,7 @@ ACCNUMDICT = dict({
         "SRR10256720":  dict({}),
         "SRR10256721":  dict({})
     }),
-    "Lauring2019": dict({
+    "Valesano2020": dict({
         "SRR10013210": dict({}),
         "SRR10013205": dict({}),
         "SRR10013181": dict({}),
@@ -747,17 +747,23 @@ def get_dataset_names(cutoff=0, selection: str=""):
     '''
     
     '''
-    if cutoff == 0:
+    if cutoff == 0 and selection == "":
         return list(DATASET_STRAIN_DICT.keys())
-    # load metadata csv
+    
     path = os.path.join(RESULTSPATH, "metadata", f"dataset_stats_{CUTOFF}.csv")
     df = pd.read_csv(path)
-    # get all names
     names = df[df["Size"] >= cutoff]["Dataset"].to_list()
 
     # make selection based on in vivo/cells etc.
-    if selection == "":
-        return names
+    if selection == "in vivo mouse":
+        select_names = ["Wang2023", "Penn2022", "Lui2019", ]
+    elif selection == "in vitro":
+        select_names = ["Alnaji2021", "Pelz2021", "Wang2020", "Kupke2020", "EBI2020", "IRC2015", "Alnaji2019_Cal07" ,"Alnaji2019_NC", "Mendes2021", "Rattanaburi2022_H1N1", "Alnaji2019_Perth", "Rattanaburi2022_H3N2", "Alnaji2019_BLEE", "Sheng2018",]
+    elif selection == "in vivo human":
+        select_names = ["Berry2021_A", "Berry2021_B", "Berry2021_B_yamagata", "Southgate2019", "Valesano2020"]
+
+    names = list(set(names) & set(select_names))
+    return names
 
 
 def load_single_dataset(exp: str, acc: str, segment_dict: dict)-> pd.DataFrame:
