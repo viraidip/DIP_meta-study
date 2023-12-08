@@ -43,7 +43,7 @@ DATASET_STRAIN_DICT = dict({
     "IRC2015": "PR8",
     "Alnaji2019_Cal07": "Cal07",
     "Alnaji2019_NC" : "NC",
-    "Mendes2021": "WSN",
+    "Mendes2021": "WSN_Mendes_rev",
     "Rattanaburi2022_H1N1": "H1N1_Thailand",
     # H3N2
     "Alnaji2019_Perth": "Perth",
@@ -562,7 +562,7 @@ SEGMENT_DICTS = dict({
         "CY034133.1": "M",
         "CY034136.1": "NS"
     }),
-    "WSN": dict({
+    "WSN_Mendes_rev": dict({
         "PB2_vRNA": "PB2",
         "PB1_vRNA": "PB1",
         "PA_vRNA": "PA",
