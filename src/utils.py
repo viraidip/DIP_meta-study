@@ -56,12 +56,13 @@ DATASET_STRAIN_DICT = dict({
     # B 
     "Alnaji2019_BLEE": "BLEE",
     "Berry2021_B": "Victoria",
-    "Berry2021_B_yamagata": "Yamagata",
+ #   "Valesano2020_Vic": "Victoria",
     "Sheng2018": "Brisbane",
+    "Berry2021_B_yamagata": "Yamagata",
     "Southgate2019": "Yamagata",
+ #   "Valesano2020_Yam": "Yamagata",
     # n.a.
-    "Greninger_2_2023": "Greninger_cons",
-    "Valesano2020": "BLEE",
+    "Greninger_2_2023": "Greninger_cons"
 })
 
 ACCNUMDICT = dict({
@@ -403,22 +404,11 @@ ACCNUMDICT = dict({
         "SRR10256720":  dict({}),
         "SRR10256721":  dict({})
     }),
-    "Valesano2020": dict({
-        "SRR10013210": dict({}),
-        "SRR10013205": dict({}),
-        "SRR10013181": dict({}),
-        "SRR10013264": dict({}),
-        "SRR10013191": dict({}),
-        "SRR10013228": dict({}),
-        "SRR10013249": dict({}),
-        "SRR10013260": dict({}),
-        "SRR10013239": dict({}),
-        "SRR10013211": dict({}),
-        "SRR10013203": dict({}),
-        "SRR10013255": dict({}),
-        "SRR10013170": dict({}),
-        "SRR10013175": dict({}),
-        "SRR10013284": dict({})
+    "Valesano2020_Vic": dict({
+        
+    }),
+    "Valesano2020_Yam": dict({
+    
     }),
     "Southgate2019": dict({
         "ERR3474616": dict({}),
@@ -764,7 +754,7 @@ def get_dataset_names(cutoff=0, selection: str=""):
     else:
         select_names = names
 
-    names = list(set(names) & set(select_names))
+    names = [name for name in names if name in select_names]
     return names
 
 
@@ -886,11 +876,9 @@ def get_p_value_symbol(p: float)-> str:
 
         :return: letter indicating the significance level
     '''
-    if p < 0.0001:
-        return "****"
-    elif p < 0.001:
+    if p < 0.00001:
         return "***"
-    elif p < 0.01:
+    elif p < 0.001:
         return "**"
     elif p < 0.05:
         return "*"
