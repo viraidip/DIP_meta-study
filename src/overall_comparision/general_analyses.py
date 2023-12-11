@@ -508,29 +508,3 @@ if __name__ == "__main__":
     start_vs_end_lengths(dfs, dfnames, limit=600)
     diff_start_end_lengths(dfs, dfnames)
     deletion_site_motifs(dfs, dfnames, w_len=2)
-
-    ### different cell types, only PR8 datasets ### 
-    cell_dfs = list()
-    cell_dfnames = list()
-    for dfname in ["Alnaji2021", "Pelz2021", "Wang2020", "EBI2020"]:
-        df = load_dataset(dfname)
-        if "Cell" in df.columns:
-            for cell_type in df["Cell"].unique():
-                c_df = df[df["Cell"] == cell_type].copy()
-
-                cell_dfs.append(preprocess(DATASET_STRAIN_DICT[dfname], join_data(c_df), CUTOFF))
-                cell_dfnames.append(f"{dfname} {cell_type}")
-        else:
-            cell_dfs.append(preprocess(DATASET_STRAIN_DICT[dfname], join_data(df), CUTOFF))
-            cell_dfnames.append(f"{dfname} MDCK")
-
-    folder = "cell_datasets"
-    plot_distribution_over_segments(cell_dfs, cell_dfnames, folder=folder)
-    calculate_deletion_shifts(cell_dfs, cell_dfnames, folder=folder)
-    length_distribution_histrogram(cell_dfs, cell_dfnames, folder=folder)
-    length_distribution_violinplot(cell_dfs, cell_dfnames, folder=folder)
-    plot_nucleotide_ratio_around_deletion_junction_heatmaps(cell_dfs, cell_dfnames, folder=folder)
-    plot_direct_repeat_ratio_heatmaps(cell_dfs, cell_dfnames, folder=folder)
-    start_vs_end_lengths(cell_dfs, cell_dfnames, limit=600, folder=folder)
-    diff_start_end_lengths(cell_dfs, cell_dfnames, folder=folder)
-    
