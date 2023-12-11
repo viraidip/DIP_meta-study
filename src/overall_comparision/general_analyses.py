@@ -11,7 +11,6 @@ import matplotlib.patches as patches
 
 from scipy import stats
 from collections import Counter
-from scipy.stats import chi2_contingency
 
 sys.path.insert(0, "..")
 from utils import load_all, get_sequence, get_seq_len, get_p_value_symbol, plot_heatmap, create_nucleotide_ratio_matrix, count_direct_repeats_overall, load_dataset, preprocess, join_data, get_dataset_names
@@ -30,7 +29,7 @@ def plot_distribution_over_segments(dfs: list, dfnames: list, folder: str="gener
 
     :return: None
     '''
-    fig, axs = plt.subplots(figsize=(len(dfs)*0.7, 5), nrows=1, ncols=1)
+    fig, axs = plt.subplots(figsize=(10, 6), nrows=1, ncols=1)
     cm = plt.get_cmap(CMAP)
     colors = [cm(1.*i/len(SEGMENTS)) for i in range(len(SEGMENTS))]
 
@@ -54,13 +53,12 @@ def plot_distribution_over_segments(dfs: list, dfnames: list, folder: str="gener
     bottom = np.zeros(len(dfs))
 
     for i, s in enumerate(SEGMENTS):
-        axs.bar(x, y[s], bar_width, color=colors[i], label=s, bottom=bottom)
+        axs.barh(x, y[s], bar_width, color=colors[i], label=s, left=bottom)
         bottom += y[s]
     
-    axs.set_ylabel("segment occurrence [%]")
-    axs.set_xlabel("dataset")
-    plt.xticks(range(len(dfnames)), [f"{dfname}\n({len(df)}) {get_p_value_symbol(p)}" for dfname, df, p in zip(dfnames, dfs, pvalues)], rotation=90)
-
+    axs.set_xlabel("segment occurrence [%]")
+    axs.set_ylabel("dataset")
+    plt.yticks(range(len(dfnames)), [f"{dfname} ({len(df)}) {get_p_value_symbol(p)}" for dfname, df, p in zip(dfnames, dfs, pvalues)])
     box = axs.get_position()
     axs.set_position([box.x0, box.y0 + box.height * 0.1, box.width, box.height * 0.9])
     axs.legend(loc="upper center", bbox_to_anchor=(0.5, 1.1), fancybox=True, shadow=True, ncol=8)
@@ -83,7 +81,7 @@ def calculate_deletion_shifts(dfs: list, dfnames: list, folder: str="general_ana
                              Default is "seq_around_deletion_junction".
     :return: None
     '''
-    fig, axs = plt.subplots(figsize=(5, 7))
+    fig, axs = plt.subplots(figsize=(10, 6))
     cm = plt.get_cmap(CMAP)
     colors = [cm(1.*i/3) for i in range(3)]
 
@@ -109,12 +107,12 @@ def calculate_deletion_shifts(dfs: list, dfnames: list, folder: str="general_ana
     bottom = np.zeros(len(dfs))
     labels = list(["in-frame", "shift +1", "shift -1"])
     for i, label in zip([0, 1, 2], labels):
-        axs.bar(x, y[i], bar_width, color=colors[i], label=label, bottom=bottom)
+        axs.barh(x, y[i], bar_width, color=colors[i], label=label, left=bottom)
         bottom += y[i]
     
-    axs.set_ylabel("deletion shift [%]")
-    axs.set_xlabel("dataset")
-    plt.xticks(range(len(dfnames)), [f"{dfname} (n={len(df)}, pval.={p:.2})" for dfname, df, p in zip(dfnames, dfs, pvalues)], rotation=90)
+    axs.set_xlabel("deletion shift [%]")
+    axs.set_ylabel("dataset")
+    plt.yticks(range(len(dfnames)), [f"{dfname} (n={len(df)}, pval.={p:.2})" for dfname, df, p in zip(dfnames, dfs, pvalues)])
     box = axs.get_position()
     axs.set_position([box.x0, box.y0 + box.height * 0.1, box.width, box.height * 0.9])
     axs.legend(loc="upper center", bbox_to_anchor=(0.5, 1.1), fancybox=True, shadow=True, ncol=8)
@@ -500,7 +498,6 @@ if __name__ == "__main__":
 
     plot_distribution_over_segments(dfs, dfnames)
     calculate_deletion_shifts(dfs, dfnames)
-    
     length_distribution_histrogram(dfs, dfnames)
     length_distribution_violinplot(dfs, dfnames)
     plot_nucleotide_ratio_around_deletion_junction_heatmaps(dfs, dfnames)
