@@ -56,11 +56,11 @@ DATASET_STRAIN_DICT = dict({
     # B 
     "Alnaji2019_BLEE": "BLEE",
     "Berry2021_B": "Victoria",
- #   "Valesano2020_Vic": "Victoria",
+    "Valesano2020_Vic": "Victoria",
     "Sheng2018": "Brisbane",
     "Berry2021_B_yamagata": "Yamagata",
     "Southgate2019": "Yamagata",
- #   "Valesano2020_Yam": "Yamagata",
+    "Valesano2020_Yam": "Yamagata",
     # n.a.
     "Greninger_2_2023": "Greninger_cons"
 })
@@ -405,10 +405,51 @@ ACCNUMDICT = dict({
         "SRR10256721":  dict({})
     }),
     "Valesano2020_Vic": dict({
-        
+        "SRR10013092":  dict({}),
+        "SRR10013237":  dict({}),
+        "SRR10013181":  dict({}),
+        "SRR10013242":  dict({}),
+        "SRR10013050":  dict({}),
+        "SRR10013272":  dict({}),
+        "SRR10013047":  dict({}),
+        "SRR10013239":  dict({}),
+        "SRR10013071":  dict({}),
+        "SRR10013201":  dict({}),
+        "SRR10013072":  dict({}),
+        "SRR10013200":  dict({}),
+        "SRR10013108":  dict({}),
+        "SRR10013256":  dict({}),
+        "SRR10013037":  dict({}),
+        "SRR10013254":  dict({}),
+        "SRR10013279":  dict({}),
+        "SRR10013219":  dict({}),
+        "SRR10013221":  dict({})
     }),
     "Valesano2020_Yam": dict({
-    
+        "SRR10013243":  dict({}),
+		"SRR10013084":  dict({}),
+		"SRR10013188":  dict({}),
+		"SRR10013094":  dict({}),
+		"SRR10013178":  dict({}),
+		"SRR10013236":  dict({}),
+		"SRR10013063":  dict({}),
+		"SRR10013209":  dict({}),
+		"SRR10013241":  dict({}),
+		"SRR10013240":  dict({}),
+		"SRR10013229":  dict({}),
+		"SRR10013068":  dict({}),
+		"SRR10013205":  dict({}),
+		"SRR10013067":  dict({}),
+		"SRR10013206":  dict({}),
+		"SRR10013062":  dict({}),
+		"SRR10013210":  dict({}),
+		"SRR10013070":  dict({}),
+		"SRR10013203":  dict({}),
+		"SRR10013103":  dict({}),
+		"SRR10013170":  dict({}),
+		"SRR10013223":  dict({}),
+		"SRR10013244":  dict({}),
+		"SRR10013275":  dict({})
     }),
     "Southgate2019": dict({
         "ERR3474616": dict({}),
@@ -540,17 +581,6 @@ SEGMENT_DICTS = dict({
         "CY115113.1": "NA",
         "CY115112.1": "M",
         "CY115115.1": "NS"
-    }),
-    # Not used right now, rather use sequences provided by Mendes and Russell
-    "___WSN": dict({
-        "CY034139.1": "PB2",
-        "CY034138.1": "PB1",
-        "CY034137.1": "PA",
-        "CY034132.1": "HA",
-        "CY034135.1": "NP",
-        "CY034134.1": "NA",
-        "CY034133.1": "M",
-        "CY034136.1": "NS"
     }),
     "WSN_Mendes_rev": dict({
         "PB2_vRNA": "PB2",

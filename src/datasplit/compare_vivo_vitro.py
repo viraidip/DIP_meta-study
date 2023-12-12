@@ -12,8 +12,8 @@ from collections import Counter
 
 sys.path.insert(0, "..")
 from utils import load_all, get_dataset_names, get_p_value_symbol
-from utils import SEGMENTS
-from overall_comparision.general_analyses import calc_DI_lengths, calc_start_end_lengths
+from utils import SEGMENTS, RESULTSPATH
+from overall_comparision.general_analyses import calc_DI_lengths
 
 
 def compare_DI_lengths(a_dfs, a_dfnames, a_label, b_dfs, b_dfnames, b_label, c_dfs, c_dfnames, c_label):
@@ -57,7 +57,12 @@ def compare_DI_lengths(a_dfs, a_dfnames, a_label, b_dfs, b_dfnames, b_label, c_d
         plt.legend()
         plt.title(f"{s} (1-2: {s_ab} | 1-3: {s_ac} | 2-3: {s_bc})")
 
-        plt.show()
+        save_path = os.path.join(RESULTSPATH, "datasplits")
+        if not os.path.exists(save_path):
+            os.makedirs(save_path)
+
+        plt.savefig(os.path.join(save_path, "vivo_vitro.png"))
+        plt.close()
 
 
 if __name__ == "__main__":

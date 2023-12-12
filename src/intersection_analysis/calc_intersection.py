@@ -192,8 +192,10 @@ if __name__ == "__main__":
             dfs.append(preprocess(strain, df, CUTOFF))
 
     original_stdout = sys.stdout
-    file_path = os.path.join(RESULTSPATH, "intersection_analysis", "intersection_analysis.log")
-    with open(file_path, 'w') as file:
+    save_path = os.path.join(RESULTSPATH, "intersection_analysis")
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+    with open(os.path.join(save_path, "intersection_analysis.log"), 'w') as file:
         sys.stdout = file
         generate_overlap_matrix_plot(dfs, dfnames)
         count_df = generate_max_overlap_candidates(dfs)

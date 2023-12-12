@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 sys.path.insert(0, "..")
 from utils import load_all, get_p_value_symbol
-from utils import SEGMENTS
+from utils import RESULTSPATH
 from overall_comparision.general_analyses import calc_start_end_lengths
 
 
@@ -46,7 +46,11 @@ def compare_3_5_ends(dfs, dfnames):
     add_significance(data[0], data[2], axs, 0, 2, 340)
     add_significance(data[1], data[2], axs, 1, 2, 370)
 
-    plt.show()
+    save_path = os.path.join(RESULTSPATH, "datasplits")
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+
+    plt.savefig(os.path.join(save_path, "Berry2021_3_5_ends.png"))
     plt.close()
 
 

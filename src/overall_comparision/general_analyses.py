@@ -449,7 +449,7 @@ def plot_direct_repeat_ratio_heatmaps(dfs: list, dfnames: list, folder: str="gen
     plt.close()
 
 
-def deletion_site_motifs(dfs, dfnames, w_len):
+def deletion_site_motifs(dfs, dfnames, w_len, folder: str="general_analysis"):
     '''
     
     '''
@@ -485,9 +485,14 @@ def deletion_site_motifs(dfs, dfnames, w_len):
 
     results_df = pd.DataFrame(results)
 
-    print(results_df)
-    print(Counter(results["start"]))
-    print(Counter(results["end"]))
+    save_path = os.path.join(RESULTSPATH, folder)
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+    path = (os.path.join(save_path, "deletion_site_motif.txt"))
+    with open(path , "w") as f:
+        print(results_df, file=f)
+        print(Counter(results["start"]), file=f)
+        print(Counter(results["end"]), file=f)
 
 
 if __name__ == "__main__":
