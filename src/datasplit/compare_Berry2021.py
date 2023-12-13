@@ -24,7 +24,6 @@ def compare_3_5_ends(dfs, dfnames):
     
     data, labels = calc_start_end_lengths(dfs, dfnames)
         
-
     fig, axs = plt.subplots(1, 1, figsize=(5, 5), tight_layout=True)
     position_list = np.arange(0, 3)
     axs.violinplot(data, position_list, points=1000, showmedians=True)
@@ -36,11 +35,15 @@ def compare_3_5_ends(dfs, dfnames):
     axs.set_title(f"Difference of start to end sequence lengths")
     
     def add_significance(l1, l2, axs, start, end, height):
-        _, pvalue = stats.f_oneway(l1, l2)
+        bins = 30
+        data1, _ = np.histogram(l1, bins=bins)
+        data2, _ = np.histogram(l2, bins=bins)
+        _, pvalue = stats.f_oneway(data1, data2)
+        print(pvalue)
         symbol = get_p_value_symbol(pvalue)
         if symbol != "":
             axs.plot([start, end], [height, height], lw=2, color='black')
-            axs.text((start + end) / 2, height + 0.01, symbol, ha='center', va='bottom', color='black')
+            axs.text((start + end) / 2, height + 0.01, f"p={pvalue:.6f} {symbol}", ha='center', va='bottom', color='black')
 
     add_significance(data[0], data[1], axs, 0, 1, 310)
     add_significance(data[0], data[2], axs, 0, 2, 340)
