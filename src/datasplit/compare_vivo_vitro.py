@@ -77,5 +77,5 @@ if __name__ == "__main__":
     patient_dfnames = get_dataset_names(cutoff=0, selection="in vivo human")
     patient_dfs, _ = load_all(patient_dfnames)
 
-    compare_DI_lengths(vitro_dfs, vitro_dfnames, "in vitro", vivo_dfs, vivo_dfnames, "in vivo human", patient_dfs, patient_dfnames, "in vivo humans")
+    compare_DI_lengths(vitro_dfs, vitro_dfnames, "in vitro", vivo_dfs, vivo_dfnames, "in vivo mouse", patient_dfs, patient_dfnames, "in vivo humans")
 
