@@ -776,7 +776,7 @@ def get_dataset_names(cutoff=0, selection: str=""):
 
     # make selection based on in vivo/cells etc.
     if selection == "in vivo mouse":
-        select_names = ["Wang2023", "Penn2022", "Lui2019", ]
+        select_names = ["Wang2023", "Penn2022", "Lui2019"]
     elif selection == "in vitro":
         select_names = ["Alnaji2021", "Pelz2021", "Wang2020", "Kupke2020", "EBI2020", "IRC2015", "Alnaji2019_Cal07" ,"Alnaji2019_NC", "Mendes2021", "Rattanaburi2022_H1N1", "Alnaji2019_Perth", "Rattanaburi2022_H3N2", "Alnaji2019_BLEE", "Sheng2018",]
     elif selection == "in vivo human":

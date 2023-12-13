@@ -39,7 +39,7 @@ if __name__ == "__main__":
                 expected_cell_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
         else:
             cell_dfs.append(preprocess(DATASET_STRAIN_DICT[dfname], join_data(df), CUTOFF))
-            cell_dfnames.append(f"{dfname} MDCK")
+            cell_dfnames.append(f"{dfname}")
             expected_cell_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
 
     folder = "cell_datasets"

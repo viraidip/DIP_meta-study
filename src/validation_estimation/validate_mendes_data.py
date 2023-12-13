@@ -70,6 +70,9 @@ def diff_start_end_lengths(dfs, dfnames, folder: str="validation_estimation")-> 
 
 
 if __name__ == "__main__":
+    ### THIS IS OUTDATED ###
+    ### WAS USED TO DETECT THE ANOMALIES IN MENDES DATASET ###
+    ### CHECKING IF THE ANOMALIES ARE DUE TO MY PROCESSING ###
     plt.style.use("seaborn")
     RESULTSPATH = os.path.dirname(RESULTSPATH)
     dfs = list()

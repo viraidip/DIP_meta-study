@@ -46,7 +46,7 @@ if __name__ == "__main__":
     diff_start_end_lengths(in_vivo_dfs, in_vivo_dfnames, folder=folder)
 
     # compare against expected
-    plot_expected_vs_observed_nucleotide_enrichment_heatmaps(in_vivo_dfs, in_vivo_dfnames, expected_in_vivo_dfs, folder)
+    plot_expected_vs_observed_nucleotide_enrichment_heatmaps(in_vivo_dfs, in_vivo_dfnames, expected_in_vivo_dfs, "observed-expected", folder)
     plot_expected_vs_observed_direct_repeat_heatmaps(in_vivo_dfs, in_vivo_dfnames, expected_in_vivo_dfs, "observed-expected", folder)
     direct_repeat_composition(in_vivo_dfs, in_vivo_dfnames, expected_in_vivo_dfs, folder)
  
@@ -67,9 +67,9 @@ if __name__ == "__main__":
     diff_start_end_lengths(patient_dfs, patient_dfnames, folder=folder)
 
     # compare against expected
-    plot_expected_vs_observed_nucleotide_enrichment_heatmaps(patient_dfs, patient_dfnames, expected_patient_dfs, folder)
+    plot_expected_vs_observed_nucleotide_enrichment_heatmaps(patient_dfs, patient_dfnames, expected_patient_dfs, "observed-expected", folder)
     plot_expected_vs_observed_direct_repeat_heatmaps(patient_dfs, patient_dfnames, expected_patient_dfs, "observed-expected", folder)
     direct_repeat_composition(patient_dfs, patient_dfnames, expected_patient_dfs, folder)   
 
     # intersections of patient data
-    patient_intersection(patient_dfs, patient_dfnames)
+    #patient_intersection(patient_dfs, patient_dfnames)

@@ -110,11 +110,11 @@ def load_lui2019_rsc(name: str)-> dict:
         :return: dictionary with one key, value pair
     '''
     if name == "SMRT":
-        filename = "Virus-1-2_enriched_junctions.tsv"
+        filename = ""
     elif name == "illumina":
         filename = "Lui2019_Illumina.csv"
     
-    file_path = os.path.join(DATAPATH, "validation_estimation", filename)
+    file_path = os.path.join(DATAPATH, "RSC_estimation", filename)
     data = pd.read_csv(file_path,
                             header=0,
                             na_values=["", "None"],
@@ -164,7 +164,7 @@ def loop_threshs(d1, d2, name)-> int:
         ns_new.append(n_new)
         ns_orig.append(n_orig)
 
-        if frac > 0.5 and not above_thresh:
+        if frac > 0.85 and not above_thresh:
             rsc = t
             above_thresh = True
 
@@ -301,14 +301,14 @@ if __name__ == "__main__":
 
     ### Mendes 2021 ###
     name = "mendes_v12enr"
-    v12enriched = load_single_dataset("Mendes2021", "SRR15720521", dict({s: s for s in SEGMENTS}))
+    v12enriched = load_single_dataset("Mendes2021", "SRR15720521", SEGMENT_DICTS["WSN_Mendes_rev"])
     ns.append(v12enriched.shape[0])
     orig_mendes = load_mendes2021_rsc("v12enriched")
     print(f"### {name} ###")
     rscs.append(loop_threshs(v12enriched, orig_mendes, name))
 
     name = "mendes_v21depl"
-    v21depleted = load_single_dataset("Mendes2021", "SRR15720526", dict({s: s for s in SEGMENTS}))
+    v21depleted = load_single_dataset("Mendes2021", "SRR15720526", SEGMENT_DICTS["WSN_Mendes_rev"])
     ns.append(v21depleted.shape[0])
     orig_mendes = load_mendes2021_rsc("v21depleted")
     print(f"### {name} ###")
@@ -323,6 +323,8 @@ if __name__ == "__main__":
     rscs.append(loop_threshs(illumina, orig_lui, name))
 
     # this shows that no dependences between dataset size and RCS is given
+    print(rscs)
+    print(np.mean(rscs[:-3]))
     plt.plot(ns, rscs)
     plt.show()
     plt.close()
