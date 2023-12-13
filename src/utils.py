@@ -58,7 +58,7 @@ DATASET_STRAIN_DICT = dict({
     "Berry2021_B": "Victoria",
     "Valesano2020_Vic": "Victoria",
     "Sheng2018": "Brisbane",
-    "Berry2021_B_yamagata": "Yamagata",
+    "Berry2021_B_Yam": "Yamagata",
     "Southgate2019": "Yamagata",
     "Valesano2020_Yam": "Yamagata",
     # n.a.
@@ -389,7 +389,7 @@ ACCNUMDICT = dict({
         "SRR15196424":  dict({}),
         "SRR15196425":  dict({})
     }),
-    "Berry2021_B_yamagata": dict({
+    "Berry2021_B_Yam": dict({
         "SRR15183338":  dict({}),
         "SRR15183343":  dict({}),
         "SRR15183342":  dict({}),
@@ -756,9 +756,6 @@ SEGMENT_DICTS = dict({
     })
 })
 
-# global colors for plotting
-COLORS = dict({"A": "deepskyblue", "C": "gold", "G": "springgreen", "U": "salmon"})
-
 # parameters for the sampling
 N_SAMPLES = 5000
 
@@ -780,7 +777,7 @@ def get_dataset_names(cutoff=0, selection: str=""):
     elif selection == "in vitro":
         select_names = ["Alnaji2021", "Pelz2021", "Wang2020", "Kupke2020", "EBI2020", "IRC2015", "Alnaji2019_Cal07" ,"Alnaji2019_NC", "Mendes2021", "Rattanaburi2022_H1N1", "Alnaji2019_Perth", "Rattanaburi2022_H3N2", "Alnaji2019_BLEE", "Sheng2018",]
     elif selection == "in vivo human":
-        select_names = ["Berry2021_A", "Berry2021_B", "Berry2021_B_yamagata", "Southgate2019", "Valesano2020"]
+        select_names = ["Berry2021_A", "Berry2021_B", "Berry2021_B_Yam", "Southgate2019", "Valesano2020_Yam", "Valesano2020_Vic"]
     else:
         select_names = names
 

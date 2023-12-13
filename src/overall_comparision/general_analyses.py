@@ -29,7 +29,7 @@ def plot_distribution_over_segments(dfs: list, dfnames: list, folder: str="gener
 
     :return: None
     '''
-    fig, axs = plt.subplots(figsize=(10, 6), nrows=1, ncols=1)
+    fig, axs = plt.subplots(figsize=(6, 6))
     cm = plt.get_cmap(CMAP)
     colors = [cm(1.*i/len(SEGMENTS)) for i in range(len(SEGMENTS))]
 
@@ -59,10 +59,11 @@ def plot_distribution_over_segments(dfs: list, dfnames: list, folder: str="gener
     axs.set_xlabel("segment occurrence [%]")
     axs.set_ylabel("dataset")
     plt.yticks(range(len(dfnames)), [f"{dfname} ({len(df)}) {get_p_value_symbol(p)}" for dfname, df, p in zip(dfnames, dfs, pvalues)])
-    box = axs.get_position()
-    axs.set_position([box.x0, box.y0 + box.height * 0.1, box.width, box.height * 0.9])
-    axs.legend(loc="upper center", bbox_to_anchor=(0.5, 1.1), fancybox=True, shadow=True, ncol=8)
+  #  box = axs.get_position()
+ #   axs.set_position([box.x0, box.y0 + box.height * 0.1, box.width, box.height * 0.9])
+    axs.legend(loc="upper center", bbox_to_anchor=(0.4, 1.1), fancybox=True, shadow=True, ncol=4)
     
+    plt.tight_layout()
     save_path = os.path.join(RESULTSPATH, folder)
     if not os.path.exists(save_path):
         os.makedirs(save_path)
@@ -81,7 +82,7 @@ def calculate_deletion_shifts(dfs: list, dfnames: list, folder: str="general_ana
                              Default is "seq_around_deletion_junction".
     :return: None
     '''
-    fig, axs = plt.subplots(figsize=(10, 6))
+    fig, axs = plt.subplots(figsize=(6, 6))
     cm = plt.get_cmap(CMAP)
     colors = [cm(1.*i/3) for i in range(3)]
 
@@ -112,10 +113,8 @@ def calculate_deletion_shifts(dfs: list, dfnames: list, folder: str="general_ana
     
     axs.set_xlabel("deletion shift [%]")
     axs.set_ylabel("dataset")
-    plt.yticks(range(len(dfnames)), [f"{dfname} (n={len(df)}, pval.={p:.2})" for dfname, df, p in zip(dfnames, dfs, pvalues)])
-    box = axs.get_position()
-    axs.set_position([box.x0, box.y0 + box.height * 0.1, box.width, box.height * 0.9])
-    axs.legend(loc="upper center", bbox_to_anchor=(0.5, 1.1), fancybox=True, shadow=True, ncol=8)
+    plt.yticks(range(len(dfnames)), [f"{dfname} (n={len(df)}, p.={p:.2})" for dfname, df, p in zip(dfnames, dfs, pvalues)])
+    axs.legend(loc="upper center", bbox_to_anchor=(0.5, 1.1), fancybox=True, shadow=True, ncol=3)
 
     plt.tight_layout()
     save_path = os.path.join(RESULTSPATH, folder)
@@ -460,7 +459,7 @@ def deletion_site_motifs(dfs, dfnames, w_len, folder: str="general_analysis"):
         "end": list(),
         "end prct.": list()
     })
-    for df, dfname in zip(dfs, dfnames):
+    for df in dfs:
         s_motifs = list()
         e_motifs = list()
 
@@ -503,6 +502,7 @@ if __name__ == "__main__":
 
     plot_distribution_over_segments(dfs, dfnames)
     calculate_deletion_shifts(dfs, dfnames)
+    '''
     length_distribution_histrogram(dfs, dfnames)
     length_distribution_violinplot(dfs, dfnames)
     plot_nucleotide_ratio_around_deletion_junction_heatmaps(dfs, dfnames)
@@ -510,3 +510,4 @@ if __name__ == "__main__":
     start_vs_end_lengths(dfs, dfnames, limit=600)
     diff_start_end_lengths(dfs, dfnames)
     deletion_site_motifs(dfs, dfnames, w_len=2)
+    '''

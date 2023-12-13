@@ -10,6 +10,7 @@ import scipy.stats as stats
 import matplotlib.pyplot as plt
 
 from matplotlib.ticker import FixedLocator, FixedFormatter
+from general_analyses import deletion_site_motifs
 
 sys.path.insert(0, "..")
 from utils import load_all
@@ -351,6 +352,7 @@ if __name__ == "__main__":
     dfnames = get_dataset_names(cutoff=50)
     dfs, expected_dfs = load_all(dfnames, expected=True)
 
-    plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs, dfnames, expected_dfs, "observed-expected")
-    plot_expected_vs_observed_direct_repeat_heatmaps(dfs, dfnames, expected_dfs, "observed-expected")
-    direct_repeat_composition(dfs, dfnames, expected_dfs)
+  #  plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs, dfnames, expected_dfs, "observed-expected")
+   # plot_expected_vs_observed_direct_repeat_heatmaps(dfs, dfnames, expected_dfs, "observed-expected")
+    #direct_repeat_composition(dfs, dfnames, expected_dfs)
+    deletion_site_motifs(expected_dfs, dfnames, w_len=2, folder="compare_expected")
