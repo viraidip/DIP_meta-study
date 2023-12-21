@@ -44,7 +44,7 @@ def plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs,
             - axs (numpy.ndarray of matplotlib.axes.Axes): The axes of the subplots.
 
     '''
-    fig, axs = plt.subplots(figsize=(13, len(dfs)), nrows=2, ncols=2)
+    fig, axs = plt.subplots(figsize=(10, len(dfs)/2), nrows=2, ncols=2)
     axs = axs.flatten()
 
     for i, nuc in enumerate(NUCLEOTIDES.keys()):
@@ -124,6 +124,7 @@ def plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs,
 
     fig.suptitle(f"nuc. occ. difference ({compared})")
     fig.subplots_adjust(top=0.9)
+    fig.tight_layout()
 
     save_path = os.path.join(RESULTSPATH, folder)
     if not os.path.exists(save_path):
@@ -151,13 +152,11 @@ def plot_expected_vs_observed_direct_repeat_heatmaps(dfs: list,
 
     :return: None
     '''
-    fig, axs = plt.subplots(figsize=(10, len(dfs)/2))
+    fig, axs = plt.subplots(figsize=(10, len(dfs) * 2/5))
 
     x = list()
     y = list()
     vals = list()
-    val_labels = list()
-        
     # calculate direct repeats
     for dfname, df, expected_df in zip(dfnames, dfs, expected_dfs):
         final_d = dict()
@@ -195,11 +194,11 @@ def plot_expected_vs_observed_direct_repeat_heatmaps(dfs: list,
         symbol = get_p_value_symbol(pvalue)
         x.extend(final_d.keys())
         y.extend([f"{dfname} ({len(df)}) {symbol}" for _ in range(6)])
-        vals.extend(final/final.sum() - expected_final/expected_final.sum())
+        vals.extend(f_obs - f_exp)
 
     m = abs(min(vals)) if abs(min(vals)) > max(vals) else max(vals)
-    axs = plot_heatmap(x,y,vals, axs, vmin=-m, vmax=m, cbar=True, format=".5f")
-    axs.set_title(f"direct repeat ratio difference ({compared})")
+    axs = plot_heatmap(x,y,vals, axs, vmin=-m, vmax=m, cbar=True, format=".1f")
+    axs.set_title(f"direct repeat perceentage difference ({compared})")
     axs.set_ylabel("")
     axs.set_xlabel("direct repeat length")
 
@@ -352,7 +351,6 @@ if __name__ == "__main__":
     dfnames = get_dataset_names(cutoff=50)
     dfs, expected_dfs = load_all(dfnames, expected=True)
 
-  #  plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs, dfnames, expected_dfs, "observed-expected")
-   # plot_expected_vs_observed_direct_repeat_heatmaps(dfs, dfnames, expected_dfs, "observed-expected")
-    #direct_repeat_composition(dfs, dfnames, expected_dfs)
-    deletion_site_motifs(expected_dfs, dfnames, w_len=2, folder="compare_expected")
+   # plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs, dfnames, expected_dfs, "observed-expected")
+    plot_expected_vs_observed_direct_repeat_heatmaps(dfs, dfnames, expected_dfs, "observed-expected")
+    #deletion_site_motifs(expected_dfs, dfnames, w_len=2, folder="compare_expected")

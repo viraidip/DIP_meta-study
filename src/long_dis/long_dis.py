@@ -91,7 +91,7 @@ def create_start_end_connection_plot(df: pd.DataFrame,
     colors = [cm(1.*i/8) for i in range(8)]
     positions = list()
 
-    fig, ax = plt.subplots(figsize=(5, 3))
+    fig, ax = plt.subplots(figsize=(4, 2.5))
     for i, row in df.iterrows():
         positions.append(row["Start"])
         positions.append(row["End"])
@@ -123,7 +123,7 @@ def create_start_end_connection_plot(df: pd.DataFrame,
     # change some values to improve figure
     ax.set_xlim(0, max_val)
     ax.set_ylim(-max_val / 8, max_val / 2)
-    ax.set_xticks(np.arange(0, max_val, 200))
+    ax.set_xticks(np.arange(0, max_val, 300))
     ax.set_yticks([])
     ax.set_xlabel("Nucleotide position")
     ax.set_title(dfname)
@@ -166,5 +166,5 @@ if __name__ == "__main__":
     dfs, _ = load_all(dfnames)
 
     start_end_positions(dfs, dfnames)
-    fraction_long_dis(dfs, dfnames)
-    lengths_long_dis(dfs, dfnames) 
+#    fraction_long_dis(dfs, dfnames)
+ #   lengths_long_dis(dfs, dfnames) 

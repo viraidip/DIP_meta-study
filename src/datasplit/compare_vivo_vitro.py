@@ -3,6 +3,7 @@
 '''
 import os
 import sys
+import random
 
 import numpy as np
 import scipy.stats as stats
@@ -51,17 +52,21 @@ def compare_DI_lengths(a_dfs, a_dfnames, a_label, b_dfs, b_dfnames, b_label, c_d
         s_ac = calc_anova(x_a, x_c)        
         s_bc = calc_anova(x_b, x_c)
 
+        plt.figure(figsize=(6, 5))
         plt.hist(x_a, alpha=0.5, label=a_label, bins=bins, density=True)
         plt.hist(x_b, alpha=0.5, label=b_label, bins=bins, density=True)
         plt.hist(x_c, alpha=0.5, label=c_label, bins=bins, density=True)
-        plt.legend()
+        plt.xlabel("DVG sequence length")
+        plt.ylabel("relative occurrence")
+        plt.legend(loc="upper center", ncol=3)
         plt.title(f"{s} (1-2: {s_ab} | 1-3: {s_ac} | 2-3: {s_bc})")
 
         save_path = os.path.join(RESULTSPATH, "datasplits")
         if not os.path.exists(save_path):
             os.makedirs(save_path)
 
-        plt.savefig(os.path.join(save_path, "vivo_vitro.png"))
+        plt.tight_layout()
+        plt.savefig(os.path.join(save_path, f"{s}_vivo_vitro.png"))
         plt.close()
 
 

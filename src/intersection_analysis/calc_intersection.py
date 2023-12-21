@@ -21,32 +21,32 @@ def generate_overlap_matrix_plot(dfs: list, dfnames: list, name: str=""):
     '''
     
     '''
+    plt.figure(figsize=(5, 5))
+    plt.rc("font", size=20)
     # initialize an empty matrix
     matrix_size = len(dfs)
     matrix = [[0] * matrix_size for _ in range(matrix_size)]
 
     # calculate the differences and populate the matrix
-    labels = list ()
     for i in range(matrix_size):
         set1 = set(dfs[i]["key"])
-        labels.append(f"{dfnames[i]} (n={len(set1)})")
         for j in range(matrix_size):
             set2 = set(dfs[j]["key"])
-            matrix[i][j] = len(set1 & set2) / (max(len(set1), len(set2), 1))
+            matrix[i][j] = len(set1 & set2) / (max(len(set1), len(set2), 1)) * 100
 
             if i == j:
-                text = f"{matrix[i][j]:.1f}"
+                text = f"{matrix[i][j]:.0f}"
                 color = "black"
             else:
-                text = f"{matrix[i][j]:.3f}"
+                text = f"{matrix[i][j]:.1f}"
                 color = "white"
-
+            
             plt.annotate(text, xy=(j, i), color=color,
                         ha='center', va='center', fontsize=12, fontweight='bold')
 
     plt.imshow(matrix, cmap="viridis", interpolation="nearest")
-    plt.colorbar()
-    plt.xticks(np.arange(len(dfnames)), labels, rotation=30)
+    plt.colorbar(fraction=0.046, pad=0.04)
+    plt.xticks(np.arange(len(dfnames)), dfnames, rotation=90)
     plt.yticks(np.arange(len(dfnames)), dfnames)
     plt.tight_layout()
     plt.grid(False)
@@ -114,7 +114,7 @@ def analyze_max_overlap_candidates(dfs, dfnames, count_df, name: str=""):
     '''
     
     '''
-    plt.figure(figsize=(8, 6), tight_layout=True)
+    plt.figure(figsize=(4, 7), tight_layout=True)
     plot_data = list()
     labels = [f"{name} ({df.shape[0]})" for name, df in zip(dfnames, dfs)]
     for df in dfs:
@@ -211,7 +211,7 @@ if __name__ == "__main__":
     file = open(file_path, 'w')
     sys.stdout = file
     strain = "PR8"
-    for i in range(5):
+    for i in range(1):
         sampl_dfs = list()
         print(f"##### round {i} #####")
         for df in dfs:

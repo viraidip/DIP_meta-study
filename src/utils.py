@@ -20,6 +20,7 @@ RESULTSPATH = json.load(open("../../.config.json"))["RESULTSPATH"]
 # segments, nuclotides, and strains
 CMAP = "Accent"
 CUTOFF = 13
+N_SAMPLES = 5000
 RESULTSPATH = os.path.join(RESULTSPATH, f"cutoff_{CUTOFF}")
 SEGMENTS = list(["PB2", "PB1", "PA", "HA", "NP", "NA", "M", "NS"])
 NUCLEOTIDES = dict({"A": "Adenine", "C": "Cytosin", "G": "Guanine", "U": "Uracil"})
@@ -756,8 +757,6 @@ SEGMENT_DICTS = dict({
     })
 })
 
-# parameters for the sampling
-N_SAMPLES = 5000
 
 
 def get_dataset_names(cutoff=0, selection: str=""):
@@ -828,7 +827,34 @@ def load_all(dfnames: list, expected: str=False):
             expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
     
     return dfs, expected_dfs
+
+
+def sort_datasets_by_type(dfs, dfnames, cutoff):
+    '''
     
+    '''
+    vitro = get_dataset_names(cutoff=cutoff, selection="in vitro")
+    vivo = get_dataset_names(cutoff=cutoff, selection="in vivo mouse")
+    patients = get_dataset_names(cutoff=cutoff, selection="in vivo human")
+
+    dfnames_new_order = vitro + vivo + patients
+
+    combined_data = list(zip(dfnames, dfs))
+
+    # Define a custom key function to sort based on the order of desired_order
+    def custom_sort(item):
+        return dfnames_new_order.index(item[0])
+
+    # Sort the combined_data list using the custom_sort function
+    sorted_data = sorted(combined_data, key=custom_sort)
+
+    # Unpack the sorted data into separate lists
+    dfnames_sorted, dfs_sorted = zip(*sorted_data)
+
+    print(dfnames_sorted)
+
+    return dfs_sorted, dfnames_sorted
+
 
 def join_data(df: pd.DataFrame)-> pd.DataFrame:
     '''

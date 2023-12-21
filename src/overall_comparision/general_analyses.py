@@ -13,7 +13,7 @@ from scipy import stats
 from collections import Counter
 
 sys.path.insert(0, "..")
-from utils import load_all, get_sequence, get_seq_len, get_p_value_symbol, plot_heatmap, create_nucleotide_ratio_matrix, count_direct_repeats_overall, load_dataset, preprocess, join_data, get_dataset_names
+from utils import load_all, get_sequence, get_seq_len, get_p_value_symbol, plot_heatmap, create_nucleotide_ratio_matrix, count_direct_repeats_overall, load_dataset, preprocess, join_data, get_dataset_names, sort_datasets_by_type
 from utils import SEGMENTS, RESULTSPATH, DATASET_STRAIN_DICT, CMAP, NUCLEOTIDES, CUTOFF
 
 
@@ -29,7 +29,7 @@ def plot_distribution_over_segments(dfs: list, dfnames: list, folder: str="gener
 
     :return: None
     '''
-    fig, axs = plt.subplots(figsize=(6, 6))
+    fig, axs = plt.subplots(figsize=(5, 5))
     cm = plt.get_cmap(CMAP)
     colors = [cm(1.*i/len(SEGMENTS)) for i in range(len(SEGMENTS))]
 
@@ -58,7 +58,7 @@ def plot_distribution_over_segments(dfs: list, dfnames: list, folder: str="gener
     
     axs.set_xlabel("segment occurrence [%]")
     axs.set_ylabel("dataset")
-    plt.yticks(range(len(dfnames)), [f"{dfname} ({len(df)}) {get_p_value_symbol(p)}" for dfname, df, p in zip(dfnames, dfs, pvalues)])
+    plt.yticks(range(len(dfnames)), [f"{dfname} (n={len(df)}) {get_p_value_symbol(p)}" for dfname, df, p in zip(dfnames, dfs, pvalues)])
   #  box = axs.get_position()
  #   axs.set_position([box.x0, box.y0 + box.height * 0.1, box.width, box.height * 0.9])
     axs.legend(loc="upper center", bbox_to_anchor=(0.4, 1.1), fancybox=True, shadow=True, ncol=4)
@@ -69,6 +69,11 @@ def plot_distribution_over_segments(dfs: list, dfnames: list, folder: str="gener
         os.makedirs(save_path)
     plt.savefig(os.path.join(save_path, "fraction_segments.png"))
     plt.close()
+
+    frac_df = pd.DataFrame(y)
+    frac_df["name"] = dfnames
+    print(frac_df)
+    frac_df.to_csv(os.path.join(save_path, "fraction_segments.csv"))
 
 
 def calculate_deletion_shifts(dfs: list, dfnames: list, folder: str="general_analysis")-> None:
@@ -82,7 +87,7 @@ def calculate_deletion_shifts(dfs: list, dfnames: list, folder: str="general_ana
                              Default is "seq_around_deletion_junction".
     :return: None
     '''
-    fig, axs = plt.subplots(figsize=(6, 6))
+    fig, axs = plt.subplots(figsize=(5, 5))
     cm = plt.get_cmap(CMAP)
     colors = [cm(1.*i/3) for i in range(3)]
 
@@ -114,7 +119,7 @@ def calculate_deletion_shifts(dfs: list, dfnames: list, folder: str="general_ana
     axs.set_xlabel("deletion shift [%]")
     axs.set_ylabel("dataset")
     plt.yticks(range(len(dfnames)), [f"{dfname} (n={len(df)}, p.={p:.2})" for dfname, df, p in zip(dfnames, dfs, pvalues)])
-    axs.legend(loc="upper center", bbox_to_anchor=(0.5, 1.1), fancybox=True, shadow=True, ncol=3)
+    axs.legend(loc="upper center", bbox_to_anchor=(0.3, 1.1), fancybox=True, shadow=True, ncol=3)
 
     plt.tight_layout()
     save_path = os.path.join(RESULTSPATH, folder)
@@ -185,11 +190,12 @@ def length_distribution_violinplot(dfs: list, dfnames: list, folder: str="genera
     '''
     
     '''
+    dfs, dfnames = sort_datasets_by_type(dfs, dfnames, cutoff=50)
     plt.rc("font", size=16)
     overall_count_dict = calc_DI_lengths(dfs, dfnames)
 
     for s in SEGMENTS:
-        fig, axs = plt.subplots(1, 1, figsize=(10, 7), tight_layout=True)
+        fig, axs = plt.subplots(1, 1, figsize=(6, 5), tight_layout=True)
         plot_list = list()
         position_list = list()
         labels = list()
@@ -223,6 +229,8 @@ def start_vs_end_lengths(dfs, dfnames, limit: int=0, folder: str="general_analys
     '''
         Plots the length of the start against the length of the end of the DI
         RNA sequences as a scatter plot.
+        5' = start
+        3' = end
 
     '''
     for df, dfname in zip(dfs, dfnames):
@@ -295,7 +303,7 @@ def diff_start_end_lengths(dfs, dfnames, folder: str="general_analysis")-> None:
     '''
 
     '''
-    fig, axs = plt.subplots(1, 1, figsize=(10, 7), tight_layout=True)
+    fig, axs = plt.subplots(1, 1, figsize=(7, 5), tight_layout=True)
     thresh = 300
     plot_list, labels = calc_start_end_lengths(dfs, dfnames, thresh)
 
@@ -303,9 +311,8 @@ def diff_start_end_lengths(dfs, dfnames, folder: str="general_analysis")-> None:
     axs.violinplot(plot_list, position_list, points=1000, showmedians=True)
     axs.set_xticks(position_list)
     axs.set_xticklabels(labels, rotation=90)
-    axs.set_xlabel("Dataset")
-    axs.set_ylabel("Start-End sequence lengths")
-    axs.set_title(f"Difference of start to end sequence lengths (threshold={thresh})")
+    #axs.set_xlabel("Dataset")
+    axs.set_ylabel("5'-end length - 3'-end length")
 
     save_path = os.path.join(RESULTSPATH, folder)
     if not os.path.exists(save_path):
@@ -478,9 +485,9 @@ def deletion_site_motifs(dfs, dfnames, w_len, folder: str="general_analysis"):
         end_motif = e_motifs_counts.most_common(1)[0]
 
         results["start"].append(start_motif[0])
-        results["start prct."].append(start_motif[1]/df.shape[0])
+        results["start prct."].append(round(start_motif[1]/df.shape[0] * 100, 1))
         results["end"].append(end_motif[0])
-        results["end prct."].append(end_motif[1]/df.shape[0])
+        results["end prct."].append(round(end_motif[1]/df.shape[0] * 100, 1))
 
     results_df = pd.DataFrame(results)
 
@@ -503,6 +510,8 @@ if __name__ == "__main__":
     plot_distribution_over_segments(dfs, dfnames)
     calculate_deletion_shifts(dfs, dfnames)
     '''
+    plot_distribution_over_segments(dfs, dfnames)
+    calculate_deletion_shifts(dfs, dfnames)
     length_distribution_histrogram(dfs, dfnames)
     length_distribution_violinplot(dfs, dfnames)
     plot_nucleotide_ratio_around_deletion_junction_heatmaps(dfs, dfnames)

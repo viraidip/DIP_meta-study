@@ -3,6 +3,7 @@
 '''
 import os
 import sys
+import random
 
 import numpy as np
 import scipy.stats as stats
@@ -25,23 +26,17 @@ def compare_3_5_ends(dfs, dfnames):
     
     data, labels = calc_start_end_lengths(dfs, dfnames)
         
-    fig, axs = plt.subplots(1, 1, figsize=(4, 6), tight_layout=True)
+    fig, axs = plt.subplots(1, 1, figsize=(3, 5), tight_layout=True)
     position_list = np.arange(0, 3)
     axs.violinplot(data, position_list, points=1000, showmedians=True)
     axs.set_xticks(position_list)
     axs.set_xticklabels(labels, rotation=90)
     axs.set_ylim(top=400)
     axs.set_xlabel("Dataset")
-    axs.set_ylabel("Start-End sequence lengths")
-    axs.set_title(f"Difference of start to end sequence lengths")
+    axs.set_ylabel("5'-end length - 3'-end length")
     
     def add_significance(l1, l2, axs, start, end, height):
-        bins = 10
-        data1, bins1 = np.histogram(l1, bins=bins)
-        data2, bins2 = np.histogram(l2, bins=bins)
-        samples1 = [value for value, count in zip(bins1, data1) for _ in repeat(None, count)]
-        samples2 = [value for value, count in zip(bins2, data2) for _ in repeat(None, count)]
-        _, pvalue = stats.mannwhitneyu(samples1, samples2)
+        _, pvalue = stats.kstest(random.sample(l1, 50), random.sample(l2, 50))
         symbol = get_p_value_symbol(pvalue)
         if symbol != "":
             axs.plot([start, end], [height, height], lw=2, color='black')
