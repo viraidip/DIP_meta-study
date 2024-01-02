@@ -54,6 +54,9 @@ def plot_distribution_over_segments(dfs: list, dfnames: list, folder: str="gener
 
     for i, s in enumerate(SEGMENTS):
         axs.barh(x, y[s], bar_width, color=colors[i], label=s, left=bottom)
+        for j, text in enumerate(y[s]):
+            if text > 10:
+                axs.text(bottom[j] + text/2, j, str(round(text, 1)), ha="center", va="center", fontsize=6)
         bottom += y[s]
     
     axs.set_xlabel("segment occurrence [%]")
@@ -61,7 +64,7 @@ def plot_distribution_over_segments(dfs: list, dfnames: list, folder: str="gener
     plt.yticks(range(len(dfnames)), [f"{dfname} (n={len(df)}) {get_p_value_symbol(p)}" for dfname, df, p in zip(dfnames, dfs, pvalues)])
   #  box = axs.get_position()
  #   axs.set_position([box.x0, box.y0 + box.height * 0.1, box.width, box.height * 0.9])
-    axs.legend(loc="upper center", bbox_to_anchor=(0.4, 1.1), fancybox=True, shadow=True, ncol=4)
+    axs.legend(loc="upper center", bbox_to_anchor=(0.3, 1.15), fancybox=True, shadow=True, ncol=4)
     
     plt.tight_layout()
     save_path = os.path.join(RESULTSPATH, folder)
@@ -112,8 +115,10 @@ def calculate_deletion_shifts(dfs: list, dfnames: list, folder: str="general_ana
     bar_width = 0.7
     bottom = np.zeros(len(dfs))
     labels = list(["in-frame", "shift +1", "shift -1"])
-    for i, label in zip([0, 1, 2], labels):
+    for i, label in enumerate(labels):
         axs.barh(x, y[i], bar_width, color=colors[i], label=label, left=bottom)
+        for j, text in enumerate(y[i]):
+            axs.text(bottom[j] + text/2, j, str(round(text, 1)), ha="center", va="center", fontsize=6)
         bottom += y[i]
     
     axs.set_xlabel("deletion shift [%]")
@@ -195,7 +200,7 @@ def length_distribution_violinplot(dfs: list, dfnames: list, folder: str="genera
     overall_count_dict = calc_DI_lengths(dfs, dfnames)
 
     for s in SEGMENTS:
-        fig, axs = plt.subplots(1, 1, figsize=(6, 5), tight_layout=True)
+        fig, axs = plt.subplots(1, 1, figsize=(6, 4), tight_layout=True)
         plot_list = list()
         position_list = list()
         labels = list()
@@ -507,7 +512,6 @@ if __name__ == "__main__":
     dfnames = get_dataset_names(cutoff=50)
     dfs, _ = load_all(dfnames)
 
-    plot_distribution_over_segments(dfs, dfnames)
     calculate_deletion_shifts(dfs, dfnames)
     '''
     plot_distribution_over_segments(dfs, dfnames)

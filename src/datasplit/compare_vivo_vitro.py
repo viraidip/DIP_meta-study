@@ -52,7 +52,7 @@ def compare_DI_lengths(a_dfs, a_dfnames, a_label, b_dfs, b_dfnames, b_label, c_d
         s_ac = calc_anova(x_a, x_c)        
         s_bc = calc_anova(x_b, x_c)
 
-        plt.figure(figsize=(6, 5))
+        plt.figure(figsize=(6, 2))
         plt.hist(x_a, alpha=0.5, label=a_label, bins=bins, density=True)
         plt.hist(x_b, alpha=0.5, label=b_label, bins=bins, density=True)
         plt.hist(x_c, alpha=0.5, label=c_label, bins=bins, density=True)

@@ -836,22 +836,14 @@ def sort_datasets_by_type(dfs, dfnames, cutoff):
     vitro = get_dataset_names(cutoff=cutoff, selection="in vitro")
     vivo = get_dataset_names(cutoff=cutoff, selection="in vivo mouse")
     patients = get_dataset_names(cutoff=cutoff, selection="in vivo human")
-
     dfnames_new_order = vitro + vivo + patients
-
     combined_data = list(zip(dfnames, dfs))
 
-    # Define a custom key function to sort based on the order of desired_order
     def custom_sort(item):
         return dfnames_new_order.index(item[0])
 
-    # Sort the combined_data list using the custom_sort function
     sorted_data = sorted(combined_data, key=custom_sort)
-
-    # Unpack the sorted data into separate lists
     dfnames_sorted, dfs_sorted = zip(*sorted_data)
-
-    print(dfnames_sorted)
 
     return dfs_sorted, dfnames_sorted
 
