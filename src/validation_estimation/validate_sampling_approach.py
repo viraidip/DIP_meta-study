@@ -14,9 +14,7 @@ from utils import RESULTSPATH, SEGMENTS, DATASET_STRAIN_DICT
 from utils import get_sequence, load_all, create_sampling_space, calculate_direct_repeat, get_dataset_names
 
 
-def plot_distribution(pos_dict: dict,
-                      name: str
-                      )-> None:
+def plot_distribution(pos_dict: dict, name: str)-> None:
     '''
         Gets the sampled starting positions for each segment and shows the
         distribution of them on the sequence.
@@ -49,9 +47,7 @@ def plot_distribution(pos_dict: dict,
     plt.close()
 
 
-def test_sampling_approach(dfs: list,
-                           dfnames: list
-                           )-> None:
+def test_sampling_approach(dfs: list, dfnames: list)-> None:
     '''
         Tests the sampling approach by generating increasingly bigger sets and
         comparing the mean of the start positions. When the difference of the

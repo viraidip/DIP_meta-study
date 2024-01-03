@@ -2,7 +2,6 @@
     General functions and global parameters, that are used in different scripts
 '''
 import os
-import random
 import json
 
 import numpy as np
@@ -12,7 +11,7 @@ import seaborn as sns
 from typing import Tuple
 from Bio import SeqIO
 
-
+### STATIC VALUES ###
 # load config and assign values to global variables
 DATAPATH = json.load(open("../../.config.json"))["DATAPATH"]
 RESULTSPATH = json.load(open("../../.config.json"))["RESULTSPATH"]
@@ -593,6 +592,16 @@ SEGMENT_DICTS = dict({
         "M_vRNA": "M",
         "NS_vRNA": "NS"
     }),
+    "WSN": dict({
+        "PB2": "PB2",
+        "PB1": "PB1",
+        "PA": "PA",
+        "HA": "HA",
+        "NP": "NP",
+        "NA": "NA",
+        "M": "M",
+        "NS": "NS"
+    }),
     "Anhui": dict({
         "439504": "PB2",
         "439508": "PB1",
@@ -642,48 +651,6 @@ SEGMENT_DICTS = dict({
         "JF915186.1": "NA",
         "JF915185.1": "M",
         "JF915191.1": "NS"
-    }),
-    "Greninger_2_2023": dict({
-        "OQ535342.1": "PB2",
-        "OQ535341.1": "PB1",
-        "OQ535340.1": "PA",
-        "OQ535335.1": "HA",
-        "OQ535338.1": "NP",
-        "OQ535337.1": "NA",
-        "OQ535336.1": "M",
-        "OQ535339.1": "NS",
-        "OQ535366.1": "PB2",
-        "OQ535365.1": "PB1",
-        "OQ535364.1": "PA",
-        "OQ535359.1": "HA",
-        "OQ535362.1": "NP",
-        "OQ535361.1": "NA",
-        "OQ535360.1": "M",
-        "OQ535363.1": "NS",
-        "OQ535350.1": "PB2",
-        "OQ535349.1": "PB1",
-        "OQ535348.1": "PA",
-        "OQ535343.1": "HA",
-        "OQ535346.1": "NP",
-        "OQ535345.1": "NA",
-        "OQ535344.1": "M",
-        "OQ535347.1": "NS",
-        "OQ535358.1": "PB2",
-        "OQ535357.1": "PB1",
-        "OQ535356.1": "PA",
-        "OQ535351.1": "HA",
-        "OQ535354.1": "NP",
-        "OQ535353.1": "NA",
-        "OQ535352.1": "M",
-        "OQ535355.1": "NS",
-        "OQ535374.1": "PB2",
-        "OQ535373.1": "PB1",
-        "OQ535372.1": "PA",
-        "OQ535367.1": "HA",
-        "OQ535370.1": "NP",
-        "OQ535369.1": "NA",
-        "OQ535368.1": "M",
-        "OQ535371.1": "NS"
     }),
     "Greninger_cons": dict({
         "PB2": "PB2",
@@ -758,10 +725,15 @@ SEGMENT_DICTS = dict({
 })
 
 
-
-def get_dataset_names(cutoff=0, selection: str=""):
+### FUNCTIONS ###
+def get_dataset_names(cutoff: int=0, selection: str="")-> list:
     '''
-    
+        Allows to select dataset names based on their cultivation type.
+        :param cutoff: Threshold for min number of DelVGs in each dataset
+        :param selection: cultivation type either 'in vivo mouse', 'in vitro'
+                         or 'in vivo human'
+        
+        :return: list of dataset names
     '''
     if cutoff == 0 and selection == "":
         return list(DATASET_STRAIN_DICT.keys())
@@ -783,10 +755,15 @@ def get_dataset_names(cutoff=0, selection: str=""):
     names = [name for name in names if name in select_names]
     return names
 
-
 def load_single_dataset(exp: str, acc: str, segment_dict: dict)-> pd.DataFrame:
     '''
-    
+        Load a single dataset, defined by one SRA accession number.
+        :param exp: name of the experiment (is also folder name)
+        :param acc: SRA accession number
+        :param segment_dict: dictionary that maps the ids of the reference
+                            fastas to the segment names
+
+        :return: Pandas Dataframe with one DelVG population
     '''
     path = os.path.join(DATAPATH, exp, f"{exp}_{acc}.csv")
     df = pd.read_csv(path,
@@ -797,9 +774,12 @@ def load_single_dataset(exp: str, acc: str, segment_dict: dict)-> pd.DataFrame:
 
     return df
 
-def load_dataset(dataset: str):
+def load_dataset(dataset: str)-> pd.DataFrame:
     '''
-    
+        Load a full dataset, defined by multiple SRA accession numbers.
+        :param exp: name of the experiment (is also folder name)
+
+        :return: Pandas Dataframe with one DelVG population of whole experiment
     '''
     acc_nums = ACCNUMDICT[dataset]
     strain = DATASET_STRAIN_DICT[dataset]
@@ -813,9 +793,15 @@ def load_dataset(dataset: str):
 
     return concat_df
 
-def load_all(dfnames: list, expected: str=False):
+def load_all(dfnames: list, expected: str=False)-> Tuple[list, list]:
     '''
-    
+        Load a list of datasets.
+        :param dfnames: list of dataset names, each is one experiment
+        :param expected: if True, expected data is loaded additionally
+
+        :return: Tuple
+            List of Pandas Dataframes each containing one experiment
+            List of dataset names in same order as first list
     '''
     dfs = list()
     expected_dfs = list()
@@ -828,10 +814,16 @@ def load_all(dfnames: list, expected: str=False):
     
     return dfs, expected_dfs
 
-
-def sort_datasets_by_type(dfs, dfnames, cutoff):
+def sort_datasets_by_type(dfs: list, dfnames: list, cutoff: int)-> Tuple[list, list]:
     '''
-    
+        Sorts a given name of experiments by cultivation type.
+        :param dfs: list of datasets, ordered as in dfnames
+        :param dfnames: list of dataset names, each is one experiment
+        :param cutoff: Threshold for min number of DelVGs in each dataset
+
+        :return: Tuple
+            List of Pandas Dataframes each containing one experiment
+            List of dataset names in same order as first list
     '''
     vitro = get_dataset_names(cutoff=cutoff, selection="in vitro")
     vivo = get_dataset_names(cutoff=cutoff, selection="in vivo mouse")
@@ -847,17 +839,21 @@ def sort_datasets_by_type(dfs, dfnames, cutoff):
 
     return dfs_sorted, dfnames_sorted
 
-
 def join_data(df: pd.DataFrame)-> pd.DataFrame:
     '''
-    
+        Combine duplicate DelVGs and sum their NGS count.
+        :param df: Pandas DataFrame with DelVG data
+
+        :return: Pandas DataFrame without duplicate DelVGs
     '''
     return df.groupby(["Segment", "Start", "End"]).sum(["NGS_read_count"]).reset_index()
 
-
-def load_mapped_reads(experiment: str):
+def load_mapped_reads(experiment: str)-> pd.DataFrame:
     '''
+        Loads data about the reads that were mapped to each segment.
+        :param experiment: name of the experiment (is also folder name)
 
+        :return: Pandas DataFrame with mapped reads per segment
     '''
     acc_nums = ACCNUMDICT[experiment]
 
@@ -874,10 +870,13 @@ def load_mapped_reads(experiment: str):
 
     return concat_df
 
-
-def load_all_mapped_reads(dfnames):
+def load_all_mapped_reads(dfnames: list)-> list:
     '''
-    
+        Loads data about the mapped reads for all given experiments.
+        :param dfnames: list of dataset names, each is one experiment
+
+        :return: List of Pandas Dataframes each containing mapped reads for one
+                experiment
     '''
     mr_dfs = list()
     for experiment in dfnames:
@@ -885,14 +884,13 @@ def load_all_mapped_reads(dfnames):
         mr_dfs.append(df)
     return mr_dfs
 
-
 def get_sequence(strain: str, seg: str, full: bool=False)-> object:
     '''
         Loads a DNA sequence given the strain and segment.
         :param strain: name of the strain
         :param seg: name of the segment
         :param full: if True the whole Biopython Seq Object is returned
-                     if False a string object is returned
+                    if False a string object is returned
 
         :return: Biopython Seq Object or str() of the sequence
     '''
@@ -916,10 +914,10 @@ def get_seq_len(strain: str, seg: str)-> int:
 
 def get_p_value_symbol(p: float)-> str:
     '''
-        Indicates the statistical significance by letters. Is used for plots.
+        Indicates the statistical significance by strings. Is used for plots.
         :param p: p-value of the test
 
-        :return: letter indicating the significance level
+        :return: string indicating the significance level
     '''
     if p < 0.00001:
         return "***"
@@ -930,50 +928,24 @@ def get_p_value_symbol(p: float)-> str:
     else:
         return ""
 
-def create_sequence_library(data_dict: dict)-> dict:
-    '''
-        Gets the raw loaded sequence data, which is a dict over all strains.
-        In each dict the value is a data frame including DI RNA candidates.
-        Creates the DI RNA sequence and adds it to the data frame.
-        :param data_dict: dictionary key is strain names, value is df of DI RNA
-                          candiates
-
-        :return: dictionary with key for each strain. Value is a pandas df.
-    '''
-    for k, v in data_dict.items():
-        del_seq_list = list()
-        for i, row in v.iterrows():
-            full_seq = get_sequence(k, row["Segment"])
-            del_seq = full_seq[:row["Start"]] + full_seq[row["End"]-1:]
-            del_seq_list.append(del_seq)
-
-        data_dict[k]["DIRNASequence"] = del_seq_list
-
-    return data_dict
-
 
 ######################
 ### DIRECT REPEATS ###
 ######################
-def calculate_direct_repeat(seq: str,
-                            s: int,
-                            e: int,
-                            w_len: int
-                            )-> Tuple[int, str]:
+def calculate_direct_repeat(seq: str, s: int, e: int, w_len: int)-> Tuple[int, str]:
     '''
         Counts the number of overlapping nucleotides directly before start and
         end of junction site --> direct repeats
         :param seq: nucleotide sequence
-        :param w_len: length of window to be searched
         :param s: start point
         :param e: end point
+        :param w_len: length of window to be searched
 
-        :return: Tuple with two entries:
-                    Integer giving the number of overlapping nucleotides
-                    String of the overlapping nucleotides
+        :return: Tuple
+            Integer giving the number of overlapping nucleotides
+            String of the overlapping nucleotides
     '''
     counter = 0
-
     start_window = seq[s-w_len: s]
     end_window = seq[e-1-w_len: e-1]
         
@@ -984,7 +956,7 @@ def calculate_direct_repeat(seq: str,
     if len(seq) < e:
         return 0, "_"
         
-    for i in range(len(end_window) - 1, -1, -1):
+    for i in range(len(end_window)-1, -1, -1):
         if start_window[i] == end_window[i]:
             counter += 1
         else:
@@ -997,25 +969,21 @@ def calculate_direct_repeat(seq: str,
 
     return counter, overlap_seq
 
-def count_direct_repeats_overall(df: pd.DataFrame,
-                                 seq: str
-                                 )-> Tuple[dict, dict]:
+def count_direct_repeats_overall(df: pd.DataFrame, seq: str)-> Tuple[dict, dict]:
     '''
         Calculates the number of direct repeats for each data point.
         :param df: dataframe with sequence and junction site data
         :param seq: RNA sequence of the given segement and strain
-        :param mode: states which calculation mode is used in 
-                     calculate_overlapping_nucleotides() check there for info
 
-        :return: Tuple including a dict with the count of the length of
-                 overlapping sequences and a dict with the overlapping
-                 sequences and their count.
+        :return: Tuple
+            Dict with the count of the direct repeat lengths
+            Dict with the overlapping sequences and their count
     '''
     w_len = 5
     nuc_overlap_dict = dict({i: 0 for i in range(0, w_len+1)})
     overlap_seq_dict = dict()
  
-    for i, row in df.iterrows():
+    for _, row in df.iterrows():
         s = row["Start"]
         e = row["End"]
         idx, overlap_seq = calculate_direct_repeat(seq, s, e, w_len)
@@ -1030,17 +998,15 @@ def count_direct_repeats_overall(df: pd.DataFrame,
 #############################
 ### NUCLEOTIDE ENRICHMENT ###
 #############################
-def count_nucleotide_occurrence(seq: str,
-                                p: int
-                                )-> dict:
+def count_nucleotide_occurrence(seq: str, p: int)-> dict:
     '''
         Counts the number of nucleotides next to a given point.
         Goes 5 steps in both directions.
         :param seq: whole RNA sequence
         :param p: point on the sequence where to count
 
-        :return: returns a counter dict with an entry for each nucleotide. In
-                 each entry the counter for each position is given.
+        :return: Counter dict with an entry for each nucleotide. In each entry
+                the counter for each position is given.
     '''
     window = seq[p-5:p+5]
     r_dict = dict({n: np.zeros(10) for n in NUCLEOTIDES})
@@ -1049,25 +1015,23 @@ def count_nucleotide_occurrence(seq: str,
         r_dict[char][i] = 1
     return r_dict
 
-def count_nucleotide_occurrence_overall(df: pd.DataFrame,
-                                        seq: str
-                                        )-> Tuple[dict, dict]:
+def count_nucleotide_occurrence_overall(df: pd.DataFrame, seq: str)-> Tuple[dict, dict]:
     '''
         Counts the occurrence of each nucleotide at different positions around
         the junction site
         :param df: dataframe with sequence and junction site data
         :param seq: rna sequence where to count the occurrence
 
-        :return: tupel with two entries:
-                    dict with nucleotide count for start site
-                    dict with nucleotide count for end site
+        :return: Tuple
+            Dict with nucleotide count for start of deletion site
+            Dict with nucleotide count for end of deletion site
     '''
 
     count_start_dict = dict({n: np.zeros(10) for n in NUCLEOTIDES})
     count_end_dict = dict({n: np.zeros(10) for n in NUCLEOTIDES})
     normalize = 0
 
-    for i, row in df.iterrows():
+    for _, row in df.iterrows():
         seq_start_dict = count_nucleotide_occurrence(seq, row["Start"]) 
         seq_end_dict = count_nucleotide_occurrence(seq, row["End"]-1)
         normalize += 1
@@ -1082,7 +1046,12 @@ def count_nucleotide_occurrence_overall(df: pd.DataFrame,
 #####################
 def generate_expected_data(strain: str, df: pd.DataFrame)-> pd.DataFrame:
     '''
-    
+        Randomly samples deletion sites for a given dataset which can be used
+        to compare the results of the real dataset.
+        :param strain: name of the strain
+        :param df: DelVG dataset
+
+        :return: artifical dataset that includes random deletion sites
     '''
     for seg in SEGMENTS:
         df = df.loc[df["Segment"] == seg]
@@ -1116,34 +1085,34 @@ def generate_sampling_data(seq: str, s: Tuple[int, int], e: Tuple[int, int],  n:
         expected values.
         :param seq: RNA sequence
         :param s: tuple with start and end point of the range for the artifical
-                  start point of the deletion site
+                  start point of the deletion sites
         :param e: tuple with start and end point of the range for the artifical
-                  end point of the deletion site
+                  end point of the deletion sites
         :param n: number of samples to generate
 
-        :return: dataframe with the artifical data set
+        :return: Pandas DataFrame of the artifical data set
     '''
     df_no_duplicates = create_sampling_space(seq, s, e)
     return df_no_duplicates.sample(n)
 
-
 def create_sampling_space(seq: str, s: Tuple[int, int], e: Tuple[int, int])-> pd.DataFrame:
     '''
+        Creates all possible candidates that would be expected.
         :param seq: RNA sequence
         :param s: tuple with start and end point of the range for the artifical
-                  start point of the deletion site
+                  start point of the deletion sites
         :param e: tuple with start and end point of the range for the artifical
-                  end point of the deletion site
+                  end point of the deletion sites
         
-        :return: dataframe with possible DI RNA candidates
+        :return: dataframe with possible DelVG candidates
     '''
     # create all combinations of start and end positions that are possible
     combinations = [(x, y) for x in range(s[0], s[1]+1) for y in range(e[0], e[1]+1)]
 
-    # create for each the DI Sequence
+    # create for each the DelVG Sequence
     sequences = [seq[:start] + seq[end-1:] for (start, end) in combinations]
 
-    # filter out duplicate DI sequences while keeping the ones with highest start number
+    # filter out duplicate DelVG sequences while keeping the ones with highest start number
     start, end = zip(*combinations)
     temp_df = pd.DataFrame(data=dict({"Start": start, "End": end, "Sequence": sequences}))
 
@@ -1156,13 +1125,16 @@ def create_sampling_space(seq: str, s: Tuple[int, int], e: Tuple[int, int])-> pd
 
     return df_no_duplicates
 
-
 #######################
 ### Data processing ###
 #######################
-def create_nucleotide_ratio_matrix(df, col):
+def create_nucleotide_ratio_matrix(df: pd.DataFrame, col: str)-> pd.DataFrame:
     '''
-    
+        Counts nucleotides around the deletion site. Used to create heatmaps.
+        :param df: Pandas DataFrame that was created using sequence_df()
+        :param col: column name which sequence to use
+
+        :return: Pandas DataFrame with probabilites for the nucleotides
     '''
     probability_matrix = pd.DataFrame(columns=NUCLEOTIDES.keys())
     seq_matrix = df.filter([col], axis=1)
@@ -1174,36 +1146,48 @@ def create_nucleotide_ratio_matrix(df, col):
         probability_matrix[n] = seq_matrix.apply(lambda x: dict(x.value_counts()).get(n,0)/len(x), axis=0)
 
     return probability_matrix
-def plot_heatmap(y,x,vals,ax, format=".2f", cmap="coolwarm", vmin=0, vmax=1, cbar=False,cbar_ax=None, cbar_kws=None):
+
+def plot_heatmap(y: list, x: list, vals: list, ax: object,
+                 format=".2f", cmap="coolwarm", vmin=0, vmax=1, cbar=False, cbar_ax=None, cbar_kws=None)-> object:
     '''
-        Plot heatmap for values in vals, with x (columns) and y (rows) as labels.
+        Helper function to plot heatmap.
+        :param y: columns of heatmap
+        :param x: rows of heatmap
+        :param vals: values for heatmap
+        :param ax: matplotlib.axes object
+        :param: additional parameters check sns.heatmap() for more information
+        
+        :return: generated heatmap on matplotlib.axes object
     '''
     df = pd.DataFrame({"x":x,"y":y,"vals":vals})
     df = pd.pivot_table(df, index="x", columns="y", values="vals", sort=False)
     ax = sns.heatmap(df, fmt=format, annot=True, vmin=vmin, vmax=vmax, ax=ax, cbar=cbar, cmap=cmap, cbar_ax=cbar_ax, cbar_kws=cbar_kws)
     return ax
-def sequence_df(df, strain, isize=5):
-    '''Generate a DataFrame with sequence information.
 
-    Args:
-        df (pandas.DataFrame): The input DataFrame containing the DIP candidates in the "key" column. Nomenclature: {seg}_{start}_{end}
-        isize (int, optional): The size of the sequence before and after the start and end positions. Default is 5.
-
-    Returns:
-        pandas.DataFrame: A DataFrame with the following columns:
-            - "key": The original key from the input DataFrame.
-            - "seg": The segment extracted from the key.
-            - "start": The start position extracted from the key.
-            - "end": The end position extracted from the key.
-            - "seq": The dip sequence obtained from the "key".
-            - "deleted_sequence": The deleted sequence obtained from the "key".
-            - "isize": The specified size for the before and after sequences.
-            - "seq_before_start": The sequence before the start position of length "isize".
-            - "seq_after_start": The sequence after the start position of length "isize".
-            - "seq_before_end": The sequence before the end position of length "isize".
-            - "seq_after_end": The sequence after the end position of length "isize".
+def sequence_df(df: pd.DataFrame, strain: str, isize: int=5)-> pd.DataFrame:
     '''
-    res_df = pd.DataFrame(columns=["key","Segment", "Start","End","seq", "deleted_sequence", "isize", "full_seq", "Strain", "seq_around_deletion_junction", "NGS_read_count"])
+        Generate a DataFrame with sequence information.
+        :param df: Pandas DataFrame containing the DelVGs in the "key" column
+            Nomenclature: {seg}_{start}_{end}
+        :param strain: name of the strain
+        :param isize: the size of the sequence before and after the start and
+            end positions. Default is 5.
+
+    :return: Pandas DataFrame with the following columns:
+            - "key": The original key from the input DataFrame.
+            - "Segment": The segment
+            - "Start": The start position of the deletion site
+            - "End": The end position of the deletion site
+            - "seq": The dip sequence
+            - "deleted_sequence": The deleted sequence
+            - "isize": The specified size for the before and after sequences
+            - "full_seq": full sequence of the wild type virus
+            - "Strain": strain used in the experiment
+            - "seq_around_deletion_junction": sequence around deletion sites
+            - "NGS_read_count": NGS count measured in the experiment
+
+    '''
+    res_df = pd.DataFrame(columns=["key", "Segment", "Start", "End", "seq", "deleted_sequence", "isize", "full_seq", "Strain", "seq_around_deletion_junction", "NGS_read_count"])
     for _, r in df.iterrows():
         k = r["key"]
         seq, seq_head, seq_foot = get_dip_sequence(k, strain)
@@ -1220,34 +1204,47 @@ def sequence_df(df, strain, isize=5):
 
         seq_around_deletion_junction = seq_before_start + seq_after_start + seq_before_end + seq_after_end
         res_df = pd.concat([res_df, pd.DataFrame({"key":k, "Segment":seg, "Start":start, "End":end, "seq":seq, "isize":isize, "full_seq": full_seq, "Strain": strain,
-                                "deleted_sequence":deleted_seq, "seq_around_deletion_junction": seq_around_deletion_junction, "NGS_read_count": NGS_read_count}, index=[0])], ignore_index=True)
+                            "deleted_sequence":deleted_seq, "seq_around_deletion_junction": seq_around_deletion_junction, "NGS_read_count": NGS_read_count}, index=[0])], ignore_index=True)
     return res_df
-def preprocess(strain, df, cutoff):
+
+def preprocess(strain: str, df: pd.DataFrame, thresh: int)-> pd.DataFrame:
     '''
-    
+        Excluding DelVGs with to low NGS count and running sequence_df().
+        :param strain: name of the strain
+        :param df: Pandas DataFrame with DelVG data
+        :param thresh: Threshold for min number of count for each DelVG
+
+        :return: resulting df of sequence_df() function
     '''
-    if cutoff > 1:
-        df = df[df["NGS_read_count"] >= cutoff].copy()
+    if thresh > 1:
+        df = df[df["NGS_read_count"] >= thresh].copy()
     df["key"] = df["Segment"] + "_" + df["Start"].map(str) + "_" + df["End"].map(str)
     return sequence_df(df, strain)
-def get_deleted_sequence(dip_id, strain):
-    '''
-    return the sequence of a dip_id
 
-    Args:
-        dip_id (str): the id of the dip
-
-    Returns:
-        str: the sequence of the dip
+def get_deleted_sequence(delvg_id: str, strain: str)-> str:
     '''
-    seg, start, end = dip_id.split("_")
+        Return the sequence of the deletion site.
+        :param delvg_id: the id of the DelVG ({seg}_{start}_{end})
+        :param strain: name of the strain
+
+        :return: the sequence that is deleted in a DelVG
+    '''
+    seg, start, end = delvg_id.split("_")
     seq = get_sequence(strain, seg)
     return seq[int(start):int(end)-1]
-def get_dip_sequence(dip_id, strain):
+
+def get_dip_sequence(delvg_id: str, strain: str)-> Tuple[str, str, str]:
     '''
-    
+        Return the remaining sequence of a DelVG. Deletion is filled with "*".
+        :param delvg_id: the id of the DelVG ({seg}_{start}_{end})
+        :param strain: name of the strain
+
+        :return: Tuple
+            the remaining sequence of a DelVG
+            the sequence before the deletion site
+            the sequence after the deletion site
     '''
-    seg, start, end = dip_id.split("_")
+    seg, start, end = delvg_id.split("_")
     fl_seq = get_sequence(strain, seg)
     seq_head = fl_seq[:int(start)]
     seq_foot = fl_seq[int(end)-1:]

@@ -1,5 +1,6 @@
 '''
-
+    Estimate which RSC is sufficient.
+    Is done by comparing generated data to original data of the publications.
 '''
 import os
 import sys
@@ -8,21 +9,18 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
+from typing import Tuple
+
 sys.path.insert(0, "..")
 from utils import load_single_dataset, join_data
-from utils import SEGMENTS, RESULTSPATH, DATAPATH, CUTOFF, CMAP, SEGMENT_DICTS
+from utils import RESULTSPATH, DATAPATH, SEGMENT_DICTS
 
 
 def load_pelz2021_rsc()-> dict:
     '''
-        Loads the data from Pelz et al 2021 publication.
-        Is structured the same way as data from Alnaji 2019.
-        :param de_novo: if True only de novo candidates are taken
-        :param long_dirna: if True loads data set that includes long DI RNA
-                           candidates
-        :param by_time: if True loads the dataset split up by timepoints
+        Loads the data from Pelz et al. 2021 publication.
 
-        :return: dictionary with one key, value pair
+        :return: dictionary with strain name as key and data frame as value
     '''
     filename = "ShortDeletions_by_timepoints.xlsx"
     file_path = os.path.join(DATAPATH, "RSC_estimation", filename)
@@ -31,14 +29,12 @@ def load_pelz2021_rsc()-> dict:
                               header=0,
                               na_values=["", "None"],
                               keep_default_na=False)
-
     return data_dict
 
 
 def load_alnaji2021_rsc()-> dict:
     '''
-        Loads the data set of Alnaji et al. 2021. Returns a dictionary with the
-        data.
+        Loads the data set of Alnaji et al. 2021.
 
         :return: dictionary with strain name as key and data frame as value
     '''
@@ -50,6 +46,9 @@ def load_alnaji2021_rsc()-> dict:
 
 def load_alnaji2019_rsc()-> dict:
     '''
+        Loads the data set of Alnaji et al. 2019.
+
+        :return: dictionary with strain name as key and data frame as value
     '''
     file_path = os.path.join(DATAPATH, "RSC_estimation", "DI_Influenza_FA_JVI.xlsx")
     data_dict = pd.read_excel(io=file_path,
@@ -64,13 +63,11 @@ def load_alnaji2019_rsc()-> dict:
     # Cleaned data is stored in a dict, can be accessed by [datasetname]_[l1/l2]
     # dataset names are "Cal07", "NC", "Perth", "BLEE"
     cleaned_data_dict = dict()
-    for key, value in data_dict.items():
+    for key in data_dict.keys():
         cleaned_data_dict[f"{key}_l1"] = data_dict[key].iloc[:, 0:4]
         cleaned_data_dict[f"{key}_l2"] = data_dict[key].iloc[:, 5:9]
-
         cleaned_data_dict[f"{key}_l1"].dropna(how="all", inplace=True)
         cleaned_data_dict[f"{key}_l2"].dropna(how="all", inplace=True)
-
         cleaned_data_dict[f"{key}_l2"].columns = cleaned_data_dict[f"{key}_l1"].columns 
 
     return cleaned_data_dict
@@ -78,12 +75,10 @@ def load_alnaji2019_rsc()-> dict:
 
 def load_mendes2021_rsc(name: str)-> dict:
     '''
-        :param de_novo: if True only de novo candidates are taken
-        :param long_dirna: if True loads data set that includes long DI RNA
-                           candidates
-        :param by_time: if True loads the dataset split up by timepoints
+        Loads the data set of Mendes et al. 2021.
+        :param name: indicates which dataset to load
 
-        :return: dictionary with one key, value pair
+        :return: dictionary with strain name as key and data frame as value
     '''
     if name == "v12enriched":
         filename = "Virus-1-2_enriched_junctions.tsv"
@@ -102,12 +97,10 @@ def load_mendes2021_rsc(name: str)-> dict:
 
 def load_lui2019_rsc(name: str)-> dict:
     '''
-        :param de_novo: if True only de novo candidates are taken
-        :param long_dirna: if True loads data set that includes long DI RNA
-                           candidates
-        :param by_time: if True loads the dataset split up by timepoints
+        Loads the data set of Lui et al. 2019.
+        :param name: indicates which dataset to load
 
-        :return: dictionary with one key, value pair
+        :return: dictionary with strain name as key and data frame as value
     '''
     if name == "SMRT":
         filename = ""
@@ -118,38 +111,38 @@ def load_lui2019_rsc(name: str)-> dict:
     data = pd.read_csv(file_path,
                             header=0,
                             na_values=["", "None"],
-                            keep_default_na=False
-                            )
+                            keep_default_na=False)
     
     data = join_data(data)
-    #data = data[(data["End"] - data["Start"]) >= 10]
-
     return data
 
 
-def compare_datasets(d1, d2, thresh=1)-> float:
+def compare_datasets(d1: pd.DataFrame, d2: pd.DataFrame, thresh: int=1)-> Tuple[float, int, int]:
     '''
-    
+        Calculate the intersection of two given datasets.
+        :param d1: dataset 1
+        :param d2: dataset 2
+        :param thresh: Threshold for min number of count for each DelVG
+        
+        :return: Tuple
+            fraction of intersecting DelVGs
+            number of DelVGs in dataset 1
+            number of DelVGs in dataset 2
     '''
     d1 = d1[d1["NGS_read_count"] >= thresh]
     d2 = d2[d2["NGS_read_count"] >= thresh]
-    
-    dfs = list([d1, d2])
-
-    DI_sets = list()
-    for d in dfs:
-        DI_sets.append(set(d["Segment"] + "_" + d["Start"].astype(str) + "_" + d["End"].astype(str)))
-    
-    n1 = len(DI_sets[0])
-    n2 = len(DI_sets[1])
+    DI_sets = [set(d["Segment"] + "_" + d["Start"].astype(str) + "_" + d["End"].astype(str)) for d in [d1, d2]]
     n_intersect = len(DI_sets[0] & DI_sets[1])
+    return n_intersect, len(DI_sets[0]), len(DI_sets[1])
 
-    return n_intersect, n1, n2
 
-
-def loop_threshs(d1, d2, name)-> int:
+def loop_threshs(d1: pd.DataFrame, d2: pd.DataFrame, name: str)-> int:
     '''
-    
+        Loops over different thresholds for the RSC and calcualtes the
+        intersection of two given datasets.
+        :param d1: dataset 1
+        :param d2: dataset 2
+        :param name: name of the experiment
     '''
     threshs = np.arange(50)
     fracs = list()
@@ -168,32 +161,30 @@ def loop_threshs(d1, d2, name)-> int:
             rsc = t
             above_thresh = True
 
+    # plot fraction of intersecting DelVGs between the two datasets
     plt.plot(threshs, fracs)
     if above_thresh:
         plt.axvline(x=rsc, color='r', linestyle='--')
         plt.text(rsc, 0.5, f'rsc={rsc}', ha='center')
     plt.ylim(0, 1.1)
-    plt.ylabel("ratio of common DVGs")
+    plt.ylabel("ratio of common DelVGs")
     plt.xlabel("cutoff value")
     save_path = os.path.join(RESULTSPATH, "validation_estimation")
     if not os.path.exists(save_path):
         os.makedirs(save_path)
-    plt.savefig(os.path.join(save_path, f"{name}_common_DVGs.png"))
+    plt.savefig(os.path.join(save_path, f"{name}_common_DelVGs.png"))
     plt.close()
 
+    # plot number of unique DelVGs for the two datasets
     plt.plot(threshs, ns_new, label="selfm")
     plt.plot(threshs, ns_orig, label="orig")
     if above_thresh:
         plt.axvline(x=rsc, color='r', linestyle='--')
         plt.text(rsc, n_orig, f'x={rsc}', ha='center')
     plt.legend()
-    plt.ylabel("number of unique DVGs")
+    plt.ylabel("number of unique DelVGs")
     plt.xlabel("cutoff value")
-
-    save_path = os.path.join(RESULTSPATH, "validation_estimation")
-    if not os.path.exists(save_path):
-        os.makedirs(save_path)
-    plt.savefig(os.path.join(save_path, f"{name}_unique_DVGs.png"))
+    plt.savefig(os.path.join(save_path, f"{name}_unique_DelVGs.png"))
     plt.close()
 
     return rsc
@@ -205,7 +196,6 @@ if __name__ == "__main__":
     rscs = list()
     ns = list()
     
-
     ### Pelz seed ###
     name = "pelz_seed"
     seed = load_single_dataset("Pelz2021", "SRR15084925", SEGMENT_DICTS["PR8"])

@@ -1,9 +1,8 @@
 '''
-
+    Compares the lengths of the DelVGs between the cultivation types.
 '''
 import os
 import sys
-import random
 
 import numpy as np
 import scipy.stats as stats
@@ -17,9 +16,20 @@ from utils import SEGMENTS, RESULTSPATH
 from overall_comparision.general_analyses import calc_DI_lengths
 
 
-def compare_DI_lengths(a_dfs, a_dfnames, a_label, b_dfs, b_dfnames, b_label, c_dfs, c_dfnames, c_label):
+def compare_DI_lengths(a_dfs: list, a_dfnames: list, a_label: str, b_dfs: list, b_dfnames: list, b_label: str, c_dfs: list, c_dfnames: list, c_label: str)-> None:
     '''
-    
+        compares the lengths of the DelVGs between three classes.
+        :param a_dfs: list of datasets for class a
+        :param a_dfnames: list of dataset names for class a
+        :param a_label: label of class a
+        :param b_dfs: list of datasets for class b
+        :param b_dfnames: list of dataset names for class b
+        :param b_label: label of class b
+        :param c_dfs: list of datasets for class c
+        :param c_dfnames: list of dataset names for class c
+        :param c_label: label of class c
+
+        :return: None
     '''
     def process_data(dfs, dfnames):
         lengths_dict = calc_DI_lengths(dfs, dfnames)
@@ -28,7 +38,6 @@ def compare_DI_lengths(a_dfs, a_dfnames, a_label, b_dfs, b_dfnames, b_label, c_d
             for s in d.keys():
                 final_d[s] += Counter(d[s])
         return final_d
-    
     a_dict = process_data(a_dfs, a_dfnames)
     b_dict = process_data(b_dfs, b_dfnames)
     c_dict = process_data(c_dfs, c_dfnames)
@@ -38,7 +47,6 @@ def compare_DI_lengths(a_dfs, a_dfnames, a_label, b_dfs, b_dfnames, b_label, c_d
         x_a = [key for key, value in a_dict[s].items() for _ in range(value)]
         x_b = [key for key, value in b_dict[s].items() for _ in range(value)]
         x_c = [key for key, value in c_dict[s].items() for _ in range(value)]
-
         if len(x_a) < 50 or len(x_b) < 50 or len(x_c) < 50:
             continue
 
@@ -47,7 +55,6 @@ def compare_DI_lengths(a_dfs, a_dfnames, a_label, b_dfs, b_dfnames, b_label, c_d
             data2, _ = np.histogram(x_2, bins=bins)
             _, pvalue = stats.f_oneway(data1, data2)
             return get_p_value_symbol(pvalue)
-        
         s_ab = calc_anova(x_a, x_b)        
         s_ac = calc_anova(x_a, x_c)        
         s_bc = calc_anova(x_b, x_c)
@@ -64,7 +71,6 @@ def compare_DI_lengths(a_dfs, a_dfnames, a_label, b_dfs, b_dfnames, b_label, c_d
         save_path = os.path.join(RESULTSPATH, "datasplits")
         if not os.path.exists(save_path):
             os.makedirs(save_path)
-
         plt.tight_layout()
         plt.savefig(os.path.join(save_path, f"{s}_vivo_vitro.png"))
         plt.close()
@@ -75,12 +81,10 @@ if __name__ == "__main__":
 
     vitro_dfnames = get_dataset_names(cutoff=0, selection="in vitro")
     vitro_dfs, _ = load_all(vitro_dfnames)
-
     vivo_dfnames = get_dataset_names(cutoff=0, selection="in vivo mouse")
     vivo_dfs, _ = load_all(vivo_dfnames)
-    
     patient_dfnames = get_dataset_names(cutoff=0, selection="in vivo human")
     patient_dfs, _ = load_all(patient_dfnames)
 
-    compare_DI_lengths(vitro_dfs, vitro_dfnames, "in vitro", vivo_dfs, vivo_dfnames, "in vivo mouse", patient_dfs, patient_dfnames, "in vivo humans")
+    compare_DI_lengths(vitro_dfs, vitro_dfnames, "in vitro", vivo_dfs, vivo_dfnames, "in vivo mouse", patient_dfs, patient_dfnames, "in vivo human")
 

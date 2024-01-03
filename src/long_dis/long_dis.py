@@ -1,5 +1,6 @@
 '''
-
+    Analyse the DelVGs with a sequence length of at least 85 % of the full
+    sequence.
 '''
 import os
 import sys
@@ -16,9 +17,13 @@ from utils import RESULTSPATH, SEGMENTS, DATASET_STRAIN_DICT, CMAP
 
 THRESH = 0.85
 
-def get_long_dis(df):
+
+def get_long_dis(df: pd.DataFrame)-> pd.DataFrame:
     '''
-    
+        identifies the DelVGs with a length above the defined threshold.
+        :param dfs: DataFrame where long DelVGs should be identified
+        
+        :return: filtered DataFrame
     '''
     df["len_full"] = df["full_seq"].apply(len)
     df["len_di"] = df["len_full"] - df["deleted_sequence"].apply(len)
@@ -30,33 +35,38 @@ def get_long_dis(df):
     return final_df
 
 
-def fraction_long_dis(dfs: list, dfnames: list):
+def fraction_long_dis(dfs: list, dfnames: list)-> None:
     '''
-    
+        calculates the fration of long DelVGs in the given datasets.
+        :param dfs: The list of DataFrames containing the data, preprocessed
+            with sequence_df(df)
+        :param dfnames: The names associated with each DataFrame in `dfs`
+        
+        :return: None
     '''
     counts = list()
     fractions = list()
-    
-    for df, dfname in zip(dfs, dfnames):
+    for df in dfs:
         n_all_dis = len(df)
         n_long_dis = len(get_long_dis(df))
-       
         f = n_long_dis/n_all_dis * 100
         counts.append(n_long_dis)
         fractions.append(f)
-        
     res_df = pd.DataFrame(dict({"names": dfnames, "long DIs": counts, "fraction DIs": fractions}))
-    print(res_df)
-
     save_path = os.path.join(RESULTSPATH, "long_dis")
     if not os.path.exists(save_path):
         os.makedirs(save_path)
     res_df.to_csv(os.path.join(save_path, "fractions.csv"), float_format="%.2f", index=False)
 
 
-def lengths_long_dis(dfs, dfnames):
+def lengths_long_dis(dfs: list, dfnames: list)-> None:
     '''
-    
+        plot histrogram of DelVG deletion site lengths.
+        :param dfs: The list of DataFrames containing the data, preprocessed
+            with sequence_df(df)
+        :param dfnames: The names associated with each DataFrame in `dfs`
+        
+        :return: None
     '''
     save_path = os.path.join(RESULTSPATH, "long_dis")
     if not os.path.exists(save_path):
@@ -71,7 +81,6 @@ def lengths_long_dis(dfs, dfnames):
             bins = int(len(lengths)/2)
 
             plt.hist(lengths, bins=bins, edgecolor="black")
-
             plt.xlabel("DI length")
             plt.ylabel("Frequency")
             plt.title(f"{dfname} {s}")
@@ -79,23 +88,25 @@ def lengths_long_dis(dfs, dfnames):
             plt.close()
 
 
-def create_start_end_connection_plot(df: pd.DataFrame,
-                                     dfname: str,
-                                     strain: str,
-                                     segment: str):
+def create_start_end_connection_plot(df: pd.DataFrame, dfname: str, strain: str, segment: str)-> None:
     '''
-    
+        plot the connection of the start and end of the deletion sites for a
+        given dataset. Includes a histogram and marks long DelVGs.
+        :param df: DelVG dataset, preprocessed with sequence_df(df)
+        :param dfname: The name of the dataset
+        :param strain: name of the strain
+        :param segment: name of the segment
+
+        :return: None
     '''
     max_val = get_seq_len(strain, segment)
     cm = plt.get_cmap(CMAP)
     colors = [cm(1.*i/8) for i in range(8)]
     positions = list()
-
     fig, ax = plt.subplots(figsize=(4, 2.5))
     for i, row in df.iterrows():
         positions.append(row["Start"])
         positions.append(row["End"])
-
         center = row["Start"] + (row["End"] - row["Start"]) / 2
         del_length = (row["End"] - row["Start"])
         radius = del_length / 2
@@ -111,15 +122,13 @@ def create_start_end_connection_plot(df: pd.DataFrame,
         half_cirlce = patches.Arc((center, y), radius*2, radius*2, angle=0, theta1=start_angle, theta2=end_angle, color=color, alpha=0.5)
         ax.add_patch(half_cirlce)
 
-    # add boxes for start and end of DI RNA sequence
+    # add box for RNA sequence
     ax.add_patch(plt.Rectangle((0, -80), max_val, 80, alpha=0.7, color="black"))
     ax.annotate("RNA sequence", (max_val / 2, -70), color="white", ha="center", fontsize=10)
-
-        # add histogram
+    # add histogram
     if len(positions) > 50:
         ax2 = ax.twinx()
         ax2.hist(positions, density=True, bins=50, alpha=0.4)
-
     # change some values to improve figure
     ax.set_xlim(0, max_val)
     ax.set_ylim(-max_val / 8, max_val / 2)
@@ -135,11 +144,9 @@ def create_start_end_connection_plot(df: pd.DataFrame,
         _, dy = inv.transform((0, 0)) - inv.transform((0, y1-y2))
         miny, maxy = ax2.get_ylim()
         ax2.set_ylim(miny+dy, maxy+dy)
-    
     if len(positions) > 50:    
         align_yaxis(ax, 0, ax2, 0)
         ax2.set_yticks([])
-
     # save figure
     plt.tight_layout()
     save_path = os.path.join(RESULTSPATH, "start_end", dfname)
@@ -151,7 +158,13 @@ def create_start_end_connection_plot(df: pd.DataFrame,
 
 def start_end_positions(dfs: list, dfnames: list)-> None:
     '''
-    
+        plot the connection of the start and end of the deletion sites for all
+        given dataset.
+        :param dfs: The list of DataFrames containing the data, preprocessed
+            with sequence_df(df)
+        :param dfnames: The names associated with each DataFrame in `dfs`
+        
+        :return: None
     '''
     for df, dfname in zip(dfs, dfnames):
         strain = DATASET_STRAIN_DICT[dfname]
@@ -166,5 +179,5 @@ if __name__ == "__main__":
     dfs, _ = load_all(dfnames)
 
     start_end_positions(dfs, dfnames)
-#    fraction_long_dis(dfs, dfnames)
- #   lengths_long_dis(dfs, dfnames) 
+    fraction_long_dis(dfs, dfnames)
+    lengths_long_dis(dfs, dfnames) 

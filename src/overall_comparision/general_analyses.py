@@ -1,5 +1,5 @@
 '''
-
+    Performs general analyses of the datasets
 '''
 import os
 import sys
@@ -7,27 +7,26 @@ import sys
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import matplotlib.patches as patches
 
 from scipy import stats
+from typing import Tuple
 from collections import Counter
 
 sys.path.insert(0, "..")
-from utils import load_all, get_sequence, get_seq_len, get_p_value_symbol, plot_heatmap, create_nucleotide_ratio_matrix, count_direct_repeats_overall, load_dataset, preprocess, join_data, get_dataset_names, sort_datasets_by_type
+from utils import load_all, get_sequence, get_seq_len, get_p_value_symbol, plot_heatmap, create_nucleotide_ratio_matrix, count_direct_repeats_overall, get_dataset_names, sort_datasets_by_type
 from utils import SEGMENTS, RESULTSPATH, DATASET_STRAIN_DICT, CMAP, NUCLEOTIDES, CUTOFF
 
 
 def plot_distribution_over_segments(dfs: list, dfnames: list, folder: str="general_analysis")-> None:
     '''
-
-    Args:
-        dfs (list of pandas.DataFrame): The list of DataFrames containing the data. 
-                                        Each dataframe should be preprocessed with sequence_df(df)
-        dfnames (list of str): The names associated with each DataFrame in `dfs`.
-        col (str, optional): The column name in the DataFrames that contains the sequence segments of interest. 
-                             Default is "seq_around_deletion_junction".
-
-    :return: None
+        creates a plot that shows how the DelVGs are distributed over the
+        segments for a given list of datasets.
+        :param dfs: The list of DataFrames containing the data, preprocessed
+            with sequence_df(df)
+        :param dfnames: The names associated with each DataFrame in `dfs`
+        :param folder: defines where to save the results
+    
+        :return: None
     '''
     fig, axs = plt.subplots(figsize=(5, 5))
     cm = plt.get_cmap(CMAP)
@@ -62,8 +61,6 @@ def plot_distribution_over_segments(dfs: list, dfnames: list, folder: str="gener
     axs.set_xlabel("segment occurrence [%]")
     axs.set_ylabel("dataset")
     plt.yticks(range(len(dfnames)), [f"{dfname} (n={len(df)}) {get_p_value_symbol(p)}" for dfname, df, p in zip(dfnames, dfs, pvalues)])
-  #  box = axs.get_position()
- #   axs.set_position([box.x0, box.y0 + box.height * 0.1, box.width, box.height * 0.9])
     axs.legend(loc="upper center", bbox_to_anchor=(0.3, 1.15), fancybox=True, shadow=True, ncol=4)
     
     plt.tight_layout()
@@ -75,20 +72,18 @@ def plot_distribution_over_segments(dfs: list, dfnames: list, folder: str="gener
 
     frac_df = pd.DataFrame(y)
     frac_df["name"] = dfnames
-    print(frac_df)
     frac_df.to_csv(os.path.join(save_path, "fraction_segments.csv"))
 
 
 def calculate_deletion_shifts(dfs: list, dfnames: list, folder: str="general_analysis")-> None:
     '''
-
-    Args:
-        dfs (list of pandas.DataFrame): The list of DataFrames containing the data. 
-                                        Each dataframe should be preprocessed with sequence_df(df)
-        dfnames (list of str): The names associated with each DataFrame in `dfs`.
-        col (str, optional): The column name in the DataFrames that contains the sequence segments of interest. 
-                             Default is "seq_around_deletion_junction".
-    :return: None
+        creates a plot that shows the deletion shifts of the DelVGs.
+        :param dfs: The list of DataFrames containing the data, preprocessed
+            with sequence_df(df)
+        :param dfnames: The names associated with each DataFrame in `dfs`
+        :param folder: defines where to save the results
+    
+        :return: None
     '''
     fig, axs = plt.subplots(figsize=(5, 5))
     cm = plt.get_cmap(CMAP)
@@ -136,7 +131,12 @@ def calculate_deletion_shifts(dfs: list, dfnames: list, folder: str="general_ana
 
 def calc_DI_lengths(dfs: list, dfnames: list)-> dict:
     '''
-    
+        counts the length of the DelVGs for each segment independently.
+        :param dfs: The list of DataFrames containing the data, preprocessed
+            with sequence_df(df)
+        :param dfnames: The names associated with each DataFrame in `dfs`
+        
+        :return: dictionary with the DelVG lengths per segment for each dataset
     '''
     overall_count_dict = dict()
     for df, dfname in zip(dfs, dfnames):
@@ -159,7 +159,13 @@ def calc_DI_lengths(dfs: list, dfnames: list)-> dict:
 
 def length_distribution_histrogram(dfs: list, dfnames: list, folder: str="general_analysis")-> None:
     '''
+        creates a histogram that shows the length distribution of the DelVGs.
+        :param dfs: The list of DataFrames containing the data, preprocessed
+            with sequence_df(df)
+        :param dfnames: The names associated with each DataFrame in `dfs`
+        :param folder: defines where to save the results
     
+        :return: None
     '''
     plt.rc("font", size=16)
     overall_count_dict = calc_DI_lengths(dfs, dfnames)
@@ -187,13 +193,18 @@ def length_distribution_histrogram(dfs: list, dfnames: list, folder: str="genera
         if not os.path.exists(save_path):
             os.makedirs(save_path)
         plt.savefig(os.path.join(save_path, f"{s}_length_del_hist.png"))
-
         plt.close()
 
 
 def length_distribution_violinplot(dfs: list, dfnames: list, folder: str="general_analysis")-> None:
     '''
+        creates a violinplot that shows the length distribution of the DelVGs.
+        :param dfs: The list of DataFrames containing the data, preprocessed
+            with sequence_df(df)
+        :param dfnames: The names associated with each DataFrame in `dfs`
+        :param folder: defines where to save the results
     
+        :return: None    
     '''
     dfs, dfnames = sort_datasets_by_type(dfs, dfnames, cutoff=50)
     plt.rc("font", size=16)
@@ -211,10 +222,8 @@ def length_distribution_violinplot(dfs: list, dfnames: list, folder: str="genera
                 counts_list = list()
                 for length, count in overall_count_dict[dfname][s].items():
                     counts_list.extend([length] * count)
-
                 plot_list.append(counts_list)
                 position_list.append(i+1)            
-
             labels.append(f"{dfname} (n={n_counts})")
         
         axs.violinplot(plot_list, position_list, points=1000, showmedians=True)
@@ -230,13 +239,17 @@ def length_distribution_violinplot(dfs: list, dfnames: list, folder: str="genera
         plt.close()
 
 
-def start_vs_end_lengths(dfs, dfnames, limit: int=0, folder: str="general_analysis")-> None:
+def start_vs_end_lengths(dfs: list, dfnames: list, limit: int=0, folder: str="general_analysis")-> None:
     '''
-        Plots the length of the start against the length of the end of the DI
-        RNA sequences as a scatter plot.
-        5' = start
-        3' = end
-
+        plots the length of the start against the length of the end of the
+        DelVG RNA sequences as a scatter plot (5' = start, 3' = end).
+        :param dfs: The list of DataFrames containing the data, preprocessed
+            with sequence_df(df)
+        :param dfnames: The names associated with each DataFrame in `dfs`
+        :param limit: defines where to set the x- and y-axis limits
+        :param folder: defines where to save the results
+    
+        :return: None  
     '''
     for df, dfname in zip(dfs, dfnames):
         fig, axs = plt.subplots(2, 4, figsize=(12, 6), tight_layout=True)
@@ -247,7 +260,6 @@ def start_vs_end_lengths(dfs, dfnames, limit: int=0, folder: str="general_analys
                 df_s["End_L"] = df_s["full_seq"].str.len() - df_s["End"]
                 axs[j,i%4].scatter(df_s["Start"], df_s["End_L"], s=1.0)
                 axs[j,i%4].plot([0, 1], [0, 1], transform=axs[j,i%4].transAxes, c="r", linewidth=0.5, linestyle="--")
-
                 if limit == 0:
                     max_p = max(df_s["Start"].max(), df_s["End_L"].max())
                 else:
@@ -259,7 +271,6 @@ def start_vs_end_lengths(dfs, dfnames, limit: int=0, folder: str="general_analys
                     pearson = stats.pearsonr(df_s["Start"], df_s["End_L"])
                 else:
                     pearson = ["NA", "NA"]
-
                 axs[j,i%4].set_xticks([0, max_p/2, max_p])
                 axs[j,i%4].set_yticks([0, max_p/2, max_p])
                 axs[j,i%4].set_aspect("equal", "box")
@@ -286,9 +297,19 @@ def start_vs_end_lengths(dfs, dfnames, limit: int=0, folder: str="general_analys
         plt.close()
 
 
-def calc_start_end_lengths(dfs, dfnames, thresh=300):
+def calc_start_end_lengths(dfs: list, dfnames: list, thresh: int=300)-> Tuple[list, list]:
     '''
+        calcualtes the difference of the start and end lengths of the DelVG RNA
+        sequences (5' = start, 3' = end).
+        :param dfs: The list of DataFrames containing the data, preprocessed
+            with sequence_df(df)
+        :param dfnames: The names associated with each DataFrame in `dfs`
+        :param thresh: defines to which difference DelVGs should be included,
+            allows to exclude long DelVGs
     
+        :return: Tuple
+            List of difference between start and end lengths
+            List of labels for the plot
     '''
     plot_list = list()
     labels = list()
@@ -304,9 +325,16 @@ def calc_start_end_lengths(dfs, dfnames, thresh=300):
     return plot_list, labels
 
 
-def diff_start_end_lengths(dfs, dfnames, folder: str="general_analysis")-> None:
+def diff_start_end_lengths(dfs: list, dfnames: list, folder: str="general_analysis")-> None:
     '''
-
+        plots the difference of the start and end lengths of the DelVG RNA
+        sequences as a violinplot (5' = start, 3' = end).
+        :param dfs: The list of DataFrames containing the data, preprocessed
+            with sequence_df(df)
+        :param dfnames: The names associated with each DataFrame in `dfs`
+        :param folder: defines where to save the results
+    
+        :return: None  
     '''
     fig, axs = plt.subplots(1, 1, figsize=(7, 5), tight_layout=True)
     thresh = 300
@@ -316,7 +344,6 @@ def diff_start_end_lengths(dfs, dfnames, folder: str="general_analysis")-> None:
     axs.violinplot(plot_list, position_list, points=1000, showmedians=True)
     axs.set_xticks(position_list)
     axs.set_xticklabels(labels, rotation=90)
-    #axs.set_xlabel("Dataset")
     axs.set_ylabel("5'-end length - 3'-end length")
 
     save_path = os.path.join(RESULTSPATH, folder)
@@ -326,27 +353,18 @@ def diff_start_end_lengths(dfs, dfnames, folder: str="general_analysis")-> None:
     plt.close()
 
 
-def plot_nucleotide_ratio_around_deletion_junction_heatmaps(dfs, dfnames, folder: str="general_analysis"):
+def plot_nucleotide_ratio_around_deletion_junction_heatmaps(dfs: list, dfnames: list, folder: str="general_analysis")-> None:
     '''
-        Plot heatmaps of nucleotide ratios around deletion junctions.
-
-    Args:
-        dfs (list of pandas.DataFrame): The list of DataFrames containing the data. 
-                                        Each dataframe should be preprocessed with sequence_df(df)
-        dfnames (list of str): The names associated with each DataFrame in `dfs`.
-        height (float, optional): The height of the figure in inches. Default is 20.
-        width (float, optional): The width of the figure in inches. Default is 16.
-        nucleotides (list of str, optional): The nucleotides to be plotted. Default is ["A", "C", "G", "T"].
-
-    Returns:
-        tuple: A tuple containing the figure and the axes of the subplots.
-            - fig (matplotlib.figure.Figure): The generated figure.
-            - axs (numpy.ndarray of matplotlib.axes.Axes): The axes of the subplots.
-
+        plot heatmaps of nucleotide ratios around deletion junctions.
+        :param dfs: The list of DataFrames containing the data, preprocessed
+            with sequence_df(df)
+        :param dfnames: The names associated with each DataFrame in `dfs`
+        :param folder: defines where to save the results
+    
+        :return: None
     '''
     fig, axs = plt.subplots(figsize=(13, len(dfs)), nrows=2, ncols=2)
     axs = axs.flatten()
-
     for i, nuc in enumerate(NUCLEOTIDES.keys()):
         x = list()
         y = list()
@@ -359,7 +377,6 @@ def plot_nucleotide_ratio_around_deletion_junction_heatmaps(dfs, dfnames, folder
                 vals.append(probability_matrix.loc[j, nuc] * 100)
                 
         axs[i] = plot_heatmap(x,y,vals, axs[i], vmin=min(vals), vmax=max(vals), cbar=True, format=".0f")
-        
         for val_label in axs[i].texts:
             val_label.set_size(8)
         axs[i].set_title(f"{NUCLEOTIDES[nuc]}")
@@ -374,7 +391,6 @@ def plot_nucleotide_ratio_around_deletion_junction_heatmaps(dfs, dfnames, folder
             axs[i].set_yticklabels([f"{dfname} ({len(df)})" for dfname, df in zip(dfnames, dfs)])
         else:
             axs[i].set_yticklabels([])
-
         if i < 2:
             axs[i].xaxis.set_ticks_position("top")
             axs[i].xaxis.set_label_position("top")
@@ -389,7 +405,6 @@ def plot_nucleotide_ratio_around_deletion_junction_heatmaps(dfs, dfnames, folder
                 xlabel.set_color("grey") 
           
     fig.subplots_adjust(top=0.9)
-
     save_path = os.path.join(RESULTSPATH, folder)
     if not os.path.exists(save_path):
         os.makedirs(save_path)
@@ -399,38 +414,26 @@ def plot_nucleotide_ratio_around_deletion_junction_heatmaps(dfs, dfnames, folder
 
 def plot_direct_repeat_ratio_heatmaps(dfs: list, dfnames: list, folder: str="general_analysis")-> None:
     '''
-        Plot heatmaps of nucleotide ratios around deletion junctions.
-
-    Args:
-        dfs (list of pandas.DataFrame): The list of DataFrames containing the data. 
-                                        Each dataframe should be preprocessed with sequence_df(df)
-        dfnames (list of str): The names associated with each DataFrame in `dfs`.
-        col (str, optional): The column name in the DataFrames that contains the sequence segments of interest. 
-                             Default is "seq_around_deletion_junction".
-        height (float, optional): The height of the figure in inches. Default is 20.
-        width (float, optional): The width of the figure in inches. Default is 16.
-        nucleotides (list of str, optional): The nucleotides to be plotted. Default is ["A", "C", "G", "T"].
-
-    :return: None
-
+        plot heatmaps of nucleotide ratios around deletion junctions.
+        :param dfs: The list of DataFrames containing the data, preprocessed
+            with sequence_df(df)
+        :param dfnames: The names associated with each DataFrame in `dfs`
+        :param folder: defines where to save the results
+    
+        :return: None
     '''
     fig, axs = plt.subplots(figsize=(10, len(dfs)/2))
-
     x = list()
     y = list()
     vals = list()
-    
     for dfname, df in zip(dfnames, dfs):
         final_d = dict()
-
         for s in SEGMENTS:
             df_s = df[df["Segment"] == s]
             if len(df_s) == 0:
                 continue
-            
             seq = get_sequence(df_s["Strain"].unique()[0], s)
             counts, _ = count_direct_repeats_overall(df_s, seq)
-            
             for k, v in counts.items():
                 if k in final_d:
                     final_d[k] += v
@@ -460,9 +463,17 @@ def plot_direct_repeat_ratio_heatmaps(dfs: list, dfnames: list, folder: str="gen
     plt.close()
 
 
-def deletion_site_motifs(dfs, dfnames, w_len, folder: str="general_analysis"):
+def deletion_site_motifs(dfs: list, dfnames: list, m_len: int, folder: str="general_analysis")-> None:
     '''
+        calcualte the motifs of specified length before start and end of
+        deletion site.
+        :param dfs: The list of DataFrames containing the data, preprocessed
+            with sequence_df(df)
+        :param dfnames: The names associated with each DataFrame in `dfs`
+        :param m_len: lenght of the motif to consider
+        :param folder: defines where to save the results
     
+        :return: None
     '''
     results = dict({
         "name": dfnames,
@@ -474,15 +485,14 @@ def deletion_site_motifs(dfs, dfnames, w_len, folder: str="general_analysis"):
     for df in dfs:
         s_motifs = list()
         e_motifs = list()
-
-        for i, r in df.iterrows():
+        for _, r in df.iterrows():
             seq = r["full_seq"]
             s = r["Start"]
             e = r["End"]
-            s_window = seq[s-w_len:s+w_len]
-            e_window = seq[e-(w_len+1):e+(w_len-1)]
-            s_motifs.append(s_window[:w_len])
-            e_motifs.append(e_window[:w_len])
+            s_motif = seq[s-m_len:s+m_len]
+            e_motif = seq[e-(m_len+1):e+(m_len-1)]
+            s_motifs.append(s_motif[:m_len])
+            e_motifs.append(e_motif[:m_len])
 
         s_motifs_counts = Counter(s_motifs)
         start_motif = s_motifs_counts.most_common(1)[0]
@@ -512,8 +522,6 @@ if __name__ == "__main__":
     dfnames = get_dataset_names(cutoff=50)
     dfs, _ = load_all(dfnames)
 
-    calculate_deletion_shifts(dfs, dfnames)
-    '''
     plot_distribution_over_segments(dfs, dfnames)
     calculate_deletion_shifts(dfs, dfnames)
     length_distribution_histrogram(dfs, dfnames)
@@ -523,4 +531,4 @@ if __name__ == "__main__":
     start_vs_end_lengths(dfs, dfnames, limit=600)
     diff_start_end_lengths(dfs, dfnames)
     deletion_site_motifs(dfs, dfnames, w_len=2)
-    '''
+    

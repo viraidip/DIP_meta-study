@@ -1,5 +1,5 @@
 '''
-
+    Performs an analysis of the metadata of the datasets
 '''
 import os
 import sys
@@ -13,9 +13,12 @@ from utils import load_all_mapped_reads, load_mapped_reads, load_all, get_datase
 from utils import SEGMENTS, DATAPATH, RESULTSPATH, ACCNUMDICT, CMAP, CUTOFF
 
 
-def load_all_metadata(dfnames):
+def load_all_metadata(dfnames: list)-> list:
     '''
-    
+        loads the metadata file for each given dataset.
+        :param dfnames: The names of the datasets
+
+        :return: the metadata as DataFrame, in the same order as dfnames
     '''
     dfs = list()
     for dfname in dfnames:
@@ -28,19 +31,22 @@ def load_all_metadata(dfnames):
     return dfs
 
 
-def analyse_metadata(dfs, dfnames, mr_dfs)-> None:
+def analyse_metadata(dfs: list, dfnames: list, mr_dfs: list)-> None:
     '''
-    
+        analyse the metadata of each dataset and write results into a csv.
+        :param dfs: The list of DataFrames containing the metadata
+        :param dfnames: The names associated with each DataFrame in `dfs`
+        :param mr_dfs: The list of DataFrames containing the mapped reads
+
+        :return: None        
     '''
     results = dict({"names": dfnames, "Reads mean": list(), "Reads sum": list(), "AvgSpotLen": list(), "considered datasets": list()})
 
     for df, dfname in zip(dfs, dfnames):
         results["considered datasets"].append(len(ACCNUMDICT[dfname]))
-
         if "AvgSpotLen" not in df.columns:
             df["AvgSpotLen"] = df["Bases"] / df["Reads"]
         results["AvgSpotLen"].append(df["AvgSpotLen"].mean())
-
         if "Reads" not in df.columns:
             df["Reads"] = df["Bases"] / df["AvgSpotLen"]
         results["Reads mean"].append(df["Reads"].mean())
@@ -58,10 +64,8 @@ def analyse_metadata(dfs, dfnames, mr_dfs)-> None:
     results["mapped reads"] = list()
     for mr_df in mr_dfs:
         results["mapped reads"].append(mr_df["counts"].sum())
-
     result_df = pd.DataFrame(results)
     pd.set_option('display.float_format', '{:.1f}'.format)
-    
     save_path = os.path.join(RESULTSPATH, "metadata")
     if not os.path.exists(save_path):
         os.makedirs(save_path)
@@ -70,7 +74,11 @@ def analyse_metadata(dfs, dfnames, mr_dfs)-> None:
 
 def mapped_reads_distribution(dfs: list, dfnames: list)-> None:
     '''
-    
+        analyse the distribution of the mapped reads for each dataset.
+        :param dfs: The list of DataFrames containing the mapped reads
+        :param dfnames: The names associated with each DataFrame in `dfs`
+
+        :return: None     
     '''
     fig, axs = plt.subplots(1, 1, figsize=(10, 6))
     x = 0
@@ -83,7 +91,6 @@ def mapped_reads_distribution(dfs: list, dfnames: list)-> None:
         total_counts = sum_counts["counts"].sum()
         sum_counts["fraction"] = sum_counts["counts"] / total_counts
         bottom = np.zeros(len(dfs))
-
         for i, s in enumerate(SEGMENTS):
             v = sum_counts[sum_counts['segment'] == s]['fraction'].values[0]
             axs.bar(x, v, bar_width, color=colors[i], label=s, bottom=bottom)
@@ -95,17 +102,14 @@ def mapped_reads_distribution(dfs: list, dfnames: list)-> None:
     axs.set_xlabel('Segment')
     axs.set_ylabel('Fraction')
     axs.set_title('Fraction of reads from different segments')
-
     handles, labels = axs.get_legend_handles_labels()
     unique_handles_labels = {}
     for handle, label in zip(handles, labels):
         if label not in unique_handles_labels:
             unique_handles_labels[label] = handle
-
     box = axs.get_position()
     axs.set_position([box.x0, box.y0 + box.height * 0.1, box.width, box.height * 0.9])
     axs.legend(unique_handles_labels.values(), unique_handles_labels.keys(), loc="upper center", bbox_to_anchor=(0.5, 1.1), fancybox=True, shadow=True, ncol=8)
-    
     save_path = os.path.join(RESULTSPATH, "metadata")
     if not os.path.exists(save_path):
         os.makedirs(save_path)
@@ -115,7 +119,11 @@ def mapped_reads_distribution(dfs: list, dfnames: list)-> None:
 
 def dataset_distributions(dfs: list, dfnames: list)-> None:
     '''
-    
+        calcualte statistical parameters for the datasets.
+        :param dfs: The list of DataFrames containing the DelVG data
+        :param dfnames: The names of the datasets
+
+        :return: None
     '''
     stats = dict({"Dataset": dfnames,
                   "Size": list(),
@@ -126,7 +134,6 @@ def dataset_distributions(dfs: list, dfnames: list)-> None:
                   "Mapped reads": list(),
                   "NGS/MR": list()})
     plot_data = list()
-    
     for df, dfname in zip(dfs, dfnames):
         counts = df["NGS_read_count"]
         plot_data.append(counts)
@@ -135,11 +142,9 @@ def dataset_distributions(dfs: list, dfnames: list)-> None:
         stats["Median"].append(counts.median())
         stats["Std. dev."].append(counts.std())
         stats["Max"].append(counts.max())
-
         # load mapped reads
         mr_df = load_mapped_reads(dfname)
         mr_sum = mr_df["counts"].sum()
-
         stats["Mapped reads"].append(mr_sum)
         stats["NGS/MR"].append(counts.sum() / mr_sum)
 
@@ -149,15 +154,12 @@ def dataset_distributions(dfs: list, dfnames: list)-> None:
     plt.xscale("log")
     plt.xlabel("NGS read count (log scale)")
     plt.ylabel("Datasets")
-
     save_path = os.path.join(RESULTSPATH, "metadata")
     if not os.path.exists(save_path):
         os.makedirs(save_path)
     plt.savefig(os.path.join(save_path, f"dataset_distribution_{CUTOFF}.png"))
     plt.close()
-
     stats_df = pd.DataFrame(stats)
-
     stats_df.to_csv(os.path.join(save_path, f"dataset_stats_{CUTOFF}.csv"), float_format="%.2f", index=False)
 
 
@@ -167,10 +169,8 @@ if __name__ == "__main__":
     dfnames = get_dataset_names()
     meta_dfs = load_all_metadata(dfnames)
     mr_dfs = load_all_mapped_reads(dfnames)
-
     analyse_metadata(meta_dfs, dfnames, mr_dfs)
     mapped_reads_distribution(mr_dfs, dfnames)
     
     dfs, _ = load_all(dfnames)
-    
     dataset_distributions(dfs, dfnames)

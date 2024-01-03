@@ -1,5 +1,6 @@
 '''
-
+    Compare the three datasets by Berry et al. 2021 based on their difference
+    in 3' and 5' lengths.
 '''
 import os
 import sys
@@ -9,23 +10,23 @@ import numpy as np
 import scipy.stats as stats
 import matplotlib.pyplot as plt
 
-from itertools import repeat
-
 sys.path.insert(0, "..")
 from utils import load_all, get_p_value_symbol
 from utils import RESULTSPATH
 from overall_comparision.general_analyses import calc_start_end_lengths
 
 
-def compare_3_5_ends(dfs, dfnames):
+def compare_3_5_ends(dfs: list, dfnames: list)-> None:
     '''
-    
+        compare the given datasets in their difference of start and end
+        sequence length.
+        :param dfs: The list of DataFrames containing the data, preprocessed
+            with sequence_df(df)
+        :param dfnames: The names associated with each DataFrame in `dfs`
+
+        :return: None
     '''
-    data = list()
-    labels = list()
-    
     data, labels = calc_start_end_lengths(dfs, dfnames)
-        
     fig, axs = plt.subplots(1, 1, figsize=(3, 5), tight_layout=True)
     position_list = np.arange(0, 3)
     axs.violinplot(data, position_list, points=1000, showmedians=True)
@@ -49,7 +50,6 @@ def compare_3_5_ends(dfs, dfnames):
     save_path = os.path.join(RESULTSPATH, "datasplits")
     if not os.path.exists(save_path):
         os.makedirs(save_path)
-
     plt.savefig(os.path.join(save_path, "Berry2021_3_5_ends.png"))
     plt.close()
 

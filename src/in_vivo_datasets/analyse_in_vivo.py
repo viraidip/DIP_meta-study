@@ -1,30 +1,15 @@
 '''
-
+    Run same analyses as in 'overall_comparision' folder, but only with the in
+    vivo patient and mouse datasets.
 '''
-import os
 import sys
 
-import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
 
 sys.path.insert(0, "..")
-from utils import load_all, load_dataset, preprocess, get_dataset_names
-from utils import DATASET_STRAIN_DICT, CUTOFF
+from utils import load_all, get_dataset_names
 from overall_comparision.general_analyses import plot_distribution_over_segments, calculate_deletion_shifts, length_distribution_histrogram, length_distribution_violinplot, plot_nucleotide_ratio_around_deletion_junction_heatmaps, plot_direct_repeat_ratio_heatmaps, start_vs_end_lengths, diff_start_end_lengths
-from overall_comparision.compare_expected import plot_expected_vs_observed_nucleotide_enrichment_heatmaps, plot_expected_vs_observed_direct_repeat_heatmaps, direct_repeat_composition
-
-
-def patient_intersection(dfs, dfnames):
-    '''
-    
-    '''
-    for df, dfname in zip(dfs, dfnames):
-        print(df.shape)
-        count_occurrences = df.groupby("key").size().reset_index(name="count")
-
-        # Display the result
-        print(count_occurrences.sort_values(by='count', ascending=False))
+from overall_comparision.compare_expected import plot_expected_vs_observed_nucleotide_enrichment_heatmaps, plot_expected_vs_observed_direct_repeat_heatmaps
 
 
 if __name__ == "__main__":
@@ -48,7 +33,6 @@ if __name__ == "__main__":
     # compare against expected
     plot_expected_vs_observed_nucleotide_enrichment_heatmaps(in_vivo_dfs, in_vivo_dfnames, expected_in_vivo_dfs, "observed-expected", folder)
     plot_expected_vs_observed_direct_repeat_heatmaps(in_vivo_dfs, in_vivo_dfnames, expected_in_vivo_dfs, "observed-expected", folder)
-    direct_repeat_composition(in_vivo_dfs, in_vivo_dfnames, expected_in_vivo_dfs, folder)
  
 
 ### in vivo patient data ###
@@ -69,7 +53,3 @@ if __name__ == "__main__":
     # compare against expected
     plot_expected_vs_observed_nucleotide_enrichment_heatmaps(patient_dfs, patient_dfnames, expected_patient_dfs, "observed-expected", folder)
     plot_expected_vs_observed_direct_repeat_heatmaps(patient_dfs, patient_dfnames, expected_patient_dfs, "observed-expected", folder)
-    direct_repeat_composition(patient_dfs, patient_dfnames, expected_patient_dfs, folder)   
-
-    # intersections of patient data
-    #patient_intersection(patient_dfs, patient_dfnames)
