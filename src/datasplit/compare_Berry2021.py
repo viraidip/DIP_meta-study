@@ -32,20 +32,21 @@ def compare_3_5_ends(dfs: list, dfnames: list)-> None:
     axs.violinplot(data, position_list, points=1000, showmedians=True)
     axs.set_xticks(position_list)
     axs.set_xticklabels(labels, rotation=90)
-    axs.set_ylim(top=400)
-    axs.set_xlabel("Dataset")
+    axs.set_ylim(top=430)
     axs.set_ylabel("5'-end length - 3'-end length")
     
     def add_significance(l1, l2, axs, start, end, height):
-        _, pvalue = stats.kstest(random.sample(l1, 50), random.sample(l2, 50))
+        #_, pvalue = stats.kstest(random.sample(l1, 50), random.sample(l2, 50))
+        _, pvalue = stats.kstest(l1, l2)
+        print(pvalue)
         symbol = get_p_value_symbol(pvalue)
         if symbol != "":
             axs.plot([start, end], [height, height], lw=2, color='black')
-            axs.text((start + end) / 2, height-10, symbol, ha='center', va='bottom', color='black')
+            axs.text((start + end) / 2, height, f"{pvalue:.2e}", ha='center', va='bottom', color='black', fontsize=8)
 
     add_significance(data[0], data[1], axs, 0, 1, 310)
-    add_significance(data[0], data[2], axs, 0, 2, 340)
-    add_significance(data[1], data[2], axs, 1, 2, 370)
+    add_significance(data[0], data[2], axs, 0, 2, 350)
+    add_significance(data[1], data[2], axs, 1, 2, 390)
 
     save_path = os.path.join(RESULTSPATH, "datasplits")
     if not os.path.exists(save_path):

@@ -63,8 +63,8 @@ def compare_DI_lengths(a_dfs: list, a_dfnames: list, a_label: str, b_dfs: list, 
         plt.hist(x_a, alpha=0.5, label=a_label, bins=bins, density=True)
         plt.hist(x_b, alpha=0.5, label=b_label, bins=bins, density=True)
         plt.hist(x_c, alpha=0.5, label=c_label, bins=bins, density=True)
-        plt.xlabel("DVG sequence length")
-        plt.ylabel("relative occurrence")
+        plt.xlabel("DelVG sequence length")
+        plt.ylabel("rel. occurrence")
         plt.legend(loc="upper center", ncol=3)
         plt.title(f"{s} (1-2: {s_ab} | 1-3: {s_ac} | 2-3: {s_bc})")
 

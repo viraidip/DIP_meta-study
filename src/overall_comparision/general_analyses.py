@@ -59,7 +59,6 @@ def plot_distribution_over_segments(dfs: list, dfnames: list, folder: str="gener
         bottom += y[s]
     
     axs.set_xlabel("segment occurrence [%]")
-    axs.set_ylabel("dataset")
     plt.yticks(range(len(dfnames)), [f"{dfname} (n={len(df)}) {get_p_value_symbol(p)}" for dfname, df, p in zip(dfnames, dfs, pvalues)])
     axs.legend(loc="upper center", bbox_to_anchor=(0.3, 1.15), fancybox=True, shadow=True, ncol=4)
     
@@ -117,7 +116,6 @@ def calculate_deletion_shifts(dfs: list, dfnames: list, folder: str="general_ana
         bottom += y[i]
     
     axs.set_xlabel("deletion shift [%]")
-    axs.set_ylabel("dataset")
     plt.yticks(range(len(dfnames)), [f"{dfname} (n={len(df)}, p.={p:.2})" for dfname, df, p in zip(dfnames, dfs, pvalues)])
     axs.legend(loc="upper center", bbox_to_anchor=(0.3, 1.1), fancybox=True, shadow=True, ncol=3)
 
@@ -229,8 +227,7 @@ def length_distribution_violinplot(dfs: list, dfnames: list, folder: str="genera
         axs.violinplot(plot_list, position_list, points=1000, showmedians=True)
         axs.set_xticks(range(1, len(dfnames)+1))
         axs.set_xticklabels(labels, rotation=90)
-        axs.set_xlabel("Dataset")
-        axs.set_ylabel("DVG sequence length")
+        axs.set_ylabel("DelVG seq. length")
 
         save_path = os.path.join(RESULTSPATH, folder)
         if not os.path.exists(save_path):
@@ -521,7 +518,7 @@ if __name__ == "__main__":
     
     dfnames = get_dataset_names(cutoff=50)
     dfs, _ = load_all(dfnames)
-
+    
     plot_distribution_over_segments(dfs, dfnames)
     calculate_deletion_shifts(dfs, dfnames)
     length_distribution_histrogram(dfs, dfnames)

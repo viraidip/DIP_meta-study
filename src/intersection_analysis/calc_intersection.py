@@ -124,7 +124,7 @@ def analyze_max_overlap_candidates(dfs: list, dfnames: list, count_df: pd.DataFr
 
         :return: None
     '''
-    plt.figure(figsize=(4, 7), tight_layout=True)
+    plt.figure(figsize=(4, 8), tight_layout=True)
     plot_data = list()
     labels = [f"{name} ({df.shape[0]})" for name, df in zip(dfnames, dfs)]
     for df in dfs:
@@ -150,10 +150,9 @@ def analyze_max_overlap_candidates(dfs: list, dfnames: list, count_df: pd.DataFr
         shift = i / ((len(counts_list)-1)*2) - 0.25
         plt.scatter(x_p+shift, y_p, marker="x", label=c, zorder=100)
     plt.yscale("log")
-    plt.xticks(rotation=45) 
-    plt.xlabel("Datasets")
+    plt.xticks(rotation=90)
     plt.ylabel("NGS read count (log scale)")
-    plt.legend()
+    plt.legend(loc="upper center", bbox_to_anchor=(0.4, 1.15), fancybox=True, shadow=True, ncol=2)
     if name != "":
         filename = f"{name}_ngs_counts.png"
     else:
@@ -209,6 +208,8 @@ if __name__ == "__main__":
         analyze_max_overlap_candidates(dfs, dfnames, count_df, name="only_PB2")
     sys.stdout = original_stdout
     
+    exit()
+
     ### make validation with sampling data ###
     original_stdout = sys.stdout
     file_path = os.path.join(RESULTSPATH, "intersection_analysis", "control_analysis.log")
