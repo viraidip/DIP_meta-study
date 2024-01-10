@@ -333,7 +333,7 @@ def diff_start_end_lengths(dfs: list, dfnames: list, folder: str="general_analys
     
         :return: None  
     '''
-    fig, axs = plt.subplots(1, 1, figsize=(7, 5), tight_layout=True)
+    fig, axs = plt.subplots(1, 1, figsize=(6, 5), tight_layout=True)
     thresh = 300
     plot_list, labels = calc_start_end_lengths(dfs, dfnames, thresh)
 

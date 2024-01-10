@@ -746,9 +746,13 @@ def get_dataset_names(cutoff: int=0, selection: str="")-> list:
     if selection == "in vivo mouse":
         select_names = ["Wang2023", "Penn2022", "Lui2019"]
     elif selection == "in vitro":
-        select_names = ["Alnaji2021", "Pelz2021", "Wang2020", "Kupke2020", "EBI2020", "IRC2015", "Alnaji2019_Cal07" ,"Alnaji2019_NC", "Mendes2021", "Rattanaburi2022_H1N1", "Alnaji2019_Perth", "Rattanaburi2022_H3N2", "Alnaji2019_BLEE", "Sheng2018",]
+        select_names = ["Alnaji2021", "Pelz2021", "Wang2020", "Kupke2020", "EBI2020", "IRC2015", "Alnaji2019_Cal07" ,"Alnaji2019_NC", "Mendes2021", "Rattanaburi2022_H1N1", "Alnaji2019_Perth", "Rattanaburi2022_H3N2", "Alnaji2019_BLEE", "Sheng2018"]
     elif selection == "in vivo human":
         select_names = ["Berry2021_A", "Berry2021_B", "Berry2021_B_Yam", "Southgate2019", "Valesano2020_Yam", "Valesano2020_Vic"]
+    elif selection == "IAV":
+        select_names = ["Alnaji2021", "Pelz2021", "Wang2023", "Wang2020", "Kupke2020", "EBI2020", "IRC2015", "Alnaji2019_Cal07", "Alnaji2019_NC", "Mendes2021", "Rattanaburi2022_H1N1", "Alnaji2019_Perth", "Rattanaburi2022_H3N2", "Berry2021_A", "Penn2022", "Lui2019"]
+    elif selection == "IBV":
+        select_names = ["Alnaji2019_BLEE", "Berry2021_B", "Valesano2020_Vic", "Sheng2018", "Berry2021_B_Yam", "Southgate2019","Valesano2020_Yam"]
     else:
         select_names = names
 
