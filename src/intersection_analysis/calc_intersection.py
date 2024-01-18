@@ -49,7 +49,7 @@ def generate_overlap_matrix_plot(dfs: list, dfnames: list, name: str=""):
             plt.annotate(text, xy=(j, i), color=color, ha='center', va='center', fontsize=12, fontweight='bold')
 
     plt.imshow(matrix, cmap="viridis", interpolation="nearest")
-    plt.colorbar(fraction=0.046, pad=0.04)
+    plt.colorbar(fraction=0.046, pad=0.04, label="Intersecting DelVGs [%]")
     plt.xticks(np.arange(len(dfnames)), dfnames, rotation=90)
     plt.yticks(np.arange(len(dfnames)), dfnames)
     plt.tight_layout()
@@ -98,7 +98,7 @@ def generate_max_overlap_candidates(dfs: list, thresh: int=0)-> pd.DataFrame:
             w_len = 2
             s_motif = seq[s-w_len:s]
             e_motif = seq[e-(w_len+1):e-1]
-            print(f"{cand}:\t{count}\t{dir_rep}\t{s_motif}\t{e_motif}")
+
             candidates.append(cand)
             counts.append(count)
             dir_reps.append(dir_rep)
@@ -133,7 +133,7 @@ def analyze_max_overlap_candidates(dfs: list, dfnames: list, count_df: pd.DataFr
 
     # mark identified DelVGs in boxplot
     x_p = np.arange(1, len(dfs)+1)
-    counts_list = count_df[count_df["counts"] >= count_df["counts"].max()-1]["DI"].tolist()
+    counts_list = count_df["DI"].tolist()
     for i, c in enumerate(counts_list):
         print(f"### {c} ###")
         y_p = list()
@@ -207,8 +207,6 @@ if __name__ == "__main__":
         print("### only PB2 Candidates ###")
         analyze_max_overlap_candidates(dfs, dfnames, count_df, name="only_PB2")
     sys.stdout = original_stdout
-    
-    exit()
 
     ### make validation with sampling data ###
     original_stdout = sys.stdout
