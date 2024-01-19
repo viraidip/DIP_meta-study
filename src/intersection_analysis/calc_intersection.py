@@ -29,7 +29,7 @@ def generate_overlap_matrix_plot(dfs: list, dfnames: list, name: str=""):
 
         :return: None
     '''
-    plt.figure(figsize=(5, 5))
+    plt.figure(figsize=(5, 4))
     plt.rc("font", size=20)
     # initialize an empty matrix
     matrix_size = len(dfs)
@@ -124,7 +124,7 @@ def analyze_max_overlap_candidates(dfs: list, dfnames: list, count_df: pd.DataFr
 
         :return: None
     '''
-    plt.figure(figsize=(4, 8), tight_layout=True)
+    plt.figure(figsize=(5, 8), tight_layout=True)
     plot_data = list()
     labels = [f"{name} ({df.shape[0]})" for name, df in zip(dfnames, dfs)]
     for df in dfs:
@@ -152,7 +152,7 @@ def analyze_max_overlap_candidates(dfs: list, dfnames: list, count_df: pd.DataFr
     plt.yscale("log")
     plt.xticks(rotation=90)
     plt.ylabel("NGS read count (log scale)")
-    plt.legend(loc="upper center", bbox_to_anchor=(0.4, 1.15), fancybox=True, shadow=True, ncol=2)
+    plt.legend(loc="upper right", ncol=1, frameon=True, shadow=True, facecolor="white", edgecolor="black")
     if name != "":
         filename = f"{name}_ngs_counts.png"
     else:
