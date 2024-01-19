@@ -333,15 +333,17 @@ def diff_start_end_lengths(dfs: list, dfnames: list, folder: str="general_analys
     
         :return: None  
     '''
-    fig, axs = plt.subplots(1, 1, figsize=(10, 4), tight_layout=True)
+    fig, axs = plt.subplots(1, 1, figsize=(4, 7), tight_layout=True)
     thresh = 300
     plot_list, labels = calc_start_end_lengths(dfs, dfnames, thresh)
+    plot_list.reverse()
+    labels.reverse()
 
     position_list = np.arange(0, len(dfs))
-    axs.violinplot(plot_list, position_list, points=1000, showmedians=True)
-    axs.set_xticks(position_list)
-    axs.set_xticklabels(labels, rotation=90)
-    axs.set_ylabel("5'-end length - 3'-end length")
+    axs.violinplot(plot_list, position_list, points=1000, showmedians=True, vert=False)
+    axs.set_yticks(position_list)
+    axs.set_yticklabels(labels)
+    axs.set_xlabel("5'-end length - 3'-end length")
 
     save_path = os.path.join(RESULTSPATH, folder)
     if not os.path.exists(save_path):

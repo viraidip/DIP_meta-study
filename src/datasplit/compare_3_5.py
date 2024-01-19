@@ -111,7 +111,7 @@ def create_comparision_matrix(dfs: list, dfnames: list):
     '''
     plot_list, labels = calc_start_end_lengths(dfs, dfnames)
 
-    plt.figure(figsize=(8, 6))
+    plt.figure(figsize=(6, 7))
     plt.rc("font", size=20)
     # initialize an empty matrix
     matrix_size = len(plot_list)
@@ -129,7 +129,7 @@ def create_comparision_matrix(dfs: list, dfnames: list):
                 plt.annotate(text, xy=(j, i), color=color, ha='center', va='center', fontsize=6, fontweight='bold')
 
     plt.imshow(matrix, cmap="viridis", interpolation="nearest", norm=LogNorm())
-    plt.colorbar(fraction=0.046, pad=0.04, label="p-value (logarithmic scale)")
+    plt.colorbar(fraction=0.046, pad=0.04, orientation="horizontal", location="top", label="p-value (logarithmic scale)")
     plt.xticks(np.arange(len(dfnames)), dfnames, rotation=90)
     plt.yticks(np.arange(len(dfnames)), dfnames)
     plt.tight_layout()
