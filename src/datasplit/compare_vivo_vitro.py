@@ -50,23 +50,33 @@ def compare_DI_lengths(a_dfs: list, a_dfnames: list, a_label: str, b_dfs: list, 
         if len(x_a) < 50 or len(x_b) < 50 or len(x_c) < 50:
             continue
 
-        def calc_anova(x_1, x_2):
-            data1, _ = np.histogram(x_1, bins=bins)
-            data2, _ = np.histogram(x_2, bins=bins)
-            _, pvalue = stats.f_oneway(data1, data2)
-            return get_p_value_symbol(pvalue)
-        s_ab = calc_anova(x_a, x_b)        
-        s_ac = calc_anova(x_a, x_c)        
-        s_bc = calc_anova(x_b, x_c)
-
         plt.figure(figsize=(6, 2))
         plt.hist(x_a, alpha=0.5, label=a_label, bins=bins, density=True)
         plt.hist(x_b, alpha=0.5, label=b_label, bins=bins, density=True)
         plt.hist(x_c, alpha=0.5, label=c_label, bins=bins, density=True)
+
+        def calc_anova(x_1, x_2, s, e, h):
+            data1, _ = np.histogram(x_1, bins=bins)
+            data2, _ = np.histogram(x_2, bins=bins)
+            _, pvalue = stats.f_oneway(data1, data2)
+            symbol = get_p_value_symbol(pvalue)
+            if symbol != "":
+                plt.plot([s, e], [h, h], lw=1, color='black')
+                plt.plot([s, s], [h, h-0.00005], lw=1, color='black')
+                plt.plot([e, e], [h, h-0.00005], lw=1, color='black')
+                plt.text((s + e) / 2, h-0.0001, symbol, ha='center', va='bottom', color='black', fontsize=8)
+
+            return
+        
+        calc_anova(x_a, x_b, 550, 1000, 0.0041)
+        calc_anova(x_a, x_c, 550, 1900, 0.0042)
+        calc_anova(x_b, x_c, 1200, 1900, 0.0043)
+
+
+        plt.ylim(0, 0.0045)
         plt.xlabel("DelVG sequence length")
-        plt.ylabel("rel. occurrence")
+        plt.ylabel("probability density")
         plt.legend(loc="upper center", ncol=3)
-        plt.title(f"{s} (1-2: {s_ab} | 1-3: {s_ac} | 2-3: {s_bc})")
 
         save_path = os.path.join(RESULTSPATH, "datasplits")
         if not os.path.exists(save_path):
