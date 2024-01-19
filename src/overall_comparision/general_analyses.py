@@ -227,7 +227,7 @@ def length_distribution_violinplot(dfs: list, dfnames: list, folder: str="genera
         axs.violinplot(plot_list, position_list, points=1000, showmedians=True)
         axs.set_xticks(range(1, len(dfnames)+1))
         axs.set_xticklabels(labels, rotation=90)
-        axs.set_ylabel("DelVG seq. length")
+        axs.set_ylabel("DelVG sequence length")
 
         save_path = os.path.join(RESULTSPATH, folder)
         if not os.path.exists(save_path):
