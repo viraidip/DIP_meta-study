@@ -86,7 +86,7 @@ def calculate_deletion_shifts(dfs: list, dfnames: list, folder: str="general_ana
     '''
     fig, axs = plt.subplots(figsize=(5, 5))
     cm = plt.get_cmap(CMAP)
-    colors = [cm(1.*i/3) for i in range(3)]
+    colors = [cm(0/8), cm(3/8), cm(1/8)]
 
     pvalues = list()
     x = np.arange(0, len(dfs))
@@ -224,7 +224,7 @@ def length_distribution_violinplot(dfs: list, dfnames: list, folder: str="genera
                 position_list.append(i+1)            
             labels.append(f"{dfname} (n={n_counts})")
         
-        axs.violinplot(plot_list, position_list, points=1000, showmedians=True)
+        axs.violinplot(plot_list, position_list, points=1000, showextrema=False, showmedians=True)
         axs.set_xticks(range(1, len(dfnames)+1))
         axs.set_xticklabels(labels, rotation=90)
         axs.set_ylabel("DelVG sequence length")
@@ -340,7 +340,14 @@ def diff_start_end_lengths(dfs: list, dfnames: list, folder: str="general_analys
     labels.reverse()
 
     position_list = np.arange(0, len(dfs))
-    axs.violinplot(plot_list, position_list, points=1000, showmedians=True, vert=False)
+    violin_parts = axs.violinplot(plot_list, position_list, showextrema=False, points=1000, showmeans=True, vert=False)
+    for pc in violin_parts["bodies"]:
+        pc.set_edgecolor("black")
+
+    for i, d in enumerate(plot_list):
+        y_p = np.random.uniform(i-0.3, i+0.3, len(d))
+        plt.scatter(d, y_p, c="darkgrey", s=2, zorder=0)
+
     axs.set_yticks(position_list)
     axs.set_yticklabels(labels)
     axs.set_xlabel("5'-end length - 3'-end length")
