@@ -14,9 +14,30 @@ import matplotlib.pyplot as plt
 
 sys.path.insert(0, "..")
 from utils import load_single_dataset, preprocess
-from utils import SEGMENTS, CUTOFF
-from RSC_estimation import load_mendes2021_rsc
+from utils import SEGMENTS, CUTOFF, DATAPATH
 from overall_comparision.general_analyses import diff_start_end_lengths
+
+
+def load_mendes2021_rsc(name: str)-> dict:
+    '''
+        Loads the data set of Mendes et al. 2021.
+        :param name: indicates which dataset to load
+
+        :return: dictionary with strain name as key and data frame as value
+    '''
+    if name == "v12enriched":
+        filename = "Virus-1-2_enriched_junctions.tsv"
+    elif name == "v21depleted":
+        filename = "Virus-2-1_depleted_junctions.tsv"
+    
+    file_path = os.path.join(DATAPATH, "RSC_estimation", filename)
+    data = pd.read_csv(file_path,
+                            header=0,
+                            na_values=["", "None"],
+                            keep_default_na=False,
+                            sep="\t")
+    
+    return data
 
 
 if __name__ == "__main__":

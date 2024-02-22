@@ -2,7 +2,6 @@
     General functions and global parameters, that are used in different scripts
 '''
 import os
-import json
 
 import numpy as np
 import pandas as pd
@@ -13,12 +12,12 @@ from Bio import SeqIO
 
 ### STATIC VALUES ###
 # load config and assign values to global variables
-DATAPATH = json.load(open("../../.config.json"))["DATAPATH"]
-RESULTSPATH = json.load(open("../../.config.json"))["RESULTSPATH"]
+DATAPATH = "/home/jens/DIPs/DIP_meta/data"
+RESULTSPATH = "/home/jens/DIPs/DIP_meta/results"
 
 # segments, nuclotides, and strains
 CMAP = "Accent"
-CUTOFF = 13
+CUTOFF = 15
 N_SAMPLES = 5000
 RESULTSPATH = os.path.join(RESULTSPATH, f"cutoff_{CUTOFF}")
 SEGMENTS = list(["PB2", "PB1", "PA", "HA", "NP", "NA", "M", "NS"])
@@ -48,7 +47,7 @@ DATASET_STRAIN_DICT = dict({
     # H3N2
     "Alnaji2019_Perth": "Perth",
     "Berry2021_A": "Connecticut",
-    "Rattanaburi2022_H3N2": "Thailand",
+    "Rattanaburi2022_H3N2": "H3N2_Thailand",
     # H5N1
     "Penn2022": "Turkey",
     # H7N9
@@ -682,7 +681,7 @@ SEGMENT_DICTS = dict({
         "CY018654.1": "M",
         "CY018657.1": "NS"
     }),
-    "Thailand": dict({
+    "H3N2_Thailand": dict({
         "KP335735.1": "PB2",
         "KP335793.1": "PB1",
         "KP335851.1": "PA",

@@ -536,5 +536,5 @@ if __name__ == "__main__":
     plot_direct_repeat_ratio_heatmaps(dfs, dfnames)
     start_vs_end_lengths(dfs, dfnames, limit=600)
     diff_start_end_lengths(dfs, dfnames)
-    deletion_site_motifs(dfs, dfnames, w_len=2)
+    deletion_site_motifs(dfs, dfnames, m_len=2)
     
