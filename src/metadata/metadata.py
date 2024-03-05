@@ -9,8 +9,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 sys.path.insert(0, "..")
-from utils import load_all_mapped_reads, load_mapped_reads, load_all, get_dataset_names
-from utils import SEGMENTS, DATAPATH, RESULTSPATH, ACCNUMDICT, CMAP, CUTOFF
+from utils import load_all, get_dataset_names
+from utils import DATAPATH, RESULTSPATH, ACCNUMDICT, CUTOFF
 
 
 def load_all_metadata(dfnames: list)-> list:
@@ -117,6 +117,5 @@ if __name__ == "__main__":
 
     analyse_metadata(meta_dfs, dfnames)
 
-    
     dfs, _ = load_all(dfnames)
     dataset_distributions(dfs, dfnames)

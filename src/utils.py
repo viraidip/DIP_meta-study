@@ -37,12 +37,13 @@ DATASET_STRAIN_DICT = dict({
     "Pelz2021": "PR8",
     "Wang2023": "PR8",
     "Wang2020": "PR8",
+    "Zhuravlev2020": "PR8",
     "Kupke2020": "PR8",
-    "EBI2020": "PR8",
-    "IRC2015": "PR8",
+    "VdHoecke2015": "PR8",
     "Alnaji2019_Cal07": "Cal07",
     "Alnaji2019_NC" : "NC",
     "Mendes2021": "WSN_Mendes_rev",
+    "Boussier2020": "WSN",
     "Rattanaburi2022_H1N1": "H1N1_Thailand",
     # H3N2
     "Alnaji2019_Perth": "Perth",
@@ -337,7 +338,7 @@ ACCNUMDICT = dict({
         "SRR3743522": dict({}),
         "SRR3743523": dict({})
     }),
-    "EBI2020": dict({
+    "Zhuravlev2020": dict({
         "ERR4566024":  dict({"Cell": "A549"}),
         "ERR4566025":  dict({"Cell": "A549"}),
         "ERR4566028":  dict({"Cell": "HEK293FT"}),
@@ -510,7 +511,7 @@ ACCNUMDICT = dict({
         "ERR3474796": dict({}),
         "ERR3474809": dict({})
     }),
-    "IRC2015": dict({
+    "VdHoecke2015": dict({
         "SRR1757953": dict({}),
         "SRR1758027": dict({})
     }),
@@ -527,6 +528,31 @@ ACCNUMDICT = dict({
         "SRR10256723": dict({}),
         "SRR10256724": dict({}),
         "SRR10256725": dict({})
+    }),
+    "Boussier2020": dict({
+        "180628A_rec_A-P1p_S218": dict({}),
+        "180628A_rec_B-P1p_S219": dict({}),
+        "180628A_rec_C-P1p_S219": dict({}),
+        "180628A_rec_D-P1p_S221": dict({}),
+        "180628A_rec_WT1p6-1213_S242": dict({}),
+        "180628B_rec_A-P1p-PCR_S213": dict({}),
+        "180628B_rec_B-P1p-PCR_S214": dict({}),
+        "180628B_rec_C-P1p-PCR_S215": dict({}),
+        "180628B_rec_D-P1p-PCR_S216": dict({}),
+        "180628B_rec_WT-P1p-PCR_S217": dict({}),
+        "180705A_rec_AP1pb_S294": dict({}),
+        "180705A_rec_BP1pb_S295": dict({}),
+        "180705A_rec_CP1pb_S296": dict({}),
+        "180705A_rec_DP1pb_S297": dict({}),
+        "180705A_rec_WTP1pb_S298": dict({}),
+        "180705B_rec_AP1pPCRb_S289": dict({}),
+        "180705B_rec_BP1pPCRb_S290": dict({}),
+        "180705B_rec_CP1pPCRb_S291": dict({}),
+        "180705B_rec_DP1pPCRb_S292": dict({}),
+        "180705B_rec_WTP1pPCRb_S293": dict({}),
+        "180706A_rec_AP1pc_S10": dict({}),
+        "180706A_rec_BP1pc_S11": dict({}),
+        "180706A_rec_DP1pc_S12": dict({})
     })
 })
 
@@ -592,14 +618,14 @@ SEGMENT_DICTS = dict({
         "NS_vRNA": "NS"
     }),
     "WSN": dict({
-        "PB2": "PB2",
-        "PB1": "PB1",
-        "PA": "PA",
-        "HA": "HA",
-        "NP": "NP",
-        "NA": "NA",
-        "M": "M",
-        "NS": "NS"
+        "LC333182.1": "PB2",
+        "LC333183.1": "PB1",
+        "LC333184.1": "PA",
+        "LC333185.1": "HA",
+        "LC333186.1": "NP",
+        "LC333187.1": "NA",
+        "LC333188.1": "M",
+        "LC333189.1": "NS"
     }),
     "Anhui": dict({
         "439504": "PB2",
@@ -745,11 +771,11 @@ def get_dataset_names(cutoff: int=0, selection: str="")-> list:
     if selection == "in vivo mouse":
         select_names = ["Wang2023", "Penn2022", "Lui2019"]
     elif selection == "in vitro":
-        select_names = ["Alnaji2021", "Pelz2021", "Wang2020", "Kupke2020", "EBI2020", "IRC2015", "Alnaji2019_Cal07" ,"Alnaji2019_NC", "Mendes2021", "Rattanaburi2022_H1N1", "Alnaji2019_Perth", "Rattanaburi2022_H3N2", "Alnaji2019_BLEE", "Sheng2018"]
+        select_names = ["Alnaji2021", "Pelz2021", "Wang2020", "Kupke2020", "Zhuravlev2020", "VdHoecke2015", "Alnaji2019_Cal07" ,"Alnaji2019_NC", "Mendes2021", "Boussier2020", "Rattanaburi2022_H1N1", "Alnaji2019_Perth", "Rattanaburi2022_H3N2", "Alnaji2019_BLEE", "Sheng2018"]
     elif selection == "in vivo human":
         select_names = ["Berry2021_A", "Berry2021_B", "Berry2021_B_Yam", "Southgate2019", "Valesano2020_Yam", "Valesano2020_Vic"]
     elif selection == "IAV":
-        select_names = ["Alnaji2021", "Pelz2021", "Wang2023", "Wang2020", "Kupke2020", "EBI2020", "IRC2015", "Alnaji2019_Cal07", "Alnaji2019_NC", "Mendes2021", "Rattanaburi2022_H1N1", "Alnaji2019_Perth", "Rattanaburi2022_H3N2", "Berry2021_A", "Penn2022", "Lui2019"]
+        select_names = ["Alnaji2021", "Pelz2021", "Wang2023", "Wang2020", "Kupke2020", "Zhuravlev2020", "VdHoecke2015", "Alnaji2019_Cal07", "Alnaji2019_NC", "Mendes2021", "Boussier2020", "Rattanaburi2022_H1N1", "Alnaji2019_Perth", "Rattanaburi2022_H3N2", "Berry2021_A", "Penn2022", "Lui2019"]
     elif selection == "IBV":
         select_names = ["Alnaji2019_BLEE", "Berry2021_B", "Valesano2020_Vic", "Sheng2018", "Berry2021_B_Yam", "Southgate2019","Valesano2020_Yam"]
     else:
@@ -925,11 +951,11 @@ def get_p_value_symbol(p: float)-> str:
     if p < 0.00001:
         return "***"
     elif p < 0.001:
-        return "**"
+        return "** "
     elif p < 0.05:
-        return "*"
+        return " * "
     else:
-        return ""
+        return "ns."
 
 
 ######################
