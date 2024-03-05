@@ -15,7 +15,7 @@ from scipy.stats import percentileofscore
 sys.path.insert(0, "..")
 from utils import join_data, load_dataset, load_single_dataset
 from utils import preprocess, calculate_direct_repeat, get_sequence, generate_sampling_data
-from utils import CUTOFF, RESULTSPATH, SEGMENT_DICTS, ACCNUMDICT
+from utils import RESULTSPATH, SEGMENT_DICTS, ACCNUMDICT
 
 
 def generate_overlap_matrix_plot(dfs: list, dfnames: list, name: str=""):
@@ -188,12 +188,9 @@ if __name__ == "__main__":
     strain = "PR8"
     for dataset in dfnames:
         df = join_data(load_dataset(dataset))
-        df = df[df["Segment"].isin(["PB2", "PB1", "PA"])]
-        if dataset in ["Wang2020", "Kupke2020", "EBI2020", "IRC2015"]:
-            dfs.append(preprocess(strain, df, 2))    
-        else:
-            dfs.append(preprocess(strain, df, CUTOFF))
-
+        #df = df[df["Segment"].isin(["PB2", "PB1", "PA"])]
+        dfs.append(preprocess(strain, df, 1))    
+        
     original_stdout = sys.stdout
     save_path = os.path.join(RESULTSPATH, "intersection_analysis")
     if not os.path.exists(save_path):
@@ -208,6 +205,8 @@ if __name__ == "__main__":
         analyze_max_overlap_candidates(dfs, dfnames, count_df, name="only_PB2")
     sys.stdout = original_stdout
 
+
+    exit()
     ### make validation with sampling data ###
     original_stdout = sys.stdout
     file_path = os.path.join(RESULTSPATH, "intersection_analysis", "control_analysis.log")
