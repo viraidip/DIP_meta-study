@@ -55,11 +55,11 @@ def plot_distribution_over_segments(dfs: list, dfnames: list, folder: str="gener
         axs.barh(x, y[s], bar_width, color=colors[i], label=s, left=bottom)
         for j, text in enumerate(y[s]):
             if text > 10:
-                axs.text(bottom[j] + text/2, j, str(round(text, 1)), ha="center", va="center", fontsize=6)
+                axs.text(bottom[j] + text/2, j, str(round(text, 1)), ha="center", va="center", fontsize=9)
         bottom += y[s]
     
-    axs.set_xlabel("segment occurrence [%]")
-    plt.yticks(range(len(dfnames)), [f"{dfname} (n={len(df)}) {get_p_value_symbol(p)}" for dfname, df, p in zip(dfnames, dfs, pvalues)])
+    axs.set_xlabel("fraction of DelVGs per segment [%]")
+    plt.yticks(range(len(dfnames)), [f"{dfname} (n={len(df)}) {get_p_value_symbol(p)}  " for dfname, df, p in zip(dfnames, dfs, pvalues)])
     axs.legend(loc="upper center", bbox_to_anchor=(0.3, 1.15), fancybox=True, shadow=True, ncol=4)
     
     plt.tight_layout()
@@ -88,7 +88,7 @@ def calculate_deletion_shifts(dfs: list, dfnames: list, folder: str="general_ana
     cm = plt.get_cmap(CMAP)
     colors = [cm(0/8), cm(3/8), cm(1/8)]
 
-    pvalues = list()
+    symbols = list()
     x = np.arange(0, len(dfs))
     y = dict({n: list() for n in [0, 1, 2]})
     for df in dfs:
@@ -104,7 +104,8 @@ def calculate_deletion_shifts(dfs: list, dfnames: list, folder: str="general_ana
         f_obs = shifts / sum(shifts) * 100
         f_exp = [33.3333333, 33.3333333, 33.3333333]
         _, pvalue = stats.chisquare(f_obs, f_exp)
-        pvalues.append(pvalue)
+        symbol = get_p_value_symbol(pvalue)
+        symbols.append(symbol)
 
     bar_width = 0.7
     bottom = np.zeros(len(dfs))
@@ -112,12 +113,13 @@ def calculate_deletion_shifts(dfs: list, dfnames: list, folder: str="general_ana
     for i, label in enumerate(labels):
         axs.barh(x, y[i], bar_width, color=colors[i], label=label, left=bottom)
         for j, text in enumerate(y[i]):
-            axs.text(bottom[j] + text/2, j, str(round(text, 1)), ha="center", va="center", fontsize=6)
+            axs.text(bottom[j] + text/2, j, str(round(text, 1)), ha="center", va="center", fontsize=9)
         bottom += y[i]
     
-    axs.set_xlabel("deletion shift [%]")
-    plt.yticks(range(len(dfnames)), [f"{dfname} (n={len(df)}, p.={p:.2})" for dfname, df, p in zip(dfnames, dfs, pvalues)])
-    axs.legend(loc="upper center", bbox_to_anchor=(0.3, 1.1), fancybox=True, shadow=True, ncol=3)
+    axs.set_xlim(right=100)
+    axs.set_xlabel("fraction of deletion shift [%]")
+    plt.yticks(range(len(dfnames)), [f"{dfname} (n={len(df)}) {s}  " for dfname, df, s in zip(dfnames, dfs, symbols)])
+    axs.legend(loc="upper center", bbox_to_anchor=(0.3, 1.15), fancybox=True, shadow=True, ncol=3)
 
     plt.tight_layout()
     save_path = os.path.join(RESULTSPATH, folder)
