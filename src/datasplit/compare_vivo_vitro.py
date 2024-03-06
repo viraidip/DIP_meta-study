@@ -49,9 +49,9 @@ def compare_DI_lengths(a_dfs: list, a_dfnames: list, a_label: str, b_dfs: list, 
         symbol = get_p_value_symbol(pvalue)
         if symbol != "":
             plt.plot([s, e], [h, h], lw=1, color='black')
-            plt.plot([s, s], [h, h-0.00005], lw=1, color='black')
-            plt.plot([e, e], [h, h-0.00005], lw=1, color='black')
-            plt.text((s + e) / 2, h-0.0001, symbol, ha='center', va='bottom', color='black', fontsize=8)
+            plt.plot([s, s], [h, h+0.0002], lw=1, color='black')
+            plt.plot([e, e], [h, h+0.0002], lw=1, color='black')
+            plt.text((s + e) / 2, h-0.00045, symbol, ha='center', va='bottom', color='black', fontsize=8)
         return
 
     cm = plt.get_cmap(CMAP)
@@ -69,12 +69,12 @@ def compare_DI_lengths(a_dfs: list, a_dfnames: list, a_label: str, b_dfs: list, 
         plt.hist(x_b, alpha=0.5, label=b_label, bins=bins, density=True, color=colors[1])
         plt.hist(x_c, alpha=0.5, label=c_label, bins=bins, density=True, color=colors[2])
 
-        calc_anova(x_a, x_b, 550, 1000, 0.0041)
-        calc_anova(x_a, x_c, 550, 1900, 0.0042)
-        calc_anova(x_b, x_c, 1200, 1900, 0.0043)
+        calc_anova(x_a, x_b, 550, 1100, 0.0028)
+        calc_anova(x_a, x_c, 550, 1900, 0.0033)
+        calc_anova(x_b, x_c, 1100, 1900, 0.0038)
 
-        plt.ylim(0, 0.0045)
-        plt.xlabel("DelVG sequence length")
+        plt.ylim(0, 0.005)
+        plt.xlabel(f"DelVG sequence length for {s} (nts.)")
         plt.ylabel("probability density")
         plt.legend(loc="upper center", ncol=3)
 

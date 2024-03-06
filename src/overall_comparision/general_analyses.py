@@ -182,7 +182,7 @@ def length_distribution_histrogram(dfs: list, dfnames: list, folder: str="genera
                 m = round(np.mean(list(counts_list)), 2)                
                 axs[i].hist(count_dict[s].keys(), weights=count_dict[s].values(), bins=100, label=f"{dfname} (µ={m})", alpha=0.3)
                 axs[i].set_xlim(left=0)
-                axs[i].set_xlabel("sequence length")
+                axs[i].set_xlabel("sequence length (nts.)")
                 axs[i].set_ylabel("occurrences")
                 axs[i].legend()
             else:
@@ -229,7 +229,8 @@ def length_distribution_violinplot(dfs: list, dfnames: list, folder: str="genera
         axs.violinplot(plot_list, position_list, points=1000, showextrema=False, showmedians=True)
         axs.set_xticks(range(1, len(dfnames)+1))
         axs.set_xticklabels(labels, rotation=90)
-        axs.set_ylabel("DelVG sequence length")
+        axs.set_ylim(bottom=0, top=2500)
+        axs.set_ylabel("DelVG sequence length (nts.)       ")
 
         save_path = os.path.join(RESULTSPATH, folder)
         if not os.path.exists(save_path):
@@ -530,10 +531,11 @@ if __name__ == "__main__":
     dfnames = get_dataset_names(cutoff=50)
     dfs, _ = load_all(dfnames)
     
-    plot_distribution_over_segments(dfs, dfnames)
-    calculate_deletion_shifts(dfs, dfnames)
-    length_distribution_histrogram(dfs, dfnames)
+#    plot_distribution_over_segments(dfs, dfnames)
+ #   calculate_deletion_shifts(dfs, dfnames)
+  #  length_distribution_histrogram(dfs, dfnames)
     length_distribution_violinplot(dfs, dfnames)
+    exit()
     plot_nucleotide_ratio_around_deletion_junction_heatmaps(dfs, dfnames)
     plot_direct_repeat_ratio_heatmaps(dfs, dfnames)
     start_vs_end_lengths(dfs, dfnames, limit=600)
