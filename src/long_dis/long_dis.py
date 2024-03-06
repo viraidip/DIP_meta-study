@@ -132,7 +132,9 @@ def create_start_end_connection_plot(df: pd.DataFrame, dfname: str, strain: str,
     # change some values to improve figure
     ax.set_xlim(0, max_val)
     ax.set_ylim(-max_val / 8, max_val / 2)
-    ax.set_xticks(np.arange(0, max_val, 300))
+    xticks = list(range(0, max_val, 300))
+    xticks.append(max_val)
+    ax.set_xticks(xticks)
     ax.set_yticks([])
     ax.set_xlabel("Nucleotide position")
     ax.set_title(dfname)
