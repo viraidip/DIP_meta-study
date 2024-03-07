@@ -134,7 +134,7 @@ def create_comparision_matrix(dfs: list, dfnames: list):
     '''
     plot_list, labels = calc_start_end_lengths(dfs, dfnames)
 
-    plt.figure(figsize=(6, 7))
+    plt.figure(figsize=(10, 9))
     plt.rc("font", size=20)
     # initialize an empty matrix
     matrix_size = len(plot_list)
@@ -148,13 +148,15 @@ def create_comparision_matrix(dfs: list, dfnames: list):
                 _, pvalue = stats.f_oneway(d1, d2)
                 matrix[i][j] = max(pvalue, 0.0000000001)
                 text = get_p_value_symbol(pvalue)
-                color = "black" if pvalue > 0.000001 else "white"
-                plt.annotate(text, xy=(j, i), color=color, ha='center', va='center', fontsize=6, fontweight='bold')
+                if text == "ns.":
+                    text = ""
+                color = "black" if pvalue > 0.00001 else "white"
+                plt.annotate(text, xy=(j, i), color=color, ha='center', va='center', fontsize=10, fontweight='bold')
 
     plt.imshow(matrix, cmap="viridis", interpolation="nearest", norm=LogNorm())
-    plt.colorbar(fraction=0.046, pad=0.04, orientation="horizontal", location="top", label="p-value (logarithmic scale)")
-    plt.xticks(np.arange(len(dfnames)), dfnames, rotation=90)
-    plt.yticks(np.arange(len(dfnames)), dfnames)
+    plt.colorbar(fraction=0.046, pad=0.04, location="right", label="p-value (logarithmic scale)")
+    plt.xticks(np.arange(len(dfnames)), [f"{n}    " for n in dfnames], rotation=90)
+    plt.yticks(np.arange(len(dfnames)), [f"{n}    " for n in dfnames])
     plt.tight_layout()
     plt.grid(False)
 
@@ -178,7 +180,6 @@ if __name__ == "__main__":
     dfnames = ["Berry2021_A", "Berry2021_B", "Berry2021_B_Yam"]
     dfs, _ = load_all(dfnames)
     compare_berry(dfs, dfnames)
-    exit()
 
     dfnames = get_dataset_names(cutoff=50)
     dfs, _ = load_all(dfnames)

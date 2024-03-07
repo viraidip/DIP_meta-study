@@ -336,24 +336,25 @@ def diff_start_end_lengths(dfs: list, dfnames: list, folder: str="general_analys
     
         :return: None  
     '''
-    fig, axs = plt.subplots(1, 1, figsize=(4, 7), tight_layout=True)
+    fig, axs = plt.subplots(1, 1, figsize=(10, 4), tight_layout=True)
     thresh = 300
     plot_list, labels = calc_start_end_lengths(dfs, dfnames, thresh)
-    plot_list.reverse()
-    labels.reverse()
 
     position_list = np.arange(0, len(dfs))
-    violin_parts = axs.violinplot(plot_list, position_list, showextrema=False, points=1000, showmeans=True, vert=False)
+    violin_parts = axs.violinplot(plot_list, position_list, showextrema=False, points=1000, showmeans=True, vert=True)
     for pc in violin_parts["bodies"]:
         pc.set_edgecolor("black")
 
     for i, d in enumerate(plot_list):
         y_p = np.random.uniform(i-0.3, i+0.3, len(d))
-        plt.scatter(d, y_p, c="darkgrey", s=2, zorder=0)
+        plt.scatter(y_p, d, c="darkgrey", s=2, zorder=0)
 
-    axs.set_yticks(position_list)
-    axs.set_yticklabels(labels)
-    axs.set_xlabel("5'-end length - 3'-end length")
+    axs.set_xticks(position_list)
+    labels = [f"{l}   " for l in labels]
+    axs.set_xticklabels(labels, rotation=90)
+    axs.set_xlim(left=-0.5, right=len(dfs)-0.5)
+    axs.set_yticks(range(-300, 301, 150))
+    axs.set_ylabel("5'-end length - 3'-end length              ")
 
     save_path = os.path.join(RESULTSPATH, folder)
     if not os.path.exists(save_path):
@@ -531,11 +532,10 @@ if __name__ == "__main__":
     dfnames = get_dataset_names(cutoff=50)
     dfs, _ = load_all(dfnames)
     
-#    plot_distribution_over_segments(dfs, dfnames)
- #   calculate_deletion_shifts(dfs, dfnames)
-  #  length_distribution_histrogram(dfs, dfnames)
+    plot_distribution_over_segments(dfs, dfnames)
+    calculate_deletion_shifts(dfs, dfnames)
+    length_distribution_histrogram(dfs, dfnames)
     length_distribution_violinplot(dfs, dfnames)
-    exit()
     plot_nucleotide_ratio_around_deletion_junction_heatmaps(dfs, dfnames)
     plot_direct_repeat_ratio_heatmaps(dfs, dfnames)
     start_vs_end_lengths(dfs, dfnames, limit=600)
