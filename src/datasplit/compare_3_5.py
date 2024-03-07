@@ -4,7 +4,6 @@
 '''
 import os
 import sys
-import random
 
 import numpy as np
 import scipy.stats as stats
@@ -31,28 +30,36 @@ def compare_iav_ibv(dfs1: list, dfnames1: list, dfs2: list, dfnames2: list, cate
     data2, _ = calc_start_end_lengths(dfs2, dfnames2)
     list1 = [item for sublist in data1 for item in sublist]
     list2 = [item for sublist in data2 for item in sublist]
+    plot_list = [list1, list2]
     
     _, pvalue = stats.f_oneway(*data1)
-    lab1 = f"IAV (pval. = {pvalue:.2e})"
+    lab1 = f"IAV (p-value = {pvalue:.2e})"
     _, pvalue = stats.f_oneway(*data2)
     lab2 = f"IBV (p-value = {pvalue:.2e})"
 
-    fig, axs = plt.subplots(1, 1, figsize=(2, 5), tight_layout=True)
+    fig, axs = plt.subplots(1, 1, figsize=(10, 3), tight_layout=True)
     position_list = np.arange(0, 2)
-    axs.violinplot([list1, list2], position_list, points=1000, showmedians=True)
-    axs.set_xticks(position_list)
-    axs.set_xticklabels([lab1, lab2], rotation=90)
-    axs.set_ylim(top=430)
-    axs.set_ylabel("5'-end length - 3'-end length")
+    violin_parts = axs.violinplot(plot_list, position_list, showextrema=False, points=1000, showmeans=True, vert=False)
+    for pc in violin_parts["bodies"]:
+        pc.set_edgecolor("black")
+
+    for i, d in enumerate(plot_list):
+        y_p = np.random.uniform(i-0.3, i+0.3, len(d))
+        plt.scatter(d, y_p, c="darkgrey", s=2, zorder=0)
+
+    axs.set_yticks(position_list)
+    axs.set_yticklabels([lab1, lab2])
+    axs.set_xlabel("5'-end length - 3'-end length")
+    axs.set_xlim(right=340)
     
-    def add_significance(l1, axs, start, end, height):
+    def add_significance(l1, axs):
         _, pvalue = stats.f_oneway(*l1)
         symbol = get_p_value_symbol(pvalue)
         if symbol != "":
-            axs.plot([start, end], [height, height], lw=2, color='black')
-            axs.text((start + end) / 2, height, f"{pvalue:.2e}", ha='center', va='bottom', color='black', fontsize=8)
+            axs.plot([300, 300], [0, 1], lw=2, color='black')
+            axs.text(310, 0.5, f"{pvalue:.2e}", ha='center', va='center', color='black', fontsize=8, rotation=270)
 
-    add_significance([list1, list2], axs, 0, 1, 310)
+    add_significance(plot_list, axs)
 
     save_path = os.path.join(RESULTSPATH, "datasplits")
     if not os.path.exists(save_path):
@@ -72,25 +79,41 @@ def compare_berry(dfs: list, dfnames: list)-> None:
         :return: None
     '''
     data, labels = calc_start_end_lengths(dfs, dfnames)
-    fig, axs = plt.subplots(1, 1, figsize=(2, 5), tight_layout=True)
+
+    '''
+    fig, axs = plt.subplots(1, 1, figsize=(6, 5), tight_layout=True)
     position_list = np.arange(0, 3)
     axs.violinplot(data, position_list, points=1000, showmedians=True)
     axs.set_xticks(position_list)
     axs.set_xticklabels(labels, rotation=90)
     axs.set_ylim(top=430)
     axs.set_ylabel("5'-end length - 3'-end length")
+    '''
+    fig, axs = plt.subplots(1, 1, figsize=(10, 4), tight_layout=True)
+    position_list = np.arange(0, 3)
+    violin_parts = axs.violinplot(data, position_list, showextrema=False, points=1000, showmeans=True, vert=False)
+    for pc in violin_parts["bodies"]:
+        pc.set_edgecolor("black")
+
+    for i, d in enumerate(data):
+        y_p = np.random.uniform(i-0.3, i+0.3, len(d))
+        plt.scatter(d, y_p, c="darkgrey", s=2, zorder=0)
+
+    axs.set_yticks(position_list)
+    axs.set_yticklabels(labels)
+    axs.set_xlabel("5'-end length - 3'-end length")
+    axs.set_xlim(right=340)
     
-    def add_significance(l1, l2, axs, start, end, height):
+    def add_significance(l1, l2, axs, x, y, thresh):
         _, pvalue = stats.f_oneway(l1, l2)
-        print(pvalue)
         symbol = get_p_value_symbol(pvalue)
         if symbol != "":
-            axs.plot([start, end], [height, height], lw=2, color='black')
-            axs.text((start + end) / 2, height, f"{pvalue:.2e}", ha='center', va='bottom', color='black', fontsize=8)
+            axs.plot([x, x], [y, thresh], lw=2, color='black')
+            axs.text(x+5, (y+thresh)/2, f"{pvalue:.2e}", ha='center', va='center', color='black', fontsize=8, rotation=270)
 
-    add_significance(data[0], data[1], axs, 0, 1, 310)
-    add_significance(data[0], data[2], axs, 0, 2, 350)
-    add_significance(data[1], data[2], axs, 1, 2, 390)
+    add_significance(data[0], data[1], axs, 300, 0, 1)
+    add_significance(data[0], data[2], axs, 315, 0, 2)
+    add_significance(data[1], data[2], axs, 330, 1, 2)
 
     save_path = os.path.join(RESULTSPATH, "datasplits")
     if not os.path.exists(save_path):
@@ -145,7 +168,6 @@ def create_comparision_matrix(dfs: list, dfnames: list):
 if __name__ == "__main__":
     plt.style.use("seaborn")
 
-    ''' this is old
     IAV_dfnames = get_dataset_names(cutoff=0, selection="IAV")
     IAV_dfs, _ = load_all(IAV_dfnames)
     IBV_dfnames = get_dataset_names(cutoff=0, selection="IBV")
@@ -156,7 +178,7 @@ if __name__ == "__main__":
     dfnames = ["Berry2021_A", "Berry2021_B", "Berry2021_B_Yam"]
     dfs, _ = load_all(dfnames)
     compare_berry(dfs, dfnames)
-    '''
+    exit()
 
     dfnames = get_dataset_names(cutoff=50)
     dfs, _ = load_all(dfnames)
