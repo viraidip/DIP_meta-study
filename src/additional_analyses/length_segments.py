@@ -109,7 +109,7 @@ def fit_models_and_plot_data(x: list,
 
     # save final figure
     fname = f"regression_analysis_{k}.png"
-    save_path = os.path.join(RESULTSPATH, "validation_estimation", fname)
+    save_path = os.path.join(RESULTSPATH, "additional_analyses", fname)
     plt.savefig(save_path)
     plt.close()
 
