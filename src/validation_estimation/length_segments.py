@@ -82,11 +82,10 @@ def fit_models_and_plot_data(x: list,
 
     fig, ax = plt.subplots(1, 1, figsize=(5, 5), tight_layout=True)
     
-    ax.scatter(x, y, label="observed", marker=".")
+    ax.scatter(x, y, label="observed", marker="o", color="green", s=40)
     label_scatter(x.copy(), y.copy(), k)
-    ax.errorbar(x, y, yerr=err, fmt=".", capsize=5.0)
     y_expected = x / x.sum()
-    ax.scatter(x, y_expected, label="expected", color="grey", marker=".")
+    ax.scatter(x, y_expected, label="expected", marker="o", color="grey", s=40)
 
     model = LinearRegression().fit(x.reshape((-1, 1)), y)
     y_pred = model.predict(x.reshape((-1, 1)))
@@ -97,16 +96,11 @@ def fit_models_and_plot_data(x: list,
 
     # plotting the results
     score = model.score(x[:-2].reshape((-1, 1)), y[:-2])
-    label = f"f(x) = {coef:.6f}*x {inter:.3f} (R²: {score:.2f})"
-    ax.plot(np.insert(x, 0, inter_p), np.insert(y_pred, 0, 0), label=label, color="green")
+    ax.plot(np.insert(x, 0, inter_p), np.insert(y_pred, 0, 0), color="green")
     ax.plot(np.insert(x, 0, 0), np.insert(y_expected, 0, 0), color="grey")
 
-    # mark x axis intersection
-    ax.plot(inter_p, 0, 'ro')
-    ax.annotate(f"{inter_p:.2f}", (inter_p, 0), ha="right")
-
     # set labels and title
-    ax.legend(loc="upper left", fontsize=12)
+    ax.legend(loc="upper left", fontsize=14)
     ax.set_title(k, fontsize=20)
     ax.set_xlim(left=0, right=2600)
     ax.set_ylim(bottom=0, top=0.4)
