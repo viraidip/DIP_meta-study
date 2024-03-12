@@ -1,20 +1,14 @@
 '''
-    Does a linear and exponential regression for data from Schwartz 2016 and 
-    Alnaji 2019. Data is normalized by sum of y values for all data sets.
-    Expected value is calculated by dividing length of each segment with sum of
-    the length of all segements.
 
-    Also creates a model for all three IAV strains together.
 '''
 import os
 import sys
 
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
 
 sys.path.insert(0, "..")
-from utils import RESULTSPATH, SEGMENTS, DATASET_STRAIN_DICT
+from utils import RESULTSPATH, SEGMENTS
 from utils import load_all, get_sequence, count_direct_repeats_overall
 
 
@@ -72,7 +66,6 @@ if __name__ == "__main__":
 
     dfname = "Alnaji2021"
     dfs, expected_dfs = load_all([dfname], expected=True)
-    df = dfs[0]
-    expected_df = expected_dfs[0]
+    create_direct_repeats_plt(dfs[0], dfname, expected_dfs[0])
 
-    create_direct_repeats_plt(df, dfname, expected_df)
+

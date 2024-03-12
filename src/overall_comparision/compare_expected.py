@@ -14,6 +14,7 @@ sys.path.insert(0, "..")
 from utils import load_all
 from utils import get_sequence, count_direct_repeats_overall, get_p_value_symbol, create_nucleotide_ratio_matrix, plot_heatmap, get_dataset_names
 from utils import SEGMENTS, RESULTSPATH, NUCLEOTIDES
+from overall_comparision.general_analyses import deletion_site_motifs
 
 
 def plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs: list, dfnames: list, expected_dfs: list, compared: str, folder: str="compare_expected")-> None:
@@ -94,7 +95,7 @@ def plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs: list, dfnames:
         if i < 2:
             axs[i].xaxis.set_ticks_position("top")
             axs[i].xaxis.set_label_position("top")
-        axs[i].set_xticklabels(indexes + indexes)
+        axs[i].set_xticklabels(indexes + indexes, rotation=0)
         xlabels = axs[i].get_xticklabels()
         for x_idx, xlabel in enumerate(xlabels):
             if x_idx < quarter or x_idx >= quarter * 3:
@@ -103,7 +104,7 @@ def plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs: list, dfnames:
             else:
                 xlabel.set_color("grey")   
 
-    fig.suptitle(f"nuc. occ. difference ({compared})")
+    fig.suptitle(f"difference of the nucleotide occurrence ({compared})")
     fig.subplots_adjust(top=0.9)
     fig.tight_layout()
     save_path = os.path.join(RESULTSPATH, folder)
@@ -127,7 +128,7 @@ def plot_expected_vs_observed_direct_repeat_heatmaps(dfs: list, dfnames: list, e
     
         :return: None
     '''
-    fig, axs = plt.subplots(figsize=(10, len(dfs) * 2/5))
+    fig, axs = plt.subplots(figsize=(10, 7))
     x = list()
     y = list()
     vals = list()
@@ -193,3 +194,4 @@ if __name__ == "__main__":
 
     plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs, dfnames, expected_dfs, "observed-expected")
     plot_expected_vs_observed_direct_repeat_heatmaps(dfs, dfnames, expected_dfs, "observed-expected")
+    deletion_site_motifs(expected_dfs, dfnames, m_len=2, folder="compare_expected")

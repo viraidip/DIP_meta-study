@@ -95,7 +95,6 @@ def calculate_deletion_shifts(dfs: list, dfnames: list, folder: str="general_ana
         df["length"] = df["deleted_sequence"].apply(len)
         df["shift"] = df["length"] % 3
         shifts = df["shift"].value_counts()
-        print(shifts)
         n = df.shape[0]
         for idx in [2, 0, 1]:
             y[idx].append(shifts.loc[idx] / n * 100)
@@ -548,6 +547,7 @@ def deletion_site_motifs(dfs: list, dfnames: list, m_len: int, folder: str="gene
         print(results_df, file=f)
         print(Counter(results["start"]), file=f)
         print(Counter(results["end"]), file=f)
+    results_df.to_csv(os.path.join(save_path, "deletion_site_motif.csv"))
 
 
 if __name__ == "__main__":
@@ -556,12 +556,10 @@ if __name__ == "__main__":
     dfnames = get_dataset_names(cutoff=50)
     dfs, _ = load_all(dfnames)
     
-  #  plot_distribution_over_segments(dfs, dfnames)
-   # calculate_deletion_shifts(dfs, dfnames)
-    #length_distribution_histrogram(dfs, dfnames)
-    
+    plot_distribution_over_segments(dfs, dfnames)
+    calculate_deletion_shifts(dfs, dfnames)
+    length_distribution_histrogram(dfs, dfnames)
     length_distribution_violinplot(dfs, dfnames)
-    exit()
     plot_nucleotide_ratio_around_deletion_junction_heatmaps(dfs, dfnames)
     plot_direct_repeat_ratio_heatmaps(dfs, dfnames)
     start_vs_end_lengths(dfs, dfnames, limit=600)
