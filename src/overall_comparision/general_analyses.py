@@ -90,15 +90,14 @@ def calculate_deletion_shifts(dfs: list, dfnames: list, folder: str="general_ana
 
     symbols = list()
     x = np.arange(0, len(dfs))
-    y = dict({n: list() for n in [0, 1, 2]})
+    y = dict({n: list() for n in [2, 0, 1]})
     for df in dfs:
         df["length"] = df["deleted_sequence"].apply(len)
         df["shift"] = df["length"] % 3
         shifts = df["shift"].value_counts()
+        print(shifts)
         n = df.shape[0]
-        for idx in [0, 1, 2]:
-            if idx not in shifts.index:
-                shifts.loc[idx] = 0    
+        for idx in [2, 0, 1]:
             y[idx].append(shifts.loc[idx] / n * 100)
 
         f_obs = shifts / sum(shifts) * 100
@@ -109,12 +108,12 @@ def calculate_deletion_shifts(dfs: list, dfnames: list, folder: str="general_ana
 
     bar_width = 0.7
     bottom = np.zeros(len(dfs))
-    labels = list(["in-frame", "shift +1", "shift -1"])
-    for i, label in enumerate(labels):
-        axs.barh(x, y[i], bar_width, color=colors[i], label=label, left=bottom)
-        for j, text in enumerate(y[i]):
+    labels = dict({"shift -1": 2, "in-frame": 0, "shift +1": 1})
+    for i, (label, idx) in enumerate(labels.items()):
+        axs.barh(x, y[idx], bar_width, color=colors[i], label=label, left=bottom)
+        for j, text in enumerate(y[idx]):
             axs.text(bottom[j] + text/2, j, str(round(text, 1)), ha="center", va="center", fontsize=9)
-        bottom += y[i]
+        bottom += y[idx]
     
     axs.set_xlim(right=100)
     axs.set_xlabel("fraction of deletion shift [%]")
@@ -153,7 +152,32 @@ def calc_DI_lengths(dfs: list, dfnames: list)-> dict:
                 count_dict[r["Segment"]][DVG_Length] = 1
 
         overall_count_dict[dfname] = count_dict
-    
+
+    calc_means = False
+    if calc_means:
+        human = list()
+        other = list()
+        for k, v in overall_count_dict.items():
+            print(k)
+            n = 0
+            leng = 0
+            for element in v.values():
+                for key, value in element.items():
+                    n += value
+                    leng += key * value
+            m = leng / n
+            print(f"\t{m}")
+
+            if k in ["Berry2021_A", "Berry2021_B", "Valesano2020_Vic", "826.9078947368421", "Berry2021_B_Yam", "Southgate2019", "Valesano2020_Yam"]:
+                human.append(m)
+            else:
+                other.append(m)
+        
+        print("")
+        print(f"human:\t{np.mean(human)}")
+        print(f"other:\t{np.mean(other)}")
+        print(np.mean(human) - np.mean(other))
+
     return overall_count_dict
     
 
@@ -226,7 +250,7 @@ def length_distribution_violinplot(dfs: list, dfnames: list, folder: str="genera
                 position_list.append(i+1)            
             labels.append(f"{dfname} (n={n_counts})")
         
-        axs.violinplot(plot_list, position_list, points=1000, showextrema=False, showmedians=True)
+        axs.violinplot(plot_list, position_list, points=1000, showextrema=False, showmeans=True)
         axs.set_xticks(range(1, len(dfnames)+1))
         axs.set_xticklabels(labels, rotation=90)
         axs.set_ylim(bottom=0, top=2500)
@@ -532,10 +556,12 @@ if __name__ == "__main__":
     dfnames = get_dataset_names(cutoff=50)
     dfs, _ = load_all(dfnames)
     
-    plot_distribution_over_segments(dfs, dfnames)
-    calculate_deletion_shifts(dfs, dfnames)
-    length_distribution_histrogram(dfs, dfnames)
+  #  plot_distribution_over_segments(dfs, dfnames)
+   # calculate_deletion_shifts(dfs, dfnames)
+    #length_distribution_histrogram(dfs, dfnames)
+    
     length_distribution_violinplot(dfs, dfnames)
+    exit()
     plot_nucleotide_ratio_around_deletion_junction_heatmaps(dfs, dfnames)
     plot_direct_repeat_ratio_heatmaps(dfs, dfnames)
     start_vs_end_lengths(dfs, dfnames, limit=600)

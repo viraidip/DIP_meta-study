@@ -168,7 +168,7 @@ def plot_expected_vs_observed_direct_repeat_heatmaps(dfs: list, dfnames: list, e
 
     m = abs(min(vals)) if abs(min(vals)) > max(vals) else max(vals)
     axs = plot_heatmap(x,y,vals, axs, vmin=-m, vmax=m, cbar=True, format=".1f")
-    axs.set_title(f"direct repeat perceentage difference ({compared})")
+    axs.set_title(f"difference in direct repeat distribution ({compared})")
     axs.set_ylabel("")
     axs.set_xlabel("direct repeat length")
     for v_idx, val_label in enumerate(axs.texts):
