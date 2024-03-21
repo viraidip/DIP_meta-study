@@ -58,7 +58,7 @@ def plot_distribution_over_segments(dfs: list, dfnames: list, folder: str="gener
                 axs.text(bottom[j] + text/2, j, str(round(text, 1)), ha="center", va="center", fontsize=9)
         bottom += y[s]
     
-    axs.set_xlabel("fraction of DelVGs per segment [%]")
+    axs.set_xlabel("Fraction of DelVGs per segment [%]")
     plt.yticks(range(len(dfnames)), [f"{dfname} (n={len(df)}) {get_p_value_symbol(p)}  " for dfname, df, p in zip(dfnames, dfs, pvalues)])
     axs.legend(loc="upper center", bbox_to_anchor=(0.3, 1.15), fancybox=True, shadow=True, ncol=4)
     
@@ -115,7 +115,7 @@ def calculate_deletion_shifts(dfs: list, dfnames: list, folder: str="general_ana
         bottom += y[idx]
     
     axs.set_xlim(right=100)
-    axs.set_xlabel("fraction of deletion shift [%]")
+    axs.set_xlabel("Fraction of deletion shift [%]")
     plt.yticks(range(len(dfnames)), [f"{dfname} (n={len(df)}) {s}  " for dfname, df, s in zip(dfnames, dfs, symbols)])
     axs.legend(loc="upper center", bbox_to_anchor=(0.3, 1.15), fancybox=True, shadow=True, ncol=3)
 

@@ -83,7 +83,7 @@ def plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs: list, dfnames:
         axs[i].set_title(f"{NUCLEOTIDES[nuc]}")
         axs[i].set_ylabel("")
         axs[i].set_yticks([ytick + 0.5 for ytick in range(len(dfnames))])
-        axs[i].set_xlabel("position")  
+        axs[i].set_xlabel("Position")  
         axs[i].set_xticks([xtick - 0.5 for xtick in probability_matrix.index])
         
         quarter = len(probability_matrix.index) // 4
@@ -104,7 +104,7 @@ def plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs: list, dfnames:
             else:
                 xlabel.set_color("grey")   
 
-    fig.suptitle(f"difference of the nucleotide occurrence ({compared})")
+    fig.suptitle(f"Difference of the nucleotide occurrence ({compared})")
     fig.subplots_adjust(top=0.9)
     fig.tight_layout()
     save_path = os.path.join(RESULTSPATH, folder)
@@ -169,9 +169,9 @@ def plot_expected_vs_observed_direct_repeat_heatmaps(dfs: list, dfnames: list, e
 
     m = abs(min(vals)) if abs(min(vals)) > max(vals) else max(vals)
     axs = plot_heatmap(x,y,vals, axs, vmin=-m, vmax=m, cbar=True, format=".1f")
-    axs.set_title(f"difference in direct repeat distribution ({compared})")
+    axs.set_title(f"Difference in direct repeat distribution ({compared})")
     axs.set_ylabel("")
-    axs.set_xlabel("direct repeat length")
+    axs.set_xlabel("Direct repeat length")
     for v_idx, val_label in enumerate(axs.texts):
         val_label.set_text(f"{val_label.get_text()}")
     x_ticks = axs.get_xticklabels()

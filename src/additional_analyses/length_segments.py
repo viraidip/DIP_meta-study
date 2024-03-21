@@ -104,8 +104,8 @@ def fit_models_and_plot_data(x: list,
     ax.set_title(k, fontsize=20)
     ax.set_xlim(left=0, right=2600)
     ax.set_ylim(bottom=0, top=0.4)
-    ax.set_xlabel("sequence length (nts.)", fontsize=14)
-    ax.set_ylabel("relative DelVG occurrence", fontsize=14)
+    ax.set_xlabel("Sequence length (nts.)", fontsize=14)
+    ax.set_ylabel("Relative DelVG occurrence", fontsize=14)
 
     # save final figure
     fname = f"regression_analysis_{k}.png"

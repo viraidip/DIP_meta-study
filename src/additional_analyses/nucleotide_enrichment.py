@@ -50,8 +50,8 @@ def nucleotide_enrichment_overview(dfs):
         axs.text(0, pos+new_pos/2, n, color=colors[i], fontweight="bold", fontsize=20, ha="center", va="center")
         pos += new_pos
 
-    axs.set_xlabel("nucleotide position")
-    axs.set_ylabel("relative occurrence")
+    axs.set_xlabel("Nucleotide position")
+    axs.set_ylabel("Relative occurrence")
           
     #fig.subplots_adjust(top=0.9)
     save_path = os.path.join(RESULTSPATH, "additional_analyses")

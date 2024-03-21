@@ -75,7 +75,7 @@ def compare_DI_lengths(a_dfs: list, a_dfnames: list, a_label: str, b_dfs: list, 
 
         plt.ylim(0, 0.005)
         plt.xlabel(f"DelVG sequence length for {s} (nts.)")
-        plt.ylabel("probability density")
+        plt.ylabel("Probability density")
         plt.legend(loc="upper center", ncol=3)
 
         save_path = os.path.join(RESULTSPATH, "datasplits")
