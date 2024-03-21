@@ -839,8 +839,14 @@ def load_all(dfnames: list, expected: str=False)-> Tuple[list, list]:
         df = join_data(load_dataset(dfname))
         dfs.append(preprocess(strain, df, CUTOFF))
         if expected:
-            expected_dfs.append(preprocess(strain, generate_expected_data(strain, df), 1))
-    
+            f = os.path.join(DATAPATH, "random_sampled", f"{dfname}_{CUTOFF}.csv")
+            if os.path.exists(f):
+                exp_df = pd.read_csv(f)
+            else:
+                df = df[df["NGS_read_count"] >= CUTOFF].copy()
+                exp_df = preprocess(strain, generate_expected_data(strain, df), 1)
+                exp_df.to_csv(f)
+            expected_dfs.append(exp_df)
     return dfs, expected_dfs
 
 def sort_datasets_by_type(dfs: list, dfnames: list, cutoff: int)-> Tuple[list, list]:
