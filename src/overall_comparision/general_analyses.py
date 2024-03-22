@@ -265,7 +265,7 @@ def length_distribution_violinplot(dfs: list, dfnames: list, folder: str="genera
 def start_vs_end_lengths(dfs: list, dfnames: list, limit: int=0, folder: str="general_analysis")-> None:
     '''
         plots the length of the start against the length of the end of the
-        DelVG RNA sequences as a scatter plot (5' = start, 3' = end).
+        DelVG RNA sequences as a scatter plot (3' = start, 5' = end).
         :param dfs: The list of DataFrames containing the data, preprocessed
             with sequence_df(df)
         :param dfnames: The names associated with each DataFrame in `dfs`
@@ -322,8 +322,8 @@ def start_vs_end_lengths(dfs: list, dfnames: list, limit: int=0, folder: str="ge
 
 def calc_start_end_lengths(dfs: list, dfnames: list, thresh: int=300)-> Tuple[list, list]:
     '''
-        calcualtes the difference of the start and end lengths of the DelVG RNA
-        sequences (5' = start, 3' = end).
+        calculates the difference of the start and end lengths of the DelVG RNA
+        sequences (3' = start, 5' = end).
         :param dfs: The list of DataFrames containing the data, preprocessed
             with sequence_df(df)
         :param dfnames: The names associated with each DataFrame in `dfs`
@@ -351,7 +351,7 @@ def calc_start_end_lengths(dfs: list, dfnames: list, thresh: int=300)-> Tuple[li
 def diff_start_end_lengths(dfs: list, dfnames: list, folder: str="general_analysis")-> None:
     '''
         plots the difference of the start and end lengths of the DelVG RNA
-        sequences as a violinplot (5' = start, 3' = end).
+        sequences as a violinplot (3' = start, 5' = end).
         :param dfs: The list of DataFrames containing the data, preprocessed
             with sequence_df(df)
         :param dfnames: The names associated with each DataFrame in `dfs`
@@ -377,7 +377,7 @@ def diff_start_end_lengths(dfs: list, dfnames: list, folder: str="general_analys
     axs.set_xticklabels(labels, rotation=90)
     axs.set_xlim(left=-0.5, right=len(dfs)-0.5)
     axs.set_yticks(range(-300, 301, 150))
-    axs.set_ylabel("5'-end length - 3'-end length              ")
+    axs.set_ylabel("3'-end length - 5'-end length              ")
 
     save_path = os.path.join(RESULTSPATH, folder)
     if not os.path.exists(save_path):

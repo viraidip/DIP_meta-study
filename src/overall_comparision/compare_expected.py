@@ -83,7 +83,7 @@ def plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs: list, dfnames:
         axs[i].set_title(f"{NUCLEOTIDES[nuc]}")
         axs[i].set_ylabel("")
         axs[i].set_yticks([ytick + 0.5 for ytick in range(len(dfnames))])
-        axs[i].set_xlabel("Position")  
+        axs[i].set_xlabel("")  
         axs[i].set_xticks([xtick - 0.5 for xtick in probability_matrix.index])
         
         quarter = len(probability_matrix.index) // 4
@@ -104,7 +104,8 @@ def plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs: list, dfnames:
             else:
                 xlabel.set_color("grey")   
 
-    fig.suptitle(f"Difference of the nucleotide occurrence ({compared})")
+  #  fig.suptitle(f"Difference of the nucleotide occurrence ({compared})")
+    fig.suptitle("Enriched (red) and depleted (blue) nucleotides")
     fig.subplots_adjust(top=0.9)
     fig.tight_layout()
     save_path = os.path.join(RESULTSPATH, folder)

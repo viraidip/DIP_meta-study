@@ -76,28 +76,6 @@ def load_mendes2021_rsc()-> dict:
     return join_data(data)
 
 
-def load_lui2019_rsc(name: str)-> dict:
-    '''
-        Loads the data set of Lui et al. 2019.
-        :param name: indicates which dataset to load
-
-        :return: dictionary with strain name as key and data frame as value
-    '''
-    if name == "SMRT":
-        filename = ""
-    elif name == "illumina":
-        filename = "Lui2019_illumina.csv"
-    
-    file_path = os.path.join(DATAPATH, "RSC_estimation", filename)
-    data = pd.read_csv(file_path,
-                            header=0,
-                            na_values=["", "None"],
-                            keep_default_na=False)
-    
-    data = join_data(data)
-    return data
-
-
 def compare_datasets(d1: pd.DataFrame, d2: pd.DataFrame, thresh: int=1)-> Tuple[float, int, int]:
     '''
         Calculate the intersection of two given datasets.
@@ -125,12 +103,13 @@ def loop_threshs(d1: pd.DataFrame, d2: pd.DataFrame, name: str)-> int:
         :param d2: dataset 2
         :param name: name of the experiment
     '''
-    threshs = np.arange(50)
+    threshs = np.arange(51)
     fracs = list()
     ns_new = list()
     ns_orig = list()
     above_thresh = False
     rsc = np.nan
+    text_y = 100
     for t in threshs:
         n_inter, n_new, n_orig = compare_datasets(d1, d2, t)
         frac = 2 * n_inter / (n_new + n_orig)
@@ -141,15 +120,18 @@ def loop_threshs(d1: pd.DataFrame, d2: pd.DataFrame, name: str)-> int:
         if frac > 0.75 and not above_thresh:
             rsc = t
             above_thresh = True
+            text_y = n_new
 
     # plot fraction of intersecting DelVGs between the two datasets
+    plt.figure(figsize=(5, 4), tight_layout=True) 
     plt.plot(threshs, fracs)
     if above_thresh:
-        plt.axvline(x=rsc, color='r', linestyle='--')
-        plt.text(rsc, 0.5, f'rsc={rsc}', ha='center')
-    plt.ylim(0, 1.1)
-    plt.ylabel("ratio of common DelVGs")
-    plt.xlabel("cutoff value")
+        plt.axvline(x=rsc, color="grey", linestyle="--")
+        plt.text(rsc+1, 0.7, f"RSC={rsc}", ha="left")
+    plt.ylabel("Ratio of common DelVGs")
+    plt.xlabel("Cutoff value")
+    plt.ylim(top=1, bottom=0)
+    plt.xlim(left=0, right=50)
     save_path = os.path.join(RESULTSPATH, "validation_estimation")
     if not os.path.exists(save_path):
         os.makedirs(save_path)
@@ -157,14 +139,17 @@ def loop_threshs(d1: pd.DataFrame, d2: pd.DataFrame, name: str)-> int:
     plt.close()
 
     # plot number of unique DelVGs for the two datasets
-    plt.plot(threshs, ns_new, label="selfm")
-    plt.plot(threshs, ns_orig, label="orig")
+    plt.figure(figsize=(5, 4), tight_layout=True) 
+    plt.plot(threshs, ns_new, label="recreated")
+    plt.plot(threshs, ns_orig, label="original")
     if above_thresh:
-        plt.axvline(x=rsc, color='r', linestyle='--')
-        plt.text(rsc, n_orig, f'x={rsc}', ha='center')
+        plt.axvline(x=rsc, color="grey", linestyle="--")
+        plt.text(rsc+1, text_y, f"RSC={rsc}", ha="left", va="bottom")
     plt.legend()
-    plt.ylabel("number of unique DelVGs")
-    plt.xlabel("cutoff value")
+    plt.ylabel("Number of unique DelVGs")
+    plt.xlabel("Cutoff value")
+    plt.ylim(bottom=0)
+    plt.xlim(left=0, right=50)
     plt.savefig(os.path.join(save_path, f"{name}_unique_DelVGs.png"))
     plt.close()
 
@@ -228,6 +213,3 @@ if __name__ == "__main__":
     # this shows that no dependences between dataset size and RCS is given
     print(rscs)
     print(np.mean(rscs))
-    plt.plot(ns, rscs)
-    plt.show()
-    plt.close()
