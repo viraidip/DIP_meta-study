@@ -37,7 +37,7 @@ def compare_iav_ibv(dfs1: list, dfnames1: list, dfs2: list, dfnames2: list, cate
     _, pvalue = stats.f_oneway(*data2)
     lab2 = f"IBV (p-value = {pvalue:.2e})"
 
-    fig, axs = plt.subplots(1, 1, figsize=(10, 3), tight_layout=True)
+    fig, axs = plt.subplots(1, 1, figsize=(10, 2), tight_layout=True)
     position_list = np.arange(0, 2)
     violin_parts = axs.violinplot(plot_list, position_list, showextrema=False, points=1000, showmeans=True, vert=False)
     for pc in violin_parts["bodies"]:
@@ -79,17 +79,7 @@ def compare_berry(dfs: list, dfnames: list)-> None:
         :return: None
     '''
     data, labels = calc_start_end_lengths(dfs, dfnames)
-
-    '''
-    fig, axs = plt.subplots(1, 1, figsize=(6, 5), tight_layout=True)
-    position_list = np.arange(0, 3)
-    axs.violinplot(data, position_list, points=1000, showmedians=True)
-    axs.set_xticks(position_list)
-    axs.set_xticklabels(labels, rotation=90)
-    axs.set_ylim(top=430)
-    axs.set_ylabel("5'-end length - 3'-end length")
-    '''
-    fig, axs = plt.subplots(1, 1, figsize=(10, 4), tight_layout=True)
+    fig, axs = plt.subplots(1, 1, figsize=(10, 3), tight_layout=True)
     position_list = np.arange(0, 3)
     violin_parts = axs.violinplot(data, position_list, showextrema=False, points=1000, showmeans=True, vert=False)
     for pc in violin_parts["bodies"]:
