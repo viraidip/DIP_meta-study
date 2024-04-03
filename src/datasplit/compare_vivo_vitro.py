@@ -47,11 +47,14 @@ def compare_DI_lengths(a_dfs: list, a_dfnames: list, a_label: str, b_dfs: list, 
         data2, _ = np.histogram(x_2, bins=bins)
         _, pvalue = stats.f_oneway(data1, data2)
         symbol = get_p_value_symbol(pvalue)
-        if symbol != "":
-            plt.plot([s, e], [h, h], lw=1, color='black')
-            plt.plot([s, s], [h, h+0.0002], lw=1, color='black')
-            plt.plot([e, e], [h, h+0.0002], lw=1, color='black')
-            plt.text((s + e) / 2, h-0.00045, symbol, ha='center', va='bottom', color='black', fontsize=8)
+        plt.plot([s, e], [h, h], lw=1, color='black')
+        plt.plot([s, s], [h, h+0.0002], lw=1, color='black')
+        plt.plot([e, e], [h, h+0.0002], lw=1, color='black')
+        if symbol != "ns.":
+            shift = 0.0001
+        else:
+            shift = 0
+        plt.text((s + e) / 2, h-0.0006-shift, symbol, ha='center', va='bottom', color='black')
         return
 
     cm = plt.get_cmap(CMAP)
@@ -69,11 +72,13 @@ def compare_DI_lengths(a_dfs: list, a_dfnames: list, a_label: str, b_dfs: list, 
         plt.hist(x_b, alpha=0.5, label=b_label, bins=bins, density=True, color=colors[1])
         plt.hist(x_c, alpha=0.5, label=c_label, bins=bins, density=True, color=colors[2])
 
-        calc_anova(x_a, x_b, 550, 1100, 0.0028)
-        calc_anova(x_a, x_c, 550, 1900, 0.0033)
-        calc_anova(x_b, x_c, 1100, 1900, 0.0038)
+        calc_anova(x_a, x_b, 550, 1100, 0.0025)
+        calc_anova(x_a, x_c, 550, 1900, 0.0031)
+        calc_anova(x_b, x_c, 1100, 1900, 0.0037)
 
         plt.ylim(0, 0.005)
+        plt.yticks([0, 0.0025, 0.005])
+        plt.xticks([0, 500, 1000, 1500, 2000, 2500])
         plt.xlabel(f"DelVG sequence length for {s} (nts.)")
         plt.ylabel("Probability density")
         plt.legend(loc="upper center", ncol=3)
@@ -89,11 +94,11 @@ def compare_DI_lengths(a_dfs: list, a_dfnames: list, a_label: str, b_dfs: list, 
 if __name__ == "__main__":
     plt.style.use("seaborn")
 
-    vitro_dfnames = get_dataset_names(cutoff=0, selection="in vitro")
+    vitro_dfnames = get_dataset_names(cutoff=40, selection="in vitro")
     vitro_dfs, _ = load_all(vitro_dfnames)
-    vivo_dfnames = get_dataset_names(cutoff=0, selection="in vivo mouse")
+    vivo_dfnames = get_dataset_names(cutoff=40, selection="in vivo mouse")
     vivo_dfs, _ = load_all(vivo_dfnames)
-    patient_dfnames = get_dataset_names(cutoff=0, selection="in vivo human")
+    patient_dfnames = get_dataset_names(cutoff=40, selection="in vivo human")
     patient_dfs, _ = load_all(patient_dfnames)
 
     compare_DI_lengths(vitro_dfs, vitro_dfnames, "in vitro", vivo_dfs, vivo_dfnames, "in vivo mouse", patient_dfs, patient_dfnames, "in vivo human")

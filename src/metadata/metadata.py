@@ -52,7 +52,6 @@ def analyse_metadata(dfs: list, dfnames: list)-> None:
         results["Reads sum"].append(df["Reads"].sum())
 
     for header in ["system type", "LibraryLayout", "LibrarySelection", "LibrarySource", "strain", "subtype"]:
-            #  in vivo human, in vivo mouse , vitro,                                  
         results[header] = list()
         for df, dfname in zip(dfs, dfnames):
             if header in df.columns:
@@ -67,7 +66,6 @@ def analyse_metadata(dfs: list, dfnames: list)-> None:
     if not os.path.exists(save_path):
         os.makedirs(save_path)
     result_df.to_csv(os.path.join(save_path, "metadata.csv"), float_format="%.2f", index=False)
-
 
 
 def dataset_distributions(dfs: list, dfnames: list)-> None:

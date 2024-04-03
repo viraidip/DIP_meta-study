@@ -229,7 +229,7 @@ def length_distribution_violinplot(dfs: list, dfnames: list, folder: str="genera
     
         :return: None    
     '''
-    dfs, dfnames = sort_datasets_by_type(dfs, dfnames, cutoff=50)
+    dfs, dfnames = sort_datasets_by_type(dfs, dfnames, cutoff=40)
     plt.rc("font", size=16)
     overall_count_dict = calc_DI_lengths(dfs, dfnames)
 
@@ -553,7 +553,7 @@ def deletion_site_motifs(dfs: list, dfnames: list, m_len: int, folder: str="gene
 if __name__ == "__main__":
     plt.style.use("seaborn")
     
-    dfnames = get_dataset_names(cutoff=50)
+    dfnames = get_dataset_names(cutoff=40)
     dfs, _ = load_all(dfnames)
     
     plot_distribution_over_segments(dfs, dfnames)

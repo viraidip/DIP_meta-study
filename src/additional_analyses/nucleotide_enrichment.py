@@ -66,6 +66,6 @@ if __name__ == "__main__":
     plt.style.use("seaborn")
     plt.rc("font", size=12)
 
-    dfnames = get_dataset_names(cutoff=50)
+    dfnames = get_dataset_names(cutoff=40)
     dfs, _ = load_all(dfnames)
     nucleotide_enrichment_overview(dfs)

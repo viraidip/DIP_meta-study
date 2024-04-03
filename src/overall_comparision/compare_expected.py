@@ -190,7 +190,7 @@ def plot_expected_vs_observed_direct_repeat_heatmaps(dfs: list, dfnames: list, e
 if __name__ == "__main__":
     plt.style.use("seaborn")
 
-    dfnames = get_dataset_names(cutoff=50)
+    dfnames = get_dataset_names(cutoff=40)
     dfs, expected_dfs = load_all(dfnames, expected=True)
 
     plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs, dfnames, expected_dfs, "observed-expected")

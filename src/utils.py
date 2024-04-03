@@ -22,14 +22,7 @@ N_SAMPLES = 5000
 RESULTSPATH = os.path.join(RESULTSPATH, f"cutoff_{CUTOFF}")
 SEGMENTS = list(["PB2", "PB1", "PA", "HA", "NP", "NA", "M", "NS"])
 NUCLEOTIDES = dict({"A": "Adenine", "C": "Cytosin", "G": "Guanine", "U": "Uracil"})
-STRAINS = dict({
-    "Cal07": "A/California/07/2009",
-    "NC": "A/New Caledonia/20-JY2/1999",
-    "Perth": "A/Perth/16/2009",
-    "BLEE": "B/Lee/1940",
-    "PR8": "A/Puerto Rico/8/1934",
-    "WSN": "A/WSN/1933"
-})
+
 
 DATASET_STRAIN_DICT = dict({
     # H1N1
@@ -44,11 +37,9 @@ DATASET_STRAIN_DICT = dict({
     "Alnaji2019_NC" : "NC",
     "Mendes2021": "WSN_Mendes_rev",
     "Boussier2020": "WSN",
-    "Rattanaburi2022_H1N1": "H1N1_Thailand",
     # H3N2
     "Alnaji2019_Perth": "Perth",
     "Berry2021_A": "Connecticut",
-    "Rattanaburi2022_H3N2": "H3N2_Thailand",
     # H5N1
     "Penn2022": "Turkey",
     # H7N9
@@ -60,9 +51,7 @@ DATASET_STRAIN_DICT = dict({
     "Sheng2018": "Brisbane",
     "Berry2021_B_Yam": "Yamagata",
     "Southgate2019": "Yamagata",
-    "Valesano2020_Yam": "Yamagata",
-    # n.a.
-    "Greninger_2_2023": "Greninger_cons"
+    "Valesano2020_Yam": "Yamagata"
 })
 
 ACCNUMDICT = dict({
@@ -314,30 +303,6 @@ ACCNUMDICT = dict({
         "SRR3211975": dict({}),
         "SRR3211972": dict({})
     }),
-    "Vasilijevic2017_swine": dict({
-        "SRR3743505": dict({"Outcome": "Death", "Gender": "F"}),
-        "SRR3743506": dict({"Outcome": "Death", "Gender": "F"}),
-        "SRR3743507": dict({"Outcome": "Recovery", "Gender": "F"}),
-        "SRR3743508": dict({"Outcome": "Recovery", "Gender": "F"}),
-        "SRR3743509": dict({"Outcome": "Recovery", "Gender": "F"}),
-        "SRR3743510": dict({"Outcome": "Recovery", "Gender": "M"}),
-        "SRR3743512": dict({"Outcome": "Recovery", "Gender": "M"}),
-        "SRR3743517": dict({"Outcome": "Mulitorgan Failure", "Gender": "M"}),
-        "SRR3743524": dict({"Outcome": "Mulitorgan Failure", "Gender": "F"}),
-        "SRR3743525": dict({"Outcome": "Mulitorgan Failure", "Gender": "F"}),
-        "SRR3743526": dict({"Outcome": "Mulitorgan Failure", "Gender": "M"}),
-        "SRR3743527": dict({"Outcome": "Death", "Gender": "F"}),
-        "SRR3743529": dict({"Outcome": "Recovery", "Gender": "M"}),
-        "SRR3743530": dict({"Outcome": "Recovery", "Gender": "F"}),
-    }),
-    "Vasilijevic2017_Cal09": dict({
-        "SRR3743518": dict({}),
-        "SRR3743519": dict({}),
-        "SRR3743520": dict({}),
-        "SRR3743521": dict({}),
-        "SRR3743522": dict({}),
-        "SRR3743523": dict({})
-    }),
     "Zhuravlev2020": dict({
         "ERR4566024":  dict({"Cell": "A549"}),
         "ERR4566025":  dict({"Cell": "A549"}),
@@ -347,13 +312,6 @@ ACCNUMDICT = dict({
         "ERR4566033":  dict({"Cell": "MRC5"}),
         "ERR4566036":  dict({"Cell": "WI38"}),
         "ERR4566037":  dict({"Cell": "WI38"})
-    }),
-    "Greninger_2_2023": dict({
-        "SRR23634030": dict({"Strain": "B8E6"}),
-        "SRR23634031": dict({"Strain": "B8B1"}),
-        "SRR23634032": dict({"Strain": "B7N6"}),
-        "SRR23634033": dict({"Strain": "B7C5"}),
-        "SRR23634034": dict({"Strain": "B7H4"})
     }),
     "Berry2021_A": dict({
         "SRR15182178":  dict({}),
@@ -396,13 +354,6 @@ ACCNUMDICT = dict({
         "SRR15183341":  dict({}),
         "SRR15183340":  dict({}),
         "SRR15183339":  dict({})
-    }),
-    "Rattanaburi2022_H3N2": dict({
-        "SRR10256717":  dict({}),
-        "SRR10256718":  dict({}),
-        "SRR10256719":  dict({}),
-        "SRR10256720":  dict({}),
-        "SRR10256721":  dict({})
     }),
     "Valesano2020_Vic": dict({
         "SRR10013092":  dict({}),
@@ -514,20 +465,6 @@ ACCNUMDICT = dict({
     "VdHoecke2015": dict({
         "SRR1757953": dict({}),
         "SRR1758027": dict({})
-    }),
-    "Rattanaburi2022_H1N1": dict({
-        "SRR10256704": dict({}),
-        "SRR10256705": dict({}),
-        "SRR10256706": dict({}),
-        "SRR10256707": dict({}),
-        "SRR10256708": dict({}),
-        "SRR10256709": dict({}),
-        "SRR10256710": dict({}),
-        "SRR10256713": dict({}),
-        "SRR10256722": dict({}),
-        "SRR10256723": dict({}),
-        "SRR10256724": dict({}),
-        "SRR10256725": dict({})
     }),
     "Boussier2020": dict({
         "180628A_rec_A-P1p_S218": dict({}),
@@ -771,11 +708,11 @@ def get_dataset_names(cutoff: int=0, selection: str="")-> list:
     if selection == "in vivo mouse":
         select_names = ["Wang2023", "Penn2022", "Lui2019"]
     elif selection == "in vitro":
-        select_names = ["Alnaji2021", "Pelz2021", "Wang2020", "Kupke2020", "Zhuravlev2020", "VdHoecke2015", "Alnaji2019_Cal07" ,"Alnaji2019_NC", "Mendes2021", "Boussier2020", "Rattanaburi2022_H1N1", "Alnaji2019_Perth", "Rattanaburi2022_H3N2", "Alnaji2019_BLEE", "Sheng2018"]
+        select_names = ["Alnaji2021", "Pelz2021", "Wang2020", "Kupke2020", "Zhuravlev2020", "VdHoecke2015", "Alnaji2019_Cal07" ,"Alnaji2019_NC", "Mendes2021", "Boussier2020", "Alnaji2019_Perth", "Alnaji2019_BLEE", "Sheng2018"]
     elif selection == "in vivo human":
         select_names = ["Berry2021_A", "Berry2021_B", "Berry2021_B_Yam", "Southgate2019", "Valesano2020_Yam", "Valesano2020_Vic"]
     elif selection == "IAV":
-        select_names = ["Alnaji2021", "Pelz2021", "Wang2023", "Wang2020", "Kupke2020", "Zhuravlev2020", "VdHoecke2015", "Alnaji2019_Cal07", "Alnaji2019_NC", "Mendes2021", "Boussier2020", "Rattanaburi2022_H1N1", "Alnaji2019_Perth", "Rattanaburi2022_H3N2", "Berry2021_A", "Penn2022", "Lui2019"]
+        select_names = ["Alnaji2021", "Pelz2021", "Wang2023", "Wang2020", "Kupke2020", "Zhuravlev2020", "VdHoecke2015", "Alnaji2019_Cal07", "Alnaji2019_NC", "Mendes2021", "Boussier2020", "Alnaji2019_Perth", "Berry2021_A", "Penn2022", "Lui2019"]
     elif selection == "IBV":
         select_names = ["Alnaji2019_BLEE", "Berry2021_B", "Valesano2020_Vic", "Sheng2018", "Berry2021_B_Yam", "Southgate2019","Valesano2020_Yam"]
     else:

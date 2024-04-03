@@ -53,7 +53,7 @@ def fraction_long_dis(dfs: list, dfnames: list)-> None:
         counts.append(n_long_dis)
         fractions.append(f)
     res_df = pd.DataFrame(dict({"names": dfnames, "long DIs": counts, "fraction DIs": fractions}))
-    save_path = os.path.join(RESULTSPATH, "long_dis")
+    save_path = os.path.join(RESULTSPATH, "long_delvgs")
     if not os.path.exists(save_path):
         os.makedirs(save_path)
     res_df.to_csv(os.path.join(save_path, "fractions.csv"), float_format="%.2f", index=False)
@@ -68,7 +68,7 @@ def lengths_long_dis(dfs: list, dfnames: list)-> None:
         
         :return: None
     '''
-    save_path = os.path.join(RESULTSPATH, "long_dis")
+    save_path = os.path.join(RESULTSPATH, "long_delvgs")
     if not os.path.exists(save_path):
         os.makedirs(save_path)
     
@@ -177,7 +177,7 @@ def start_end_positions(dfs: list, dfnames: list)-> None:
 
 if __name__ == "__main__":
     plt.style.use('seaborn')
-    dfnames = get_dataset_names(cutoff=50)
+    dfnames = get_dataset_names(cutoff=40)
     dfs, _ = load_all(dfnames)
 
     start_end_positions(dfs, dfnames)

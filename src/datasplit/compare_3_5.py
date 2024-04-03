@@ -160,9 +160,9 @@ def create_comparision_matrix(dfs: list, dfnames: list):
 if __name__ == "__main__":
     plt.style.use("seaborn")
 
-    IAV_dfnames = get_dataset_names(cutoff=0, selection="IAV")
+    IAV_dfnames = get_dataset_names(cutoff=40, selection="IAV")
     IAV_dfs, _ = load_all(IAV_dfnames)
-    IBV_dfnames = get_dataset_names(cutoff=0, selection="IBV")
+    IBV_dfnames = get_dataset_names(cutoff=40, selection="IBV")
     IBV_dfs, _ = load_all(IBV_dfnames)
     categories = list(["IAV", "IBA"])
     compare_iav_ibv(IAV_dfs, IAV_dfnames, IBV_dfs, IBV_dfnames, categories)
@@ -171,6 +171,6 @@ if __name__ == "__main__":
     dfs, _ = load_all(dfnames)
     compare_berry(dfs, dfnames)
 
-    dfnames = get_dataset_names(cutoff=50)
+    dfnames = get_dataset_names(cutoff=40)
     dfs, _ = load_all(dfnames)
     create_comparision_matrix(dfs, dfnames)
