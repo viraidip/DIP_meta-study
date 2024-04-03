@@ -10,8 +10,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 sys.path.insert(0, "..")
-from utils import RESULTSPATH, SEGMENTS, DATASET_STRAIN_DICT
-from utils import get_sequence, load_all, create_sampling_space, calculate_direct_repeat, get_dataset_names
+from utils import RESULTSPATH, SEGMENTS, DATASET_STRAIN_DICT, CMAP
+from utils import get_sequence, load_all, create_sampling_space, get_dataset_names
 
 
 def plot_distribution(pos_dict: dict, name: str)-> None:
@@ -57,12 +57,16 @@ def test_sampling_approach(dfs: list, dfnames: list)-> None:
         :return: None
     '''
     plt.rc("font", size=12)
+    cm = plt.get_cmap(CMAP)
+    colors = [cm(1.*i/len(SEGMENTS)) for i in range(len(SEGMENTS))]
+    max_thresh = 0
     for df, dfname in zip(dfs, dfnames):
         print(dfname)
         fig, axs = plt.subplots(1, 1, figsize=(5, 5), tight_layout=True)
         starts_dict = dict()
         ends_dict = dict()
-        for seg in SEGMENTS:
+        for i, seg in enumerate(SEGMENTS):
+            print(seg)
             v_s = df.loc[(df["Segment"] == seg)]
             if len(v_s.index) <= 1:
                 starts_dict[s] = list()
@@ -75,39 +79,39 @@ def test_sampling_approach(dfs: list, dfnames: list)-> None:
             s = (max(start-200, 50), start+200)
             e = (end-200, min(end+200, len(seq)-50))
 
-            means = list()
-            batch_size = 100
+            batch_size = 1000
             thresh = -1
             thresh_m = 0
             sampl_data = create_sampling_space(seq, s, e)
-
-            rounds = np.arange(batch_size, 70*batch_size+1, batch_size)
-            counters = list()
+            rounds = np.arange(batch_size, 50*batch_size+1, batch_size)
+            A_dists = list()
             for n in rounds:
                 sampling_data = sampl_data.sample(n)
-
+                As = 0
                 for _, r in sampling_data.iterrows():
-                    counter, _ = calculate_direct_repeat(seq, r["Start"], r["End"], 5)
-                    counters.append(counter)
+                    nuc = seq[r["Start"]]
+                    if nuc == "A":
+                        As += 1
+                
+                A_dists.append(As / n)
 
-                means.append(np.mean(counters))
-
-                if len(means) > 1:
-                    # difference is 0.1 % np.mean(means)
-                    if abs(means[-1] - means[-2]) < np.mean(means) * 0.001 and thresh == -1:
+                if len(A_dists) >= 5:
+                    if np.std(A_dists[-5:]) < 0.002 and thresh == -1:
                         thresh = n
-                        thresh_m = means[-1]
-
+                        thresh_m = A_dists[-1]
+                        if max_thresh < thresh:
+                            max_thresh = thresh
+                
             starts_dict[s] = sampling_data["Start"].to_list()
             ends_dict[s] = sampling_data["End"].to_list()
 
-            axs.scatter(rounds, means, label=seg)
+            axs.scatter(rounds, A_dists, label=seg, color=colors[i])
             axs.scatter(thresh, thresh_m, c="black", marker="x")
 
         axs.set_xlabel("number of samples")
-        axs.set_ylabel("mean of direct repeat lengths")
+        axs.set_ylabel("occurrence of adenine at position 5")
         axs.set_title(f"{dfname}")
-        axs.legend()
+        axs.legend(loc="upper center", bbox_to_anchor=(0.5, 1.25), fancybox=True, shadow=True, ncol=4)
         
         save_path = os.path.join(RESULTSPATH, "validation_estimation")
         if not os.path.exists(save_path):
@@ -119,12 +123,14 @@ def test_sampling_approach(dfs: list, dfnames: list)-> None:
         plot_distribution(starts_dict, f"{dfname}_start")
         plot_distribution(ends_dict, f"{dfname}_end")
 
+    print(max_thresh)
+
 
 if __name__ == "__main__":
     plt.style.use("seaborn")
     RESULTSPATH = os.path.dirname(RESULTSPATH)
 
-    dfnames = get_dataset_names(cutoff=50)
+    dfnames = get_dataset_names(cutoff=40)
     dfs, _ = load_all(dfnames)
 
     test_sampling_approach(dfs, dfnames)
