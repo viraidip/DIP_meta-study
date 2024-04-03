@@ -18,7 +18,7 @@ RESULTSPATH = "/home/jens/DIPs/DIP_meta/results"
 # segments, nuclotides, and strains
 CMAP = "Accent"
 CUTOFF = 15
-N_SAMPLES = 5000
+N_SAMPLES = 35000
 RESULTSPATH = os.path.join(RESULTSPATH, f"cutoff_{CUTOFF}")
 SEGMENTS = list(["PB2", "PB1", "PA", "HA", "NP", "NA", "M", "NS"])
 NUCLEOTIDES = dict({"A": "Adenine", "C": "Cytosin", "G": "Guanine", "U": "Uracil"})
@@ -778,11 +778,14 @@ def load_all(dfnames: list, expected: str=False)-> Tuple[list, list]:
         if expected:
             f = os.path.join(DATAPATH, "random_sampled", f"{dfname}_{CUTOFF}.csv")
             if os.path.exists(f):
-                exp_df = pd.read_csv(f)
+                dtypes = {"Start": int, "End": int, "Segment": str, "NGS_read_count": int,
+                          "key": str, "Strain": str, "isize": int, "full_seq": str,
+                          "deleted_sequence": str, "seq_around_deletion_junction": str}
+                exp_df = pd.read_csv(f, dtype=dtypes)
             else:
                 df = df[df["NGS_read_count"] >= CUTOFF].copy()
                 exp_df = preprocess(strain, generate_expected_data(strain, df), 1)
-                exp_df.to_csv(f)
+                exp_df.to_csv(f, index=False)
             expected_dfs.append(exp_df)
     return dfs, expected_dfs
 
@@ -1026,18 +1029,20 @@ def generate_expected_data(strain: str, df: pd.DataFrame)-> pd.DataFrame:
         :return: artifical dataset that includes random deletion sites
     '''
     for seg in SEGMENTS:
-        df = df.loc[df["Segment"] == seg]
-        if len(df) == 0:
+        df_s = df.loc[df["Segment"] == seg]
+        if len(df_s) == 0:
             continue
         seq = get_sequence(strain, seg)
-        start = int(df["Start"].mean())
-        end = int(df["End"].mean())
+        start = int(df_s["Start"].mean())
+        end = int(df_s["End"].mean())
         s = (max(start-200, 50), start+200)
         e = (end-200, min(end+200, len(seq)-50))
-        assert s[1] < e[0], "Sampling: start and end positions are overlapping!"
-        # skip if there is no range given
-        # this would lead to oversampling of a single position
+        
+        # skip if there is no range given this would lead to oversampling of a single position
         if s[0] == s[1] or e[0] == e[1]:
+            continue
+        # positions are overlapping
+        if s[1] > e[0]:
             continue
         if "samp_df" in locals():
             temp_df = generate_sampling_data(seq, s, e, N_SAMPLES)
@@ -1159,25 +1164,28 @@ def sequence_df(df: pd.DataFrame, strain: str, isize: int=5)-> pd.DataFrame:
             - "NGS_read_count": NGS count measured in the experiment
 
     '''
-    res_df = pd.DataFrame(columns=["key", "Segment", "Start", "End", "seq", "deleted_sequence", "isize", "full_seq", "Strain", "seq_around_deletion_junction", "NGS_read_count"])
-    for _, r in df.iterrows():
-        k = r["key"]
-        seq, seq_head, seq_foot = get_dip_sequence(k, strain)
-        start = int(k.split("_")[1].split("_")[0])
-        end = int(k.split("_")[2])
-        seg = k.split("_")[0]
-        full_seq = get_sequence(strain, seg)
-        deleted_seq = get_deleted_sequence(k, strain)
-        seq_before_start = seq_head[-isize:]
-        seq_after_start = deleted_seq[:isize]
-        seq_before_end = deleted_seq[-isize:]
-        seq_after_end = seq_foot[:isize]
-        NGS_read_count = r["NGS_read_count"]
-
-        seq_around_deletion_junction = seq_before_start + seq_after_start + seq_before_end + seq_after_end
-        res_df = pd.concat([res_df, pd.DataFrame({"key":k, "Segment":seg, "Start":start, "End":end, "seq":seq, "isize":isize, "full_seq": full_seq, "Strain": strain,
-                            "deleted_sequence":deleted_seq, "seq_around_deletion_junction": seq_around_deletion_junction, "NGS_read_count": NGS_read_count}, index=[0])], ignore_index=True)
-    return res_df
+    df["Strain"] = strain
+    df["Start"] = df.apply(lambda row: int(row["key"].split("_")[1]), axis=1)
+    df["End"] = df.apply(lambda row: int(row["key"].split("_")[2]), axis=1)
+    df["Segment"] = df.apply(lambda row: row["key"].split("_")[0], axis=1)
+    df["isize"] = isize
+    def wrap_get_sequence(row):
+        return get_sequence(row["Strain"], row["Segment"])
+    df["full_seq"] = df.apply(wrap_get_sequence, axis=1)
+    def wrap_get_deleted_sequence(row):
+        return get_deleted_sequence(row["key"], row["Strain"])
+    df["deleted_sequence"] = df.apply(wrap_get_deleted_sequence, axis=1)
+    def get_seq_around_del(row):
+        seq_head = get_dip_sequence(row["key"], row["Strain"])[1]
+        seq_foot = get_dip_sequence(row["key"], row["Strain"])[2]
+        
+        seq_before_start = seq_head[-row["isize"]:]
+        seq_after_start = row["deleted_sequence"][:row["isize"]]
+        seq_before_end = row["deleted_sequence"][-row["isize"]:]
+        seq_after_end = seq_foot[:row["isize"]]
+        return seq_before_start + seq_after_start + seq_before_end + seq_after_end
+    df["seq_around_deletion_junction"] = df.apply(get_seq_around_del, axis=1)
+    return df
 
 def preprocess(strain: str, df: pd.DataFrame, thresh: int)-> pd.DataFrame:
     '''
