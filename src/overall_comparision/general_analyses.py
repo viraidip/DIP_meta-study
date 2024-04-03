@@ -144,7 +144,7 @@ def calc_DI_lengths(dfs: list, dfnames: list)-> dict:
             count_dict[s] = dict()
 
         for _, r in df.iterrows():
-            DVG_Length = len(r["seq"])-len(r["deleted_sequence"])
+            DVG_Length = len(r["full_seq"])-len(r["deleted_sequence"])
             if DVG_Length in count_dict[r["Segment"]]:
                 count_dict[r["Segment"]][DVG_Length] += 1
             else:
