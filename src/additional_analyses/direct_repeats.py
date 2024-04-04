@@ -46,10 +46,10 @@ def create_direct_repeats_plt(df, dfname, expected_df):
     ax.bar(x=x, height=f_obs, width=-0.4, align="edge", label="observed")
     ax.bar(x=x, height=f_exp, width=0.4, align="edge", label="expected")
 
-    ax.set_title(dfname, fontsize=20)
-    ax.legend(loc="upper right", fontsize=14)
-    ax.set_xlabel("Direct repeat length", fontsize=14)
-    ax.set_ylabel("Occurrence", fontsize=14)
+    ax.set_title(dfname)
+    ax.legend(loc="upper right")
+    ax.set_xlabel("Direct repeat length")
+    ax.set_ylabel("Occurrence")
     ax.set_xticks(x, ["0", "1", "2", "3", "4", ">4"])
 
     # save final figure
