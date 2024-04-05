@@ -247,8 +247,12 @@ def length_distribution_violinplot(dfs: list, dfnames: list, folder: str="genera
                     counts_list.extend([length] * count)
                 plot_list.append(counts_list)
                 position_list.append(i+1)            
-            labels.append(f"{dfname} (n={n_counts})")
+            labels.append(f"{dfname} (n={n_counts})    ")
         
+        for i, d in enumerate(plot_list):
+            y_p = np.random.uniform(i+1-0.3, i+1+0.3, len(d))
+            plt.scatter(y_p, d, c="darkgrey", s=2, zorder=0)
+
         axs.violinplot(plot_list, position_list, points=1000, showextrema=False, showmeans=True)
         axs.set_xticks(range(1, len(dfnames)+1))
         axs.set_xticklabels(labels, rotation=90)
