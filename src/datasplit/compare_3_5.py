@@ -4,14 +4,14 @@
 '''
 import os
 import sys
+import warnings
+import matplotlib
 
 import numpy as np
-import scipy.stats as stats
 import matplotlib.pyplot as plt
-from matplotlib.colors import LogNorm
 
 sys.path.insert(0, "..")
-from utils import load_all, get_p_value_symbol, get_dataset_names
+from utils import load_all, get_dataset_names, calc_cliffs_d
 from utils import RESULTSPATH
 from overall_comparision.general_analyses import calc_start_end_lengths
 
@@ -31,11 +31,6 @@ def compare_iav_ibv(dfs1: list, dfnames1: list, dfs2: list, dfnames2: list, cate
     list1 = [item for sublist in data1 for item in sublist]
     list2 = [item for sublist in data2 for item in sublist]
     plot_list = [list1, list2]
-    
-    _, pvalue = stats.f_oneway(*data1)
-    lab1 = f"IAV (p-value = {pvalue:.2e})"
-    _, pvalue = stats.f_oneway(*data2)
-    lab2 = f"IBV (p-value = {pvalue:.2e})"
 
     fig, axs = plt.subplots(1, 1, figsize=(10, 2), tight_layout=True)
     position_list = np.arange(0, 2)
@@ -48,18 +43,13 @@ def compare_iav_ibv(dfs1: list, dfnames1: list, dfs2: list, dfnames2: list, cate
         plt.scatter(d, y_p, c="darkgrey", s=2, zorder=0)
 
     axs.set_yticks(position_list)
-    axs.set_yticklabels([lab1, lab2])
+    axs.set_yticklabels([f"{' '*20}IAV (n={len(plot_list[0])})", f"{' '*22}IBV (n={len(plot_list[1])})"])
     axs.set_xlabel("5'-end length - 3'-end length")
     axs.set_xlim(right=340)
     
-    def add_significance(l1, axs):
-        _, pvalue = stats.f_oneway(*l1)
-        symbol = get_p_value_symbol(pvalue)
-        if symbol != "":
-            axs.plot([300, 300], [0, 1], lw=2, color='black')
-            axs.text(310, 0.5, f"{pvalue:.2e}", ha='center', va='center', color='black', fontsize=8, rotation=270)
-
-    add_significance(plot_list, axs)
+    cliffs_d = calc_cliffs_d(*plot_list)
+    axs.plot([300, 300], [0, 1], lw=2, color='black')
+    axs.text(305, 0.5, f"{cliffs_d:.2f}", ha='center', va='center', color='black', fontsize=8, rotation=270)
 
     save_path = os.path.join(RESULTSPATH, "datasplits")
     if not os.path.exists(save_path):
@@ -95,11 +85,9 @@ def compare_berry(dfs: list, dfnames: list)-> None:
     axs.set_xlim(right=340)
     
     def add_significance(l1, l2, axs, x, y, thresh):
-        _, pvalue = stats.f_oneway(l1, l2)
-        symbol = get_p_value_symbol(pvalue)
-        if symbol != "":
-            axs.plot([x, x], [y, thresh], lw=2, color='black')
-            axs.text(x+5, (y+thresh)/2, f"{pvalue:.2e}", ha='center', va='center', color='black', fontsize=8, rotation=270)
+        cliffs_d = calc_cliffs_d(l1, l2)
+        axs.plot([x, x], [y, thresh], lw=2, color='black')
+        axs.text(x+5, (y+thresh)/2, f"{cliffs_d:.2f}", ha='center', va='center', color='black', fontsize=8, rotation=270)
 
     add_significance(data[0], data[1], axs, 300, 0, 1)
     add_significance(data[0], data[2], axs, 315, 0, 2)
@@ -122,7 +110,7 @@ def create_comparision_matrix(dfs: list, dfnames: list):
 
         :return: None
     '''
-    plot_list, labels = calc_start_end_lengths(dfs, dfnames)
+    plot_list, _ = calc_start_end_lengths(dfs, dfnames)
 
     plt.figure(figsize=(10, 9))
     plt.rc("font", size=20)
@@ -135,16 +123,14 @@ def create_comparision_matrix(dfs: list, dfnames: list):
             if i == j:
                 matrix[i][j] = np.nan
             else:
-                _, pvalue = stats.f_oneway(d1, d2)
-                matrix[i][j] = max(pvalue, 0.0000000001)
-                text = get_p_value_symbol(pvalue)
-                if text == "ns.":
-                    text = ""
-                color = "black" if pvalue > 0.00001 else "white"
-                plt.annotate(text, xy=(j, i), color=color, ha='center', va='center', fontsize=10, fontweight='bold')
+                cliffs_d = calc_cliffs_d(d1, d2)
+                matrix[i][j] = abs(cliffs_d)
+                color = "black" if abs(cliffs_d) > 0.4 else "white"
+                plt.annotate(f"{cliffs_d:.2f}", xy=(j, i), color=color, ha='center', va='center', fontsize=10, fontweight='bold')
 
-    plt.imshow(matrix, cmap="viridis", interpolation="nearest", norm=LogNorm())
-    plt.colorbar(fraction=0.046, pad=0.04, location="right", label="p-value (logarithmic scale)")
+    warnings.filterwarnings("ignore",category=matplotlib.cbook.mplDeprecation)
+    plt.imshow(matrix, cmap="viridis", interpolation="nearest")
+    plt.colorbar(fraction=0.046, pad=0.04, location="right", label="Cliff's $\it{d}$ (absolute values)")
     plt.xticks(np.arange(len(dfnames)), [f"{n}    " for n in dfnames], rotation=90)
     plt.yticks(np.arange(len(dfnames)), [f"{n}    " for n in dfnames])
     plt.tight_layout()
@@ -153,7 +139,7 @@ def create_comparision_matrix(dfs: list, dfnames: list):
     save_path = os.path.join(RESULTSPATH, "datasplits")
     if not os.path.exists(save_path):
         os.makedirs(save_path)
-    plt.savefig(os.path.join(save_path, "pvalue_matrix.png"))
+    plt.savefig(os.path.join(save_path, "cliffs_d_comparision_matrix.png"))
     plt.close()
 
 

@@ -6,6 +6,7 @@ import os
 import numpy as np
 import pandas as pd
 import seaborn as sns
+import scipy.stats as stats
 
 from typing import Tuple
 from Bio import SeqIO
@@ -903,6 +904,20 @@ def get_p_value_symbol(p: float)-> str:
     else:
         return "ns."
 
+def calc_cliffs_d(d1: list, d2: list)-> float:
+    '''
+        Cliff, Norman (1993). Dominance statistics: Ordinal analyses to answer
+        ordinal questions (eq. 3)
+        Cliffs d ranges from -1 (max effect of group 2) to 0 (no effect) to
+        1 (max effect of group 1) Meissel K. and Yao E. (2024)
+        :param d1: dataset 1
+        :param d2: dataset 2
+
+        :return: cliff's d
+    '''
+    U, _ = stats.mannwhitneyu(d1, d2)
+    cliffs_d = 2*U / (len(d1)*len(d2)) - 1
+    return cliffs_d
 
 ######################
 ### DIRECT REPEATS ###
