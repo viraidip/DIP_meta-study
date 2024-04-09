@@ -56,7 +56,9 @@ def fraction_long_dis(dfs: list, dfnames: list)-> None:
     save_path = os.path.join(RESULTSPATH, "long_delvgs")
     if not os.path.exists(save_path):
         os.makedirs(save_path)
-    res_df.to_csv(os.path.join(save_path, "fractions.csv"), float_format="%.2f", index=False)
+
+    res_df = res_df.sort_values(by='fraction DIs', ascending=False)
+    res_df.to_csv(os.path.join(save_path, "fractions.csv"), float_format="%.1f", index=False)
 
 
 def lengths_long_dis(dfs: list, dfnames: list)-> None:
