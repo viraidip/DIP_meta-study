@@ -1,10 +1,7 @@
 '''
-    Does a linear and exponential regression for data from Schwartz 2016 and 
-    Alnaji 2019. Data is normalized by sum of y values for all data sets.
-    Expected value is calculated by dividing length of each segment with sum of
-    the length of all segements.
-
-    Also creates a model for all three IAV strains together.
+    Gives two examples for how the expected values for the segment distribution
+    was calcualted. The length of each segment was divided by the length of the
+    full genome.
 '''
 import os
 import sys
