@@ -71,7 +71,7 @@ def plot_distribution_over_segments(dfs: list, dfnames: list, folder: str="gener
 
     frac_df = pd.DataFrame(y)
     frac_df["name"] = dfnames
-    frac_df.to_csv(os.path.join(save_path, "fraction_segments.csv"))
+    frac_df.to_csv(os.path.join(save_path, "fraction_segments.csv"), index=False)
 
 
 def calculate_deletion_shifts(dfs: list, dfnames: list, folder: str="general_analysis")-> None:
@@ -154,28 +154,37 @@ def calc_DI_lengths(dfs: list, dfnames: list)-> dict:
 
     calc_means = False
     if calc_means:
-        human = list()
-        other = list()
+        in_vivo = list()
+        in_vitro = list()
+        min_median = (2000, "dataset name")
+        max_median = (0, "dataset name")
         for k, v in overall_count_dict.items():
             print(k)
-            n = 0
-            leng = 0
+            l = list()
             for element in v.values():
                 for key, value in element.items():
-                    n += value
-                    leng += key * value
-            m = leng / n
-            print(f"\t{m}")
+                    l.extend([key] * value)
 
-            if k in ["Berry2021_A", "Berry2021_B", "Valesano2020_Vic", "826.9078947368421", "Berry2021_B_Yam", "Southgate2019", "Valesano2020_Yam"]:
-                human.append(m)
+            median = np.median(l)
+            print(f"\t{median}")
+            if median < min_median[0]:
+                min_median = (median, k)
+            if median > max_median[0]:
+                max_median = (median, k)
+
+            if k in ["Wang2023", "Penn2022", "Lui2019", "Berry2021_A", "Berry2021_B", "Valesano2020_Vic", "826.9078947368421", "Berry2021_B_Yam", "Southgate2019", "Valesano2020_Yam"]:
+                in_vivo.extend(l)
             else:
-                other.append(m)
+                in_vitro.extend(l)
         
         print("")
-        print(f"human:\t{np.mean(human)}")
-        print(f"other:\t{np.mean(other)}")
-        print(np.mean(human) - np.mean(other))
+        print(f"in vivo:\t{np.mean(in_vivo)}")
+        print(f"in vitro:\t{np.mean(in_vitro)}")
+        print(np.mean(in_vivo) - np.mean(in_vitro))
+        print("")
+
+        print(f"Min median: {min_median[1]}\t{min_median[0]}")
+        print(f"Max median: {max_median[1]}\t{max_median[0]}")
 
     return overall_count_dict
     
@@ -253,7 +262,7 @@ def length_distribution_violinplot(dfs: list, dfnames: list, folder: str="genera
             y_p = np.random.uniform(i+1-0.3, i+1+0.3, len(d))
             plt.scatter(y_p, d, c="darkgrey", s=2, zorder=0)
 
-        axs.violinplot(plot_list, position_list, points=1000, showextrema=False, showmeans=True)
+        axs.violinplot(plot_list, position_list, points=1000, showextrema=False, showmedians=True)
         axs.set_xticks(range(1, len(dfnames)+1))
         axs.set_xticklabels(labels, rotation=90)
         axs.set_ylim(bottom=0, top=2500)
@@ -551,7 +560,7 @@ def deletion_site_motifs(dfs: list, dfnames: list, m_len: int, folder: str="gene
         print(results_df, file=f)
         print(Counter(results["start"]), file=f)
         print(Counter(results["end"]), file=f)
-    results_df.to_csv(os.path.join(save_path, "deletion_site_motif.csv"))
+    results_df.to_csv(os.path.join(save_path, "deletion_site_motif.csv"), index=False)
 
 
 if __name__ == "__main__":
