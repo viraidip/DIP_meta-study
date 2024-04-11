@@ -56,6 +56,13 @@ def test_sampling_approach(dfs: list, dfnames: list)-> None:
 
         :return: None
     '''
+    def estimate_position(r):
+        nuc = seq[r["Start"]]
+        if nuc == "A":
+            return 1
+        else:
+            return 0
+
     plt.rc("font", size=12)
     cm = plt.get_cmap(CMAP)
     colors = [cm(1.*i/len(SEGMENTS)) for i in range(len(SEGMENTS))]
@@ -83,16 +90,13 @@ def test_sampling_approach(dfs: list, dfnames: list)-> None:
             thresh = -1
             thresh_m = 0
             sampl_data = create_sampling_space(seq, s, e)
+            sampl_data["A_at_5"] = sampl_data.apply(estimate_position, axis=1)
+
             rounds = np.arange(batch_size, 50*batch_size+1, batch_size)
             A_dists = list()
             for n in rounds:
                 sampling_data = sampl_data.sample(n)
-                As = 0
-                for _, r in sampling_data.iterrows():
-                    nuc = seq[r["Start"]]
-                    if nuc == "A":
-                        As += 1
-                
+                As = sampling_data["A_at_5"].sum()
                 A_dists.append(As / n)
 
                 if len(A_dists) >= 5:
@@ -131,6 +135,7 @@ if __name__ == "__main__":
     RESULTSPATH = os.path.dirname(RESULTSPATH)
 
     dfnames = get_dataset_names(cutoff=40)
+    dfnames = ["Alnaji2019_BLEE"]
     dfs, _ = load_all(dfnames)
 
     test_sampling_approach(dfs, dfnames)
