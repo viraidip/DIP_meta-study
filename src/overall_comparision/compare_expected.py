@@ -61,7 +61,7 @@ def plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs: list, dfnames:
                 test_array = np.concatenate((np.ones(int(n_s * p1)), np.zeros(int(n_s - n_s * p1))))
                 test_array2 = np.concatenate((np.ones(int(n_samples2 * p2)), np.zeros(int(n_samples2 - n_samples2 * p2))))
                 # perform an ANOVA as done in Alaji2021
-                pval =  stats.f_oneway(test_array, test_array2).pvalue
+                pval = stats.f_oneway(test_array, test_array2).pvalue
 
                 diff = p1 - p2
                 vals.append(diff)

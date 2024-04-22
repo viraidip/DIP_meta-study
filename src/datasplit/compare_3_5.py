@@ -16,7 +16,7 @@ from utils import RESULTSPATH
 from overall_comparision.general_analyses import calc_start_end_lengths
 
 
-def compare_iav_ibv(dfs1: list, dfnames1: list, dfs2: list, dfnames2: list, categories: list)-> None:
+def compare_iav_ibv(dfs1: list, dfnames1: list, dfs2: list, dfnames2: list, categories: list, analysis: str)-> None:
     '''
         compare the given datasets in their difference of start and end
         sequence length.
@@ -31,8 +31,8 @@ def compare_iav_ibv(dfs1: list, dfnames1: list, dfs2: list, dfnames2: list, cate
     list1 = [item for sublist in data1 for item in sublist]
     list2 = [item for sublist in data2 for item in sublist]
     plot_list = [list1, list2]
-
-    fig, axs = plt.subplots(1, 1, figsize=(10, 2), tight_layout=True)
+    
+    fig, axs = plt.subplots(1, 1, figsize=(5, 1.5), tight_layout=True)
     position_list = np.arange(0, 2)
     violin_parts = axs.violinplot(plot_list, position_list, showextrema=False, points=1000, showmeans=True, vert=False)
     for pc in violin_parts["bodies"]:
@@ -43,60 +43,33 @@ def compare_iav_ibv(dfs1: list, dfnames1: list, dfs2: list, dfnames2: list, cate
         plt.scatter(d, y_p, c="darkgrey", s=2, zorder=0)
 
     axs.set_yticks(position_list)
-    axs.set_yticklabels([f"{' '*20}IAV (n={len(plot_list[0])})", f"{' '*22}IBV (n={len(plot_list[1])})"])
+    if analysis == "IAV_IBV":
+        step = (22, 22)
+    elif analysis == "vivo_vitro":
+        step = (6, 6)
+    elif analysis == "vitro_IAV":
+        step = (12, 12)
+    elif analysis == "vivo_IBV":
+        step = (0, 0)
+    elif analysis == "IAV_vitro_vivo":
+        step = (2, 2)
+    elif analysis == "IBV_vitro_vivo":
+        step = (0, 0)
+
+    axs.set_yticklabels([f"{' '*step[0]}{categories[0]} (n={len(plot_list[0])})", f"{' '*step[0]}{categories[1]} (n={len(plot_list[1])})"])
+
     axs.set_xlabel("5'-end length - 3'-end length")
     axs.set_xlim(right=340)
     
     cliffs_d = calc_cliffs_d(*plot_list)
     axs.plot([300, 300], [0, 1], lw=2, color='black')
-    axs.text(305, 0.5, f"{cliffs_d:.2f}", ha='center', va='center', color='black', fontsize=8, rotation=270)
+    axs.text(315, 0.5, f"{cliffs_d:.2f}", ha='center', va='center', color='black', fontsize=8, rotation=270)
+    axs.set_xticks([-300, -200, -100, 0, 100, 200, 300])
 
     save_path = os.path.join(RESULTSPATH, "datasplits")
     if not os.path.exists(save_path):
         os.makedirs(save_path)
-    plt.savefig(os.path.join(save_path, "IAV_IBV_3_5_ends.png"))
-    plt.close()
-
-
-def compare_berry(dfs: list, dfnames: list)-> None:
-    '''
-        compare the given datasets in their difference of start and end
-        sequence length.
-        :param dfs: The list of DataFrames containing the data, preprocessed
-            with sequence_df(df)
-        :param dfnames: The names associated with each DataFrame in `dfs`
-
-        :return: None
-    '''
-    data, labels = calc_start_end_lengths(dfs, dfnames)
-    fig, axs = plt.subplots(1, 1, figsize=(10, 3), tight_layout=True)
-    position_list = np.arange(0, 3)
-    violin_parts = axs.violinplot(data, position_list, showextrema=False, points=1000, showmeans=True, vert=False)
-    for pc in violin_parts["bodies"]:
-        pc.set_edgecolor("black")
-
-    for i, d in enumerate(data):
-        y_p = np.random.uniform(i-0.3, i+0.3, len(d))
-        plt.scatter(d, y_p, c="darkgrey", s=2, zorder=0)
-
-    axs.set_yticks(position_list)
-    axs.set_yticklabels(labels)
-    axs.set_xlabel("5'-end length - 3'-end length")
-    axs.set_xlim(right=340)
-    
-    def add_significance(l1, l2, axs, x, y, thresh):
-        cliffs_d = calc_cliffs_d(l1, l2)
-        axs.plot([x, x], [y, thresh], lw=2, color='black')
-        axs.text(x+5, (y+thresh)/2, f"{cliffs_d:.2f}", ha='center', va='center', color='black', fontsize=8, rotation=270)
-
-    add_significance(data[0], data[1], axs, 300, 0, 1)
-    add_significance(data[0], data[2], axs, 315, 0, 2)
-    add_significance(data[1], data[2], axs, 330, 1, 2)
-
-    save_path = os.path.join(RESULTSPATH, "datasplits")
-    if not os.path.exists(save_path):
-        os.makedirs(save_path)
-    plt.savefig(os.path.join(save_path, "Berry2021_3_5_ends.png"))
+    plt.savefig(os.path.join(save_path, f"{analysis}_3_5_ends.png"))
     plt.close()
 
 
@@ -150,13 +123,61 @@ if __name__ == "__main__":
     IAV_dfs, _ = load_all(IAV_dfnames)
     IBV_dfnames = get_dataset_names(cutoff=40, selection="IBV")
     IBV_dfs, _ = load_all(IBV_dfnames)
-    categories = list(["IAV", "IBA"])
-    compare_iav_ibv(IAV_dfs, IAV_dfnames, IBV_dfs, IBV_dfnames, categories)
+    categories = ["IAV", "IBA"]
+    compare_iav_ibv(IAV_dfs, IAV_dfnames, IBV_dfs, IBV_dfnames, categories, analysis="IAV_IBV")
 
-    dfnames = ["Berry2021_A", "Berry2021_B", "Berry2021_B_Yam"]
-    dfs, _ = load_all(dfnames)
-    compare_berry(dfs, dfnames)
+####### further analysis
+# in vitro against in vivo datasets
+    vitro_dfnames = get_dataset_names(cutoff=40, selection="in vitro")
+    vitro_dfs, _ = load_all(vitro_dfnames)
+    human_dfnames = get_dataset_names(cutoff=40, selection="in vivo human")
+    human_dfs, _ = load_all(human_dfnames)
 
+    categories = ["in vitro", "in vivo human"]
+    compare_iav_ibv(vitro_dfs, vitro_dfnames, human_dfs, human_dfnames, categories, analysis="vivo_vitro")
+
+# in vitro all IAV against BLEE and Sheng
+    vitro_iav_dfs = list()
+    vitro_iav_dfnames = list()
+    vitro_ibv_dfs = list()
+    vitro_ibv_dfnames = list()
+    for df, dfname in zip(vitro_dfs, vitro_dfnames):
+        if dfname in ["Alnaji2019_BLEE", "Sheng2018"]:
+            vitro_ibv_dfs.append(df)
+            vitro_ibv_dfnames.append(dfname)
+        else:
+            vitro_iav_dfs.append(df)
+            vitro_iav_dfnames.append(dfname)
+
+    categories = ["IAV in vitro", "IBV in vitro"]
+    compare_iav_ibv(vitro_iav_dfs, vitro_iav_dfnames, vitro_ibv_dfs, vitro_ibv_dfnames, categories, analysis="vitro_IAV")
+
+# in vivo human all IBV against Berry A
+    vivo_iav_dfs = list()
+    vivo_iav_dfnames = list()
+    vivo_ibv_dfs = list()
+    vivo_ibv_dfnames = list()
+    for df, dfname in zip(human_dfs, human_dfnames):
+        if dfname == "Berry2021_A":
+            vivo_iav_dfs.append(df)
+            vivo_iav_dfnames.append(dfname)
+        else:
+            vivo_ibv_dfs.append(df)
+            vivo_ibv_dfnames.append(dfname)
+
+    categories = ["IAV in vivo human", "IBV in vivo human"]
+    compare_iav_ibv(vivo_iav_dfs, vivo_iav_dfnames, vivo_ibv_dfs, vivo_ibv_dfnames, categories, analysis="vivo_IBV")
+
+# IAV vitro vs vivo human
+    categories = ["IAV in vitro", "IAV in vivo human"]
+    compare_iav_ibv(vitro_iav_dfs, vitro_iav_dfnames, vivo_iav_dfs, vitro_ibv_dfnames, categories, analysis="IAV_vitro_vivo")
+
+# IBV vitro vs vivo human
+    categories = ["IBV in vitro", "IBV in vivo human"]
+    compare_iav_ibv(vitro_ibv_dfs, vivo_iav_dfnames, vivo_ibv_dfs, vivo_ibv_dfnames, categories, analysis="IBV_vitro_vivo")
+
+
+### comparision matrix for all datasets together
     dfnames = get_dataset_names(cutoff=40)
     dfs, _ = load_all(dfnames)
     create_comparision_matrix(dfs, dfnames)
