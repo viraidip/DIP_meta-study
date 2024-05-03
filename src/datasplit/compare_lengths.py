@@ -65,8 +65,8 @@ def compare_DI_lengths(dfs: list, dfnames: list, labels: str, analysis: str="")-
             plt.hist(l, alpha=0.5, label=labels[i], bins=bins, density=True, color=colors[i])
 
         if len(lists) == 2:
-            start = 800 if analysis == "vivo_vitrohuman" else 1100
-            calc_stats(lists[0], lists[1], start, 1600, 0.0038)
+            start = 1100 if analysis == "IAV_IBV" else 800
+            calc_stats(lists[0], lists[1], start, 1650, 0.0038)
 
         elif len(lists) == 3:
             calc_stats(lists[0], lists[1], 550, 1100, 0.0025)
@@ -136,7 +136,7 @@ if __name__ == "__main__":
 
     dfs = [vitro_iav_dfs, vitro_ibv_dfs]
     dfnames = [vitro_iav_dfnames, vitro_ibv_dfnames]
-    labels = ["IAV vitro", "IBV vitro"]
+    labels = ["IAV in vitro", "IBV in vitro"]
     compare_DI_lengths(dfs, dfnames, labels, analysis="vitro_IAV")
 
 # in vivo human all IBV against Berry A
@@ -154,17 +154,17 @@ if __name__ == "__main__":
 
     dfs = [vivo_iav_dfs, vivo_ibv_dfs]
     dfnames = [vivo_iav_dfnames, vivo_ibv_dfnames]
-    labels = ["IAV vivo", "IBV vivo"]
+    labels = ["IAV in vivo human", "IBV in vivo human"]
     compare_DI_lengths(dfs, dfnames, labels, analysis="vivo_IBV")
 
 # IAV vitro vs vivo human
     dfs = [vitro_iav_dfs, vivo_iav_dfs]
     dfnames = [vitro_iav_dfnames, vitro_ibv_dfnames]
-    labels = ["IAV vitro", "IAV vivo"]
+    labels = ["IAV in vitro", "IAV in vivo human"]
     compare_DI_lengths(dfs, dfnames, labels, analysis="IAV_vitro_vivo")
 
 # IBV vitro vs vivo human
     dfs = [vitro_ibv_dfs, vivo_ibv_dfs]
     dfnames = [vivo_iav_dfnames, vivo_ibv_dfnames]
-    labels = ["IBV vitro", "IBV vivo"]
+    labels = ["IBV in vitro", "IBV in vivo human"]
     compare_DI_lengths(dfs, dfnames ,labels, analysis="IBV_vitro_vivo")
