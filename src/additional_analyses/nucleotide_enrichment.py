@@ -5,17 +5,17 @@ import os
 import sys
 
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
 
 sys.path.insert(0, "..")
-from utils import RESULTSPATH, NUCLEOTIDES, DATASET_STRAIN_DICT, SEGMENTS
+from utils import RESULTSPATH, NUCLEOTIDES, DATASET_STRAIN_DICT, SEGMENTS, CMAP
 from utils import load_all, get_dataset_names, create_nucleotide_ratio_matrix, get_sequence
 
 
 def nucleotide_enrichment_overview(dfs):
     fig, axs = plt.subplots(figsize=(10, 3), tight_layout=True)
-    colors = ["green", "orange", "blue", "red"]
+    cm = plt.get_cmap(CMAP)
+    colors = [cm(1.*i/len(SEGMENTS)) for i in [0, 1, 3, 6]]
     for df in dfs:
         probability_matrix = create_nucleotide_ratio_matrix(df, "seq_around_deletion_junction")
         if "overall_m" in locals():
@@ -26,7 +26,7 @@ def nucleotide_enrichment_overview(dfs):
     norm_m = overall_m/len(dfs)
     bottom = np.zeros(len(norm_m.index))
     for i, c in enumerate(norm_m.columns):
-        axs.bar(norm_m.index, norm_m[c], label=c, color=colors[i], bottom=bottom)
+        axs.bar(norm_m.index, norm_m[c], label=c, color=colors[i], bottom=bottom, edgecolor="black")
         bottom += norm_m[c]
 
     quarter = len(norm_m.index) // 4
@@ -42,7 +42,7 @@ def nucleotide_enrichment_overview(dfs):
     pos = 0
     for i, n in enumerate(NUCLEOTIDES):
         new_pos = norm_m.iloc[0, i]
-        axs.text(0, pos+new_pos/2, n, color=colors[i], fontweight="bold", fontsize=20, ha="center", va="center")
+        axs.text(0, pos+new_pos/2, n, color="black", fontweight="bold", fontsize=20, ha="center", va="center")
         pos += new_pos
 
     axs.set_xlabel("Nucleotide position")
