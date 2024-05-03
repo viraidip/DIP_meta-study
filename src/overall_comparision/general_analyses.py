@@ -509,14 +509,13 @@ def plot_direct_repeat_ratio_heatmaps(dfs: list, dfnames: list, folder: str="gen
     plt.close()
 
 
-def deletion_site_motifs(dfs: list, dfnames: list, m_len: int, folder: str="general_analysis")-> None:
+def nucleotide_pair_table(dfs: list, dfnames: list, folder: str="general_analysis")-> None:
     '''
         calcualte the motifs of specified length before start and end of
         deletion site.
         :param dfs: The list of DataFrames containing the data, preprocessed
             with sequence_df(df)
         :param dfnames: The names associated with each DataFrame in `dfs`
-        :param m_len: lenght of the motif to consider
         :param folder: defines where to save the results
     
         :return: None
@@ -535,10 +534,10 @@ def deletion_site_motifs(dfs: list, dfnames: list, m_len: int, folder: str="gene
             seq = r["full_seq"]
             s = r["Start"]
             e = r["End"]
-            s_motif = seq[s-m_len:s+m_len]
-            e_motif = seq[e-(m_len+1):e+(m_len-1)]
-            s_motifs.append(s_motif[:m_len])
-            e_motifs.append(e_motif[:m_len])
+            s_motif = seq[s-2:s+2]
+            e_motif = seq[e-(2+1):e+(2-1)]
+            s_motifs.append(s_motif[:2])
+            e_motifs.append(e_motif[:2])
 
         s_motifs_counts = Counter(s_motifs)
         start_motif = s_motifs_counts.most_common(1)[0]
@@ -571,12 +570,11 @@ if __name__ == "__main__":
     
     plot_distribution_over_segments(dfs, dfnames)
     calculate_deletion_shifts(dfs, dfnames)
-    exit()
     length_distribution_histrogram(dfs, dfnames)
     length_distribution_violinplot(dfs, dfnames)
     plot_nucleotide_ratio_around_deletion_junction_heatmaps(dfs, dfnames)
     plot_direct_repeat_ratio_heatmaps(dfs, dfnames)
     start_vs_end_lengths(dfs, dfnames, limit=600)
     diff_start_end_lengths(dfs, dfnames)
-    deletion_site_motifs(dfs, dfnames, m_len=2)
+    nucleotide_pair_table(dfs, dfnames)
     
