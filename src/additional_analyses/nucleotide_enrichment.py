@@ -12,25 +12,24 @@ from utils import RESULTSPATH, NUCLEOTIDES, DATASET_STRAIN_DICT, SEGMENTS, CMAP
 from utils import load_all, get_dataset_names, create_nucleotide_ratio_matrix, get_sequence
 
 
-def nucleotide_enrichment_overview(dfs):
+def nucleotide_enrichment_overview_expected(df, exp_df):
     fig, axs = plt.subplots(figsize=(10, 3), tight_layout=True)
-    cm = plt.get_cmap(CMAP)
-    colors = [cm(1.*i/len(SEGMENTS)) for i in [0, 1, 3, 6]]
-    for df in dfs:
-        probability_matrix = create_nucleotide_ratio_matrix(df, "seq_around_deletion_junction")
-        if "overall_m" in locals():
-            overall_m += probability_matrix
-        else:
-            overall_m = probability_matrix
+    colors = ["darkred", "firebrick", "indianred", "lightcoral"]
+    shift = -0.2
+    bars = list()
+    for df in [df, exp_df]:
+        m = create_nucleotide_ratio_matrix(df, "seq_around_deletion_junction")
+        bottom = np.zeros(len(m.index))
+        for i, c in enumerate(m.columns):
+            b = axs.bar(m.index+shift, m[c], width=0.3, label=c, color=colors[i], bottom=bottom, edgecolor="black")#, alpha=1-i*0.2)
+            if c == "A":
+                bars.append(b)    
+            bottom += m[c]
+        shift = 0.2
+        colors = ["navy", "royalblue", "cornflowerblue", "lightblue"]
 
-    norm_m = overall_m/len(dfs)
-    bottom = np.zeros(len(norm_m.index))
-    for i, c in enumerate(norm_m.columns):
-        axs.bar(norm_m.index, norm_m[c], label=c, color=colors[i], bottom=bottom, edgecolor="black")
-        bottom += norm_m[c]
-
-    quarter = len(norm_m.index) // 4
-    axs.set_xticks(norm_m.index, list(range(1,11))+list(range(1,11)))
+    quarter = len(m.index) // 4
+    axs.set_xticks(m.index, list(range(1,11))+list(range(1,11)))
     xlabels = axs.get_xticklabels()
     for x_idx, xlabel in enumerate(xlabels):
         if x_idx < quarter or x_idx >= quarter * 3:
@@ -39,19 +38,21 @@ def nucleotide_enrichment_overview(dfs):
         else:
             xlabel.set_color("grey")
     
+    plt.axvline(x=10.5, color="grey", linewidth=4)
     pos = 0
     for i, n in enumerate(NUCLEOTIDES):
-        new_pos = norm_m.iloc[0, i]
+        new_pos = m.iloc[0, i]
         axs.text(0, pos+new_pos/2, n, color="black", fontweight="bold", fontsize=20, ha="center", va="center")
         pos += new_pos
 
     axs.set_xlabel("Nucleotide position")
     axs.set_ylabel("Relative occurrence")
+    plt.legend(loc="upper center", bbox_to_anchor=(0.5, 1.15), fancybox=True, shadow=True, ncol=2, handles=bars, labels=["observed", "expected"])
           
     save_path = os.path.join(RESULTSPATH, "additional_analyses")
     if not os.path.exists(save_path):
         os.makedirs(save_path)
-    plt.savefig(os.path.join(save_path, "overall_nuc_occ.png"))
+    plt.savefig(os.path.join(save_path, "exp_nuc_occ.png"))
     plt.close()
 
 
@@ -111,7 +112,8 @@ if __name__ == "__main__":
 
     dfnames = get_dataset_names(cutoff=40)
     dfs, _ = load_all(dfnames)
-    nucleotide_enrichment_overview(dfs)
-
     analyze_adenin_distribution_datasets(dfs, dfnames)
+
+    df, exp_df = load_all(["Alnaji2021"], True)
+    nucleotide_enrichment_overview_expected(df[0], exp_df[0])
     
