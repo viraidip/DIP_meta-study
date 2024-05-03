@@ -222,7 +222,6 @@ def nucleotide_pair_plot(dfs: list, expected_dfs: list, dfnames: list, pos: str,
             if n_p not in d.keys():
                 d[n_p] = 0
 
-        #data = dict(sorted(d.items()))
         data = {k: d[k] for k in NUC_PAIRS if k in d}
         y = np.array(list(data.values())) / sum(data.values())
         return y
@@ -233,7 +232,6 @@ def nucleotide_pair_plot(dfs: list, expected_dfs: list, dfnames: list, pos: str,
     x = np.arange(0, 16)
     bottom = np.zeros(16*2)
     for i, (df, exp_df, dfname) in enumerate(zip(dfs, expected_dfs, dfnames)):
-        print(dfname)
         pairs = list()
         y = get_counts(df)
         exp_y = get_counts(exp_df)
