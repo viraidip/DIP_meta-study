@@ -128,7 +128,7 @@ def create_start_end_connection_plot(df: pd.DataFrame, dfname: str, strain: str,
     ax.add_patch(plt.Rectangle((0, -80), max_val, 80, alpha=0.7, color="black"))
     ax.annotate("RNA sequence", (max_val / 2, -70), color="white", ha="center", fontsize=10)
     # add histogram
-    if len(positions) > 50:
+    if len(positions) > 0:
         ax2 = ax.twinx()
         ax2.hist(positions, density=True, bins=50, alpha=0.4)
     # change some values to improve figure
@@ -148,9 +148,10 @@ def create_start_end_connection_plot(df: pd.DataFrame, dfname: str, strain: str,
         _, dy = inv.transform((0, 0)) - inv.transform((0, y1-y2))
         miny, maxy = ax2.get_ylim()
         ax2.set_ylim(miny+dy, maxy+dy)
-    if len(positions) > 50:    
+    if len(positions) > 0:    
         align_yaxis(ax, 0, ax2, 0)
-        ax2.set_yticks([])
+        ax2.yaxis.grid(False)
+        ax2.set_ylabel("Probability density")
     # save figure
     plt.tight_layout()
     save_path = os.path.join(RESULTSPATH, "start_end", dfname)
