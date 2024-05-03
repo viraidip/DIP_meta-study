@@ -10,11 +10,13 @@ import numpy as np
 import scipy.stats as stats
 import matplotlib.pyplot as plt
 
+from collections import Counter
+
 sys.path.insert(0, "..")
 from utils import load_all
 from utils import get_sequence, count_direct_repeats_overall, get_p_value_symbol, create_nucleotide_ratio_matrix, plot_heatmap, get_dataset_names
 from utils import SEGMENTS, RESULTSPATH, NUCLEOTIDES
-from overall_comparision.general_analyses import deletion_site_motifs
+from overall_comparision.general_analyses import nucleotide_pair_table
 
 
 def plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs: list, dfnames: list, expected_dfs: list, compared: str, folder: str="compare_expected")-> None:
@@ -187,6 +189,68 @@ def plot_expected_vs_observed_direct_repeat_heatmaps(dfs: list, dfnames: list, e
     plt.close()
 
 
+
+def nucleotide_pair_plot(dfs: list, expected_dfs: list, dfnames: list, pos: str, folder: str="general_analysis")-> None:
+    '''
+        calcualte the motifs of specified length before start and end of
+        deletion site.
+        :param dfs: The list of DataFrames containing the data, preprocessed
+            with sequence_df(df)
+        :param dfnames: The names associated with each DataFrame in `dfs`
+        :param 2: lenght of the motif to consider
+        :param folder: defines where to save the results
+    
+        :return: None
+    '''
+    if pos == "Start":
+        NUC_PAIRS = ["UA", "AA", "CA", "UG", "AU", "GA", "AG", "UU", "AC", "CU", "GG", "GU", "UC", "GC", "CC", "CG"]
+    else:
+        NUC_PAIRS = ["UA", "AA", "GA", "CA", "UG", "AU", "UU", "AG", "GG", "GU", "CU", "AC", "UC", "CC", "GC", "CG"]
+    def get_counts(df):
+        for _, r in df.iterrows():
+            seq = r["full_seq"]
+            p = r[pos]
+            if pos == "Start":
+                pairs.append(seq[p-2:p])
+            elif pos == "End":
+                pairs.append(seq[p-3:p-1])
+
+        pairs_counts = Counter(pairs)
+        d = dict(pairs_counts.items())
+
+        for n_p in NUC_PAIRS:
+            if n_p not in d.keys():
+                d[n_p] = 0
+
+        #data = dict(sorted(d.items()))
+        data = {k: d[k] for k in NUC_PAIRS if k in d}
+        y = np.array(list(data.values())) / sum(data.values())
+        return y
+
+    cm = plt.get_cmap("viridis")
+    colors = [cm(1.*i/len(dfnames)) for i in range(len(dfnames))]
+    fig, axs = plt.subplots(figsize=(10, 5))
+    x = np.arange(0, 16)
+    bottom = np.zeros(16*2)
+    for i, (df, exp_df, dfname) in enumerate(zip(dfs, expected_dfs, dfnames)):
+        print(dfname)
+        pairs = list()
+        y = get_counts(df)
+        exp_y = get_counts(exp_df)
+        axs.bar(np.concatenate((x-0.15, x+0.15)), np.concatenate((y, exp_y)), width=0.3, label=dfname, bottom=bottom, edgecolor="black", color=colors[i])
+        bottom += np.concatenate((y, exp_y))
+       
+    plt.legend(loc="upper center", bbox_to_anchor=(0.5, 1.15), fancybox=True, shadow=True, ncol=10)
+    
+    axs.set_xticks(x, NUC_PAIRS)
+    save_path = os.path.join(RESULTSPATH, folder)
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+    path = (os.path.join(save_path, f"{pos}_deletion_site_motif_plot.png"))
+    plt.savefig(path)
+    plt.close()
+
+
 if __name__ == "__main__":
     plt.style.use("seaborn")
 
@@ -195,4 +259,7 @@ if __name__ == "__main__":
 
     plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs, dfnames, expected_dfs, "observed-expected")
     plot_expected_vs_observed_direct_repeat_heatmaps(dfs, dfnames, expected_dfs, "observed-expected")
-    deletion_site_motifs(expected_dfs, dfnames, m_len=2, folder="compare_expected")
+    nucleotide_pair_table(expected_dfs, dfnames, m_len=2, folder="compare_expected")
+
+    nucleotide_pair_plot(dfs, expected_dfs, dfnames, "Start", folder="compare_expected")
+    nucleotide_pair_plot(dfs, expected_dfs, dfnames, "End", folder="compare_expected")
