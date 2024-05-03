@@ -23,7 +23,7 @@ def nucleotide_enrichment_overview_expected(df, exp_df):
         for i, c in enumerate(m.columns):
             b = axs.bar(m.index+shift, m[c], width=0.3, label=c, color=colors[i], bottom=bottom, edgecolor="black")#, alpha=1-i*0.2)
             if c == "A":
-                bars.append(b)    
+                bars.append(b)
             bottom += m[c]
         shift = 0.2
         colors = ["navy", "royalblue", "cornflowerblue", "lightblue"]
