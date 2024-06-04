@@ -90,6 +90,31 @@ def lengths_long_dis(dfs: list, dfnames: list)-> None:
             plt.close()
 
 
+def frac_20_100_long_dis(dfs: list)-> None:
+    '''
+        plot histrogram of DelVG deletion site lengths.
+        :param dfs: The list of DataFrames containing the data, preprocessed
+            with sequence_df(df)
+        :param dfnames: The names associated with each DataFrame in `dfs`
+        
+        :return: None
+    '''
+    long_20_100 = 0
+    long_all = 0
+    for df in dfs:
+        for s in SEGMENTS:
+            long_df = get_long_dis(df[df["Segment"] == s].copy())
+    #        if long_df.shape[0] <= 20:
+     #           continue
+            lengths = long_df["deleted_sequence"].apply(len)
+            long_20_100 += len([x for x in lengths if 20 <= x <= 100])
+            long_all += len(lengths)
+            
+    print(long_all)
+    print(long_20_100)
+    print(long_20_100/long_all)
+
+
 def create_start_end_connection_plot(df: pd.DataFrame, dfname: str, strain: str, segment: str)-> None:
     '''
         plot the connection of the start and end of the deletion sites for a
@@ -185,4 +210,5 @@ if __name__ == "__main__":
 
     start_end_positions(dfs, dfnames)
     fraction_long_dis(dfs, dfnames)
-    lengths_long_dis(dfs, dfnames) 
+    lengths_long_dis(dfs, dfnames)
+    frac_20_100_long_dis(dfs)
