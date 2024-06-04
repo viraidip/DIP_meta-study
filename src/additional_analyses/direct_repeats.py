@@ -12,7 +12,7 @@ from utils import RESULTSPATH, SEGMENTS
 from utils import load_all, get_sequence, count_direct_repeats_overall
 
 
-def create_direct_repeats_plt(df, dfname, expected_df):
+def create_direct_repeats_plot(df, dfname, expected_df):
     fig, ax = plt.subplots(figsize=(3, 3), tight_layout=True)
     final_d = dict()
     expected_final_d = dict()
@@ -43,8 +43,8 @@ def create_direct_repeats_plt(df, dfname, expected_df):
     f_exp = expected_final/expected_final.sum() * 100 # normalize to percentage
     x = list(final_d.keys())
 
-    ax.bar(x=x, height=f_obs, width=-0.4, align="edge", label="observed")
-    ax.bar(x=x, height=f_exp, width=0.4, align="edge", label="expected")
+    ax.bar(x=x, height=f_obs, width=-0.4, align="edge", label="observed", edgecolor="black", color="firebrick")
+    ax.bar(x=x, height=f_exp, width=0.4, align="edge", label="expected", edgecolor="black", color="royalblue")
 
     ax.set_title(dfname)
     ax.legend(loc="upper right")
@@ -66,6 +66,6 @@ if __name__ == "__main__":
 
     dfname = "Alnaji2021"
     dfs, expected_dfs = load_all([dfname], expected=True)
-    create_direct_repeats_plt(dfs[0], dfname, expected_dfs[0])
+    create_direct_repeats_plot(dfs[0], dfname, expected_dfs[0])
 
 

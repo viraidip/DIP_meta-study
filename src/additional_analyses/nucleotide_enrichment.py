@@ -22,7 +22,7 @@ def nucleotide_enrichment_overview_expected(df, exp_df):
         bottom = np.zeros(len(m.index))
         for i, c in enumerate(m.columns):
             b = axs.bar(m.index+shift, m[c], width=0.3, label=c, color=colors[i], bottom=bottom, edgecolor="black")#, alpha=1-i*0.2)
-            if c == "A":
+            if c == "C":
                 bars.append(b)
             bottom += m[c]
         shift = 0.2
@@ -101,8 +101,8 @@ def analyze_adenin_distribution_datasets(dfs: list, dfnames: list):
         for v in values:
             a_occ.append(v*v)    
 
-    print(max(a_occ))
-    print(min(a_occ))
+    print(f"{max(a_occ)*100:.1f}")
+    print(f"{min(a_occ)*100:.1f}")
 
 
 if __name__ == "__main__":

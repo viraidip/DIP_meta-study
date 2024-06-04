@@ -34,7 +34,7 @@ def plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs: list, dfnames:
         :return: None
 
     '''
-    fig, axs = plt.subplots(figsize=(10, len(dfs)/2), nrows=2, ncols=2)
+    fig, axs = plt.subplots(figsize=(10, 8), nrows=2, ncols=2)
     axs = axs.flatten()
 
     for i, nuc in enumerate(NUCLEOTIDES.keys()):
@@ -189,15 +189,13 @@ def plot_expected_vs_observed_direct_repeat_heatmaps(dfs: list, dfnames: list, e
     plt.close()
 
 
-
-def nucleotide_pair_plot(dfs: list, expected_dfs: list, dfnames: list, pos: str, folder: str="general_analysis")-> None:
+def nucleotide_pair_plot(dfs: list, expected_dfs: list, pos: str, labels: list, folder: str="general_analysis")-> None:
     '''
         calcualte the motifs of specified length before start and end of
         deletion site.
         :param dfs: The list of DataFrames containing the data, preprocessed
             with sequence_df(df)
         :param dfnames: The names associated with each DataFrame in `dfs`
-        :param 2: lenght of the motif to consider
         :param folder: defines where to save the results
     
         :return: None
@@ -207,6 +205,7 @@ def nucleotide_pair_plot(dfs: list, expected_dfs: list, dfnames: list, pos: str,
     else:
         NUC_PAIRS = ["UA", "AA", "GA", "CA", "UG", "AU", "UU", "AG", "GG", "GU", "CU", "AC", "UC", "CC", "GC", "CG"]
     def get_counts(df):
+        pairs = list()
         for _, r in df.iterrows():
             seq = r["full_seq"]
             p = r[pos]
@@ -226,19 +225,24 @@ def nucleotide_pair_plot(dfs: list, expected_dfs: list, dfnames: list, pos: str,
         y = np.array(list(data.values())) / sum(data.values())
         return y
 
-    cm = plt.get_cmap("viridis")
-    colors = [cm(1.*i/len(dfnames)) for i in range(len(dfnames))]
-    fig, axs = plt.subplots(figsize=(10, 5))
+    fig, axs = plt.subplots(figsize=(5, 2.5), tight_layout=True)
     x = np.arange(0, 16)
-    bottom = np.zeros(16*2)
-    for i, (df, exp_df, dfname) in enumerate(zip(dfs, expected_dfs, dfnames)):
-        pairs = list()
-        y = get_counts(df)
-        exp_y = get_counts(exp_df)
-        axs.bar(np.concatenate((x-0.15, x+0.15)), np.concatenate((y, exp_y)), width=0.3, label=dfname, bottom=bottom, edgecolor="black", color=colors[i])
-        bottom += np.concatenate((y, exp_y))
-       
-    plt.legend(loc="upper center", bbox_to_anchor=(0.5, 1.15), fancybox=True, shadow=True, ncol=10)
+    y = np.zeros(16)
+    y_exp = np.zeros(16)
+    for df in dfs:
+        y += get_counts(df)
+
+    for exp_df in expected_dfs:
+        y_exp += get_counts(exp_df)
+
+    y = y / len(dfs)
+    y_exp = y_exp / len(expected_dfs)
+    axs.bar(x-0.15, y, width=0.3, label=labels[0], edgecolor="black", color="firebrick")
+    axs.bar(x+0.15, y_exp, width=0.3, label=labels[1], edgecolor="black", color="royalblue")
+
+    plt.legend(loc="upper center", bbox_to_anchor=(0.5, 1.2), fancybox=True, shadow=True, ncol=2)
+    plt.xlabel("Nucleotide pair")
+    plt.ylabel("Relative occurrence")
     
     axs.set_xticks(x, NUC_PAIRS)
     save_path = os.path.join(RESULTSPATH, folder)
@@ -252,12 +256,24 @@ def nucleotide_pair_plot(dfs: list, expected_dfs: list, dfnames: list, pos: str,
 if __name__ == "__main__":
     plt.style.use("seaborn")
 
+    '''
     dfnames = get_dataset_names(cutoff=40)
     dfs, expected_dfs = load_all(dfnames, expected=True)
 
-    plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs, dfnames, expected_dfs, "observed-expected")
-    plot_expected_vs_observed_direct_repeat_heatmaps(dfs, dfnames, expected_dfs, "observed-expected")
-    nucleotide_pair_table(expected_dfs, dfnames, m_len=2, folder="compare_expected")
+#    plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs, dfnames, expected_dfs, "observed-expected")
+ #   plot_expected_vs_observed_direct_repeat_heatmaps(dfs, dfnames, expected_dfs, "observed-expected")
+  #  nucleotide_pair_table(expected_dfs, dfnames, m_len=2, folder="compare_expected")
 
-    nucleotide_pair_plot(dfs, expected_dfs, dfnames, "Start", folder="compare_expected")
-    nucleotide_pair_plot(dfs, expected_dfs, dfnames, "End", folder="compare_expected")
+    labels = ["observed", "expected"]
+    nucleotide_pair_plot(dfs, expected_dfs, "Start", labels, folder="compare_expected")
+    nucleotide_pair_plot(dfs, expected_dfs, "End", labels, folder="compare_expected")
+    '''
+
+    IAV_dfnames = get_dataset_names(cutoff=40, selection="IAV")
+    IAV_dfs, _ = load_all(IAV_dfnames)
+    IBV_dfnames = get_dataset_names(cutoff=40, selection="IBV")
+    IBV_dfs, _ = load_all(IBV_dfnames)
+    labels = ["IAV", "IBV"]
+
+    nucleotide_pair_plot(IAV_dfs, IBV_dfs, "Start", labels, folder="compare_expected/IAV_IBV")
+    nucleotide_pair_plot(IAV_dfs, IBV_dfs, "End", labels, folder="compare_expected/IAV_IBV")
