@@ -123,7 +123,7 @@ if __name__ == "__main__":
     IAV_dfs, _ = load_all(IAV_dfnames)
     IBV_dfnames = get_dataset_names(cutoff=40, selection="IBV")
     IBV_dfs, _ = load_all(IBV_dfnames)
-    categories = ["IAV", "IBA"]
+    categories = ["IAV", "IBV"]
     compare_iav_ibv(IAV_dfs, IAV_dfnames, IBV_dfs, IBV_dfnames, categories, analysis="IAV_IBV")
 
 ####### further analysis
