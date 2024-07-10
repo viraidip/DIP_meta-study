@@ -13,8 +13,8 @@ from Bio import SeqIO
 
 ### STATIC VALUES ###
 # load config and assign values to global variables
-DATAPATH = "/home/jens/DIPs/DIP_meta/data"
-RESULTSPATH = "/home/jens/DIPs/DIP_meta/results"
+DATAPATH = "/home/jens/DIPs/DIP_meta-study/data"
+RESULTSPATH = "/home/jens/DIPs/DIP_meta-study/results"
 
 # segments, nuclotides, and strains
 CMAP = "Accent"
