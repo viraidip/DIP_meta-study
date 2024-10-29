@@ -256,18 +256,16 @@ def nucleotide_pair_plot(dfs: list, expected_dfs: list, pos: str, labels: list, 
 if __name__ == "__main__":
     plt.style.use("seaborn")
 
-    '''
     dfnames = get_dataset_names(cutoff=40)
     dfs, expected_dfs = load_all(dfnames, expected=True)
 
-#    plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs, dfnames, expected_dfs, "observed-expected")
- #   plot_expected_vs_observed_direct_repeat_heatmaps(dfs, dfnames, expected_dfs, "observed-expected")
-  #  nucleotide_pair_table(expected_dfs, dfnames, m_len=2, folder="compare_expected")
+    plot_expected_vs_observed_nucleotide_enrichment_heatmaps(dfs, dfnames, expected_dfs, "observed-expected")
+    plot_expected_vs_observed_direct_repeat_heatmaps(dfs, dfnames, expected_dfs, "observed-expected")
+    nucleotide_pair_table(expected_dfs, dfnames, m_len=2, folder="compare_expected")
 
     labels = ["observed", "expected"]
     nucleotide_pair_plot(dfs, expected_dfs, "Start", labels, folder="compare_expected")
     nucleotide_pair_plot(dfs, expected_dfs, "End", labels, folder="compare_expected")
-    '''
 
     IAV_dfnames = get_dataset_names(cutoff=40, selection="IAV")
     IAV_dfs, _ = load_all(IAV_dfnames)

@@ -256,7 +256,7 @@ def length_distribution_violinplot(dfs: list, dfnames: list, folder: str="genera
                     counts_list.extend([length] * count)
                 plot_list.append(counts_list)
                 position_list.append(i+1)            
-            labels.append(f"{dfname} (n={n_counts})    ")
+            labels.append(f"{dfname} (n={n_counts})")
         
         for i, d in enumerate(plot_list):
             y_p = np.random.uniform(i+1-0.3, i+1+0.3, len(d))
@@ -266,12 +266,12 @@ def length_distribution_violinplot(dfs: list, dfnames: list, folder: str="genera
         axs.set_xticks(range(1, len(dfnames)+1))
         axs.set_xticklabels(labels, rotation=90)
         axs.set_ylim(bottom=0, top=2500)
-        axs.set_ylabel("DelVG sequence length (nts.)       ")
+        axs.set_ylabel("DelVG sequence length (nts.)")
 
         save_path = os.path.join(RESULTSPATH, folder)
         if not os.path.exists(save_path):
             os.makedirs(save_path)
-        plt.savefig(os.path.join(save_path, f"{s}_length_del_violinplot.png"))
+        plt.savefig(os.path.join(save_path, f"{s}_length_del_violinplot.png"), dpi=300)
         plt.close()
 
 

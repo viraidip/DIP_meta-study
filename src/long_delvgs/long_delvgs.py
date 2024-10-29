@@ -182,7 +182,7 @@ def create_start_end_connection_plot(df: pd.DataFrame, dfname: str, strain: str,
     save_path = os.path.join(RESULTSPATH, "start_end", dfname)
     if not os.path.exists(save_path):
         os.makedirs(save_path)
-    plt.savefig(os.path.join(save_path, f"{segment}.png"))
+    plt.savefig(os.path.join(save_path, f"{segment}.png"), dpi=300)
     plt.close()
 
 
