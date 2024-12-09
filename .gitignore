@@ -1,6 +1,12 @@
 __pycache__/
 
-data
+
+*mapped_reads_per_segment.csv
+data/RSC_estimation/
+data/intersection_analysis/
+data/random_sampled/
+data/strain_segment_fastas/
+
 results
 .config.json
 
