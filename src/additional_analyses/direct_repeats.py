@@ -39,7 +39,7 @@ def create_direct_repeats_plot(df, dfname, expected_df):
 
     final = np.array(list(final_d.values()))
     expected_final = np.array(list(expected_final_d.values()))
-    f_obs = final/final.sum() * 100 # normalize to percentage
+    f_obs = final/final.sum() * 100                   # normalize to percentage
     f_exp = expected_final/expected_final.sum() * 100 # normalize to percentage
     x = list(final_d.keys())
 
@@ -47,7 +47,7 @@ def create_direct_repeats_plot(df, dfname, expected_df):
     ax.bar(x=x, height=f_exp, width=0.4, align="edge", label="expected", edgecolor="black", color="royalblue")
 
     ax.set_title(dfname)
-    ax.legend(loc="upper right")
+    ax.legend(loc="upper right", labels=["observed", "synthetic"])
     ax.set_xlabel("Direct repeat length")
     ax.set_ylabel("Occurrence")
     ax.set_xticks(x, ["0", "1", "2", "3", "4", ">4"])
@@ -55,7 +55,7 @@ def create_direct_repeats_plot(df, dfname, expected_df):
     # save final figure
     fname = f"direct_repeats_{dfname}.png"
     save_path = os.path.join(RESULTSPATH, "additional_analyses", fname)
-    plt.savefig(save_path)
+    plt.savefig(save_path, dpi=300)
     plt.close()
 
 

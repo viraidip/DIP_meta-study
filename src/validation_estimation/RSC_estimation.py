@@ -12,8 +12,8 @@ import matplotlib.pyplot as plt
 from typing import Tuple
 
 sys.path.insert(0, "..")
-from utils import load_single_dataset, load_dataset, join_data
-from utils import RESULTSPATH, DATAPATH, SEGMENT_DICTS
+from utils import load_dataset, join_data
+from utils import RESULTSPATH, DATAPATH
 
 
 def load_pelz2021_rsc()-> dict:
@@ -150,7 +150,7 @@ def loop_threshs(d1: pd.DataFrame, d2: pd.DataFrame, name: str)-> int:
     plt.xlabel("Cutoff value")
     plt.ylim(bottom=0)
     plt.xlim(left=0, right=50)
-    plt.savefig(os.path.join(save_path, f"{name}_unique_DelVGs.png"))
+    plt.savefig(os.path.join(save_path, f"{name}_unique_DelVGs.png"), dpi=300)
     plt.close()
 
     return rsc

@@ -1,6 +1,3 @@
-'''
-
-'''
 import os
 import sys
 
@@ -47,12 +44,12 @@ def nucleotide_enrichment_overview_expected(df, exp_df):
 
     axs.set_xlabel("Nucleotide position")
     axs.set_ylabel("Relative occurrence")
-    plt.legend(loc="upper center", bbox_to_anchor=(0.5, 1.15), fancybox=True, shadow=True, ncol=2, handles=bars, labels=["observed", "expected"])
+    plt.legend(loc="upper center", bbox_to_anchor=(0.5, 1.15), fancybox=True, shadow=True, ncol=2, handles=bars, labels=["observed", "synthetic"])
           
     save_path = os.path.join(RESULTSPATH, "additional_analyses")
     if not os.path.exists(save_path):
         os.makedirs(save_path)
-    plt.savefig(os.path.join(save_path, "exp_nuc_occ.png"))
+    plt.savefig(os.path.join(save_path, "exp_nuc_occ.png"), dpi=300)
     plt.close()
 
 

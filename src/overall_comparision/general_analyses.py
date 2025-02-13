@@ -14,7 +14,20 @@ from collections import Counter
 
 sys.path.insert(0, "..")
 from utils import load_all, get_sequence, get_seq_len, get_p_value_symbol, plot_heatmap, create_nucleotide_ratio_matrix, count_direct_repeats_overall, get_dataset_names, sort_datasets_by_type
-from utils import SEGMENTS, RESULTSPATH, DATASET_STRAIN_DICT, CMAP, NUCLEOTIDES, CUTOFF
+from utils import SEGMENTS, RESULTSPATH, DATASET_STRAIN_DICT, CMAP, NUCLEOTIDES
+
+
+def get_overall_counts(dfs):
+    overall_counts = {}
+    for df in dfs:
+        counts = df["Segment"].value_counts()
+        for segment, count in counts.items():
+            if segment in overall_counts:
+                overall_counts[segment] += count
+            else:
+                overall_counts[segment] = count
+    overall_counts_df = pd.DataFrame(list(overall_counts.items()), columns=["Segment", "Count"])
+    return overall_counts_df
 
 
 def plot_distribution_over_segments(dfs: list, dfnames: list, folder: str="general_analysis")-> None:
@@ -31,25 +44,84 @@ def plot_distribution_over_segments(dfs: list, dfnames: list, folder: str="gener
     fig, axs = plt.subplots(figsize=(5, 6))
     cm = plt.get_cmap(CMAP)
     colors = [cm(1.*i/len(SEGMENTS)) for i in range(len(SEGMENTS))]
-
-    pvalues = list()
-    x = np.arange(0, len(dfs))
+    cramers_vs = list()
+    counts = [len(df) for df in dfs]
     y = dict({s: list() for s in SEGMENTS})
+
+    # generate data
+    plot_exp = list()
     for df, dfname in zip(dfs, dfnames):
-        fractions = df["Segment"].value_counts() / len(df) * 100
+        f_obs = df["Segment"].value_counts()
+        fractions = f_obs / len(df) * 100
         for s in SEGMENTS:
+            if s not in f_obs:
+                f_obs[s] = 0
             if s not in fractions:
                 fractions[s] = 0.0
             y[s].append(fractions[s])
         
-        f_obs = fractions
         full_seqs = np.array([get_seq_len(DATASET_STRAIN_DICT[dfname], seg) for seg in SEGMENTS])
-        f_exp = full_seqs / sum(full_seqs) * 100
-        _, pvalue = stats.chisquare(f_obs, f_exp)
-        pvalues.append(pvalue)
+        f_exp = full_seqs / sum(full_seqs) * f_obs.sum()
+        plot_exp.append(full_seqs)
 
+        r, pvalue = stats.chisquare(f_obs, f_exp)
+        if pvalue < 0.05:
+            v_data = np.stack((np.rint(f_obs.to_numpy()), np.rint(f_exp)), axis=1).astype(int)
+            cramers_v = stats.contingency.association(v_data)
+            cramers_v = round(cramers_v, 2)
+        else:
+            cramers_v = "n.a."
+        cramers_vs.append(cramers_v)
+
+    # add data for IAV overall
+    iav_overall = get_overall_counts(dfs[:13])
+    iav_overall["Perc"] = iav_overall["Count"] / sum(iav_overall["Count"]) * 100
+    iav_exp = np.sum(np.array(plot_exp[:13]), axis=0)
+    iav_exp = iav_exp / np.sum(iav_exp) * sum(iav_overall["Count"])
+    dfnames.insert(13, "IAV overall")
+    r, pvalue = stats.chisquare(iav_overall["Count"], iav_exp)
+    if pvalue < 0.05:
+        v_data = np.stack((np.rint(iav_overall["Count"].to_numpy()), np.rint(iav_exp)), axis=1).astype(int)
+        cramers_v = stats.contingency.association(v_data)
+        cramers_v = round(cramers_v, 2)
+    else:
+        cramers_v = "n.a."
+    cramers_vs.insert(13, cramers_v)
+    counts.insert(13, sum(iav_overall["Count"]))
+    for s in SEGMENTS:
+        y[s].insert(13, iav_overall[iav_overall["Segment"] == s]["Perc"].values[0])
+
+    # add data for IBV overall
+    ibv_overall = get_overall_counts(dfs[14:])
+    ibv_overall["Perc"] = ibv_overall["Count"] / sum(ibv_overall["Count"]) * 100
+    ibv_exp = np.sum(np.array(plot_exp[14:]), axis=0)
+    ibv_exp = ibv_exp / np.sum(ibv_exp) * sum(ibv_overall["Count"])
+    dfnames.append("IBV overall")
+    r, pvalue = stats.chisquare(ibv_overall["Count"], ibv_exp)
+    if pvalue < 0.05:
+        v_data = np.stack((np.rint(ibv_overall["Count"].to_numpy()), np.rint(ibv_exp)), axis=1).astype(int)
+        cramers_v = stats.contingency.association(v_data)
+        cramers_v = round(cramers_v, 2)
+    else:
+        cramers_v = "n.a."    
+    cramers_vs.append(cramers_v)
+    counts.append(sum(ibv_overall["Count"]))
+    for s in SEGMENTS:
+        y[s].insert(14, ibv_overall[ibv_overall["Segment"] == s]["Perc"].values[0])
+
+    # add data for expected by length (reference)
+    labels = [f"{dfname} (n={count}, V={p})  " for dfname, count, p in zip(dfnames, counts, cramers_vs)]
+    dfnames.append("Expected by length")
+    counts.append(0)
+    plot_exp = np.sum(np.array(plot_exp), axis=0)
+    plot_exp = plot_exp / sum(plot_exp) * 100
+    for idx, s in enumerate(SEGMENTS):
+        y[s].append(plot_exp[idx])
+    labels.append("Expected by length            ")
+
+    x = np.arange(0, len(dfnames))
     bar_width = 0.7
-    bottom = np.zeros(len(dfs))
+    bottom = np.zeros(len(dfnames))
 
     for i, s in enumerate(SEGMENTS):
         axs.barh(x, y[s], bar_width, color=colors[i], label=s, left=bottom, edgecolor="black")
@@ -59,14 +131,18 @@ def plot_distribution_over_segments(dfs: list, dfnames: list, folder: str="gener
         bottom += y[s]
     
     axs.set_xlabel("Fraction of DelVGs per segment [%]")
-    plt.yticks(range(len(dfnames)), [f"{dfname} (n={len(df)}) {get_p_value_symbol(p)}  " for dfname, df, p in zip(dfnames, dfs, pvalues)])
+    plt.yticks(range(len(dfnames)), labels)
+    plt.gca().get_yticklabels()[-1].set_fontweight("bold")
+    plt.gca().get_yticklabels()[-2].set_fontweight("bold")
+    plt.gca().get_yticklabels()[-10].set_fontweight("bold")
+
     axs.legend(loc="upper center", bbox_to_anchor=(0.3, 1.1), fancybox=True, shadow=True, ncol=4)
     
     plt.tight_layout()
     save_path = os.path.join(RESULTSPATH, folder)
     if not os.path.exists(save_path):
         os.makedirs(save_path)
-    plt.savefig(os.path.join(save_path, "fraction_segments.png"))
+    plt.savefig(os.path.join(save_path, "fraction_segments.png"), dpi=300)
     plt.close()
 
     frac_df = pd.DataFrame(y)
@@ -89,26 +165,68 @@ def calculate_deletion_shifts(dfs: list, dfnames: list, folder: str="general_ana
     colors = [cm(0/8), cm(3/8), cm(1/8)]
 
     symbols = list()
-    x = np.arange(0, len(dfs))
+    x = np.arange(0, len(dfs)+3)
     y = dict({n: list() for n in [2, 0, 1]})
+    iav_shifts = list()
+    ibv_shifts = list()
+    f_exp = np.array([33.3333333, 33.3333333, 33.3333333])
     for df in dfs:
         df["length"] = df["deleted_sequence"].apply(len)
         df["shift"] = df["length"] % 3
         shifts = df["shift"].value_counts()
+        if df["Strain"].unique()[0] in ["BLEE", "Victoria", "Brisbane", "Yamagata"]:
+            ibv_shifts.append(shifts)
+        else:
+            iav_shifts.append(shifts)
         n = df.shape[0]
         for idx in [2, 0, 1]:
             y[idx].append(shifts.loc[idx] / n * 100)
 
-        f_obs = shifts / sum(shifts) * 100
-        f_exp = [33.3333333, 33.3333333, 33.3333333]
-        _, pvalue = stats.chisquare(f_obs, f_exp)
-        symbol = get_p_value_symbol(pvalue)
-        symbols.append(symbol)
+        f_exp_copy = (f_exp / 100) * n
+        r, pvalue = stats.chisquare(shifts, f_exp_copy)
+        if pvalue < 0.05:
+            v_data = np.stack((shifts.to_numpy(), np.rint(f_exp_copy)), axis=1).astype(int)
+            cramers_v = stats.contingency.association(v_data)
+            cramers_v = round(cramers_v, 2)
+        else:
+            cramers_v = "n.a."
+        symbols.append(cramers_v)
+
+    labels = [f"{dfname} (n={len(df)}, V={s})  " for dfname, df, s in zip(dfnames, dfs, symbols)]
+    iav_shifts = sum(iav_shifts)
+    ibv_shifts = sum(ibv_shifts)
+    for idx in [2, 0, 1]:
+        y[idx].insert(13, iav_shifts.loc[idx] / sum(iav_shifts) * 100)
+        y[idx].append(ibv_shifts.loc[idx] / sum(ibv_shifts) * 100)
+        y[idx].append(33.3333333)
+
+    # add IAV data
+    f_exp_copy = (f_exp / 100) * iav_shifts.sum()
+    r, pvalue = stats.chisquare(iav_shifts, f_exp_copy)
+    if pvalue < 0.05:
+        v_data = np.stack((iav_shifts.to_numpy(), np.rint(f_exp_copy)), axis=1).astype(int)
+        cramers_v = stats.contingency.association(v_data)
+        cramers_v = round(cramers_v, 2)
+    else:
+        cramers_v = "n.a." 
+    labels.insert(13, f"IAV overall (n={sum(iav_shifts)}, V={cramers_v})  ")
+    
+    # add IBV data
+    f_exp_copy = (f_exp / 100) * ibv_shifts.sum()
+    r, pvalue = stats.chisquare(ibv_shifts, f_exp_copy)
+    if pvalue < 0.05:
+        v_data = np.stack((ibv_shifts.to_numpy(), np.rint(f_exp_copy)), axis=1).astype(int)
+        cramers_v = stats.contingency.association(v_data)
+        cramers_v = round(cramers_v, 2)
+    else:
+        cramers_v = "n.a."
+    labels.append(f"IBV overall (n={sum(ibv_shifts)}, V={cramers_v})  ")
+    labels.append("Expected by chance  ")
 
     bar_width = 0.7
-    bottom = np.zeros(len(dfs))
-    labels = dict({"shift -1": 2, "in-frame": 0, "shift +1": 1})
-    for i, (label, idx) in enumerate(labels.items()):
+    bottom = np.zeros(len(dfs) + 3)
+    shift_labels = dict({"shift -1": 2, "in-frame": 0, "shift +1": 1})
+    for i, (label, idx) in enumerate(shift_labels.items()):
         axs.barh(x, y[idx], bar_width, color=colors[i], label=label, left=bottom, edgecolor="black")
         for j, text in enumerate(y[idx]):
             axs.text(bottom[j] + text/2, j-0.2, str(round(text, 1)), ha="center", fontsize=9)
@@ -116,14 +234,17 @@ def calculate_deletion_shifts(dfs: list, dfnames: list, folder: str="general_ana
     
     axs.set_xlim(right=100)
     axs.set_xlabel("Fraction of deletion shift [%]")
-    plt.yticks(range(len(dfnames)), [f"{dfname} (n={len(df)}) {s}  " for dfname, df, s in zip(dfnames, dfs, symbols)])
+    plt.yticks(range(len(labels)), labels)
+    plt.gca().get_yticklabels()[-1].set_fontweight("bold")
+    plt.gca().get_yticklabels()[-2].set_fontweight("bold")
+    plt.gca().get_yticklabels()[-10].set_fontweight("bold")
     axs.legend(loc="upper center", bbox_to_anchor=(0.3, 1.1), fancybox=True, shadow=True, ncol=3)
 
     plt.tight_layout()
     save_path = os.path.join(RESULTSPATH, folder)
     if not os.path.exists(save_path):
         os.makedirs(save_path)
-    plt.savefig(os.path.join(save_path, "deletion_shifts.png"))
+    plt.savefig(os.path.join(save_path, "deletion_shifts.png"), dpi=300)
     plt.close()
  
 
@@ -189,45 +310,6 @@ def calc_DI_lengths(dfs: list, dfnames: list)-> dict:
     return overall_count_dict
     
 
-def length_distribution_histrogram(dfs: list, dfnames: list, folder: str="general_analysis")-> None:
-    '''
-        creates a histogram that shows the length distribution of the DelVGs.
-        :param dfs: The list of DataFrames containing the data, preprocessed
-            with sequence_df(df)
-        :param dfnames: The names associated with each DataFrame in `dfs`
-        :param folder: defines where to save the results
-    
-        :return: None
-    '''
-    plt.rc("font", size=16)
-    overall_count_dict = calc_DI_lengths(dfs, dfnames)
-
-    for s in SEGMENTS:
-        fig, axs = plt.subplots(len(dfnames), 1, figsize=(10, len(dfnames)*1.5), tight_layout=True)
-        for i, dfname in enumerate(dfnames):
-            count_dict = overall_count_dict[dfname]
-            if len(count_dict[s].keys()) > 1:
-                counts_list = list()
-                for length, count in count_dict[s].items():
-                    counts_list.extend([length] * count)
-
-                m = round(np.mean(list(counts_list)), 2)                
-                axs[i].hist(count_dict[s].keys(), weights=count_dict[s].values(), bins=100, label=f"{dfname} (µ={m})", alpha=0.3)
-                axs[i].set_xlim(left=0)
-                axs[i].set_xlabel("sequence length (nts.)")
-                axs[i].set_ylabel("occurrences")
-                axs[i].legend()
-            else:
-                axs[i].set_visible(False)
-                m = 0
-
-        save_path = os.path.join(RESULTSPATH, folder)
-        if not os.path.exists(save_path):
-            os.makedirs(save_path)
-        plt.savefig(os.path.join(save_path, f"{s}_length_del_hist.png"))
-        plt.close()
-
-
 def length_distribution_violinplot(dfs: list, dfnames: list, folder: str="general_analysis")-> None:
     '''
         creates a violinplot that shows the length distribution of the DelVGs.
@@ -258,78 +340,22 @@ def length_distribution_violinplot(dfs: list, dfnames: list, folder: str="genera
                 position_list.append(i+1)            
             labels.append(f"{dfname} (n={n_counts})")
         
+        # also add the individual points as a scatter plot
         for i, d in enumerate(plot_list):
             y_p = np.random.uniform(i+1-0.3, i+1+0.3, len(d))
             plt.scatter(y_p, d, c="darkgrey", s=2, zorder=0)
 
+        # plot data
         axs.violinplot(plot_list, position_list, points=1000, showextrema=False, showmedians=True)
         axs.set_xticks(range(1, len(dfnames)+1))
         axs.set_xticklabels(labels, rotation=90)
         axs.set_ylim(bottom=0, top=2500)
-        axs.set_ylabel("DelVG sequence length (nts.)")
+        axs.set_ylabel("DelVG sequence length (nt)")
 
         save_path = os.path.join(RESULTSPATH, folder)
         if not os.path.exists(save_path):
             os.makedirs(save_path)
         plt.savefig(os.path.join(save_path, f"{s}_length_del_violinplot.png"), dpi=300)
-        plt.close()
-
-
-def start_vs_end_lengths(dfs: list, dfnames: list, limit: int=0, folder: str="general_analysis")-> None:
-    '''
-        plots the length of the start against the length of the end of the
-        DelVG RNA sequences as a scatter plot (3' = start, 5' = end).
-        :param dfs: The list of DataFrames containing the data, preprocessed
-            with sequence_df(df)
-        :param dfnames: The names associated with each DataFrame in `dfs`
-        :param limit: defines where to set the x- and y-axis limits
-        :param folder: defines where to save the results
-    
-        :return: None  
-    '''
-    for df, dfname in zip(dfs, dfnames):
-        fig, axs = plt.subplots(2, 4, figsize=(12, 6), tight_layout=True)
-        j = 0
-        for i, s in enumerate(SEGMENTS):
-            df_s = df[df["Segment"] == s].copy()
-            if df_s.shape[0] > 1:
-                df_s["End_L"] = df_s["full_seq"].str.len() - df_s["End"]
-                axs[j,i%4].scatter(df_s["Start"], df_s["End_L"], s=1.0)
-                axs[j,i%4].plot([0, 1], [0, 1], transform=axs[j,i%4].transAxes, c="r", linewidth=0.5, linestyle="--")
-                if limit == 0:
-                    max_p = max(df_s["Start"].max(), df_s["End_L"].max())
-                else:
-                    max_p = limit
-                    axs[j,i%4].set_xlim(0, max_p)
-                    axs[j,i%4].set_ylim(0, max_p)
-                    df_s = df_s[(df_s["Start"] <= max_p) & (df_s["End_L"] <= max_p)]
-                if df_s.shape[0] > 1:
-                    pearson = stats.pearsonr(df_s["Start"], df_s["End_L"])
-                else:
-                    pearson = ["NA", "NA"]
-                axs[j,i%4].set_xticks([0, max_p/2, max_p])
-                axs[j,i%4].set_yticks([0, max_p/2, max_p])
-                axs[j,i%4].set_aspect("equal", "box")
-
-            else:
-                axs[j,i%4].set_visible(False)
-
-            axs[j,i%4].set_title(f"{s} (r={pearson[0]:.2})")
-            axs[j,i%4].set_xlabel("3' end")
-            axs[j,i%4].set_ylabel("5' end")
-
-            if i == 3:
-                j = 1
-
-        if limit == 0:
-            filename = f"{dfname}_length_start_end.png"
-        else:
-            filename = f"{dfname}_length_start_end_{limit}.png"
-
-        save_path = os.path.join(RESULTSPATH, folder)
-        if not os.path.exists(save_path):
-            os.makedirs(save_path)
-        plt.savefig(os.path.join(save_path, filename))
         plt.close()
 
 
@@ -395,7 +421,7 @@ def diff_start_end_lengths(dfs: list, dfnames: list, folder: str="general_analys
     save_path = os.path.join(RESULTSPATH, folder)
     if not os.path.exists(save_path):
         os.makedirs(save_path)
-    plt.savefig(os.path.join(save_path, "diff_start_end_violinplot.png"))
+    plt.savefig(os.path.join(save_path, "diff_start_end_violinplot.png"), dpi=300)
     plt.close()
 
 
@@ -567,14 +593,12 @@ if __name__ == "__main__":
     
     dfnames = get_dataset_names(cutoff=40)
     dfs, _ = load_all(dfnames)
-    
+
     plot_distribution_over_segments(dfs, dfnames)
     calculate_deletion_shifts(dfs, dfnames)
-    length_distribution_histrogram(dfs, dfnames)
     length_distribution_violinplot(dfs, dfnames)
     plot_nucleotide_ratio_around_deletion_junction_heatmaps(dfs, dfnames)
     plot_direct_repeat_ratio_heatmaps(dfs, dfnames)
-    start_vs_end_lengths(dfs, dfnames, limit=600)
     diff_start_end_lengths(dfs, dfnames)
     nucleotide_pair_table(dfs, dfnames)
     

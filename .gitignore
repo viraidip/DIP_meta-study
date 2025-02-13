@@ -4,6 +4,7 @@ data/RSC_estimation/
 data/intersection_analysis/
 data/random_sampled/
 data/strain_segment_fastas/
+data/batch_effect_cache/
 results
 .config.json
 *.pyc

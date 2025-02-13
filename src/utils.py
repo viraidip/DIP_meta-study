@@ -888,6 +888,9 @@ def get_seq_len(strain: str, seg: str)-> int:
     '''
     return len(get_sequence(strain, seg))
 
+##################
+### STATISTICS ###
+##################
 def get_p_value_symbol(p: float)-> str:
     '''
         Indicates the statistical significance by strings. Is used for plots.
@@ -915,9 +918,74 @@ def calc_cliffs_d(d1: list, d2: list)-> float:
 
         :return: cliff's d
     '''
-    U, _ = stats.mannwhitneyu(d1, d2)
+    U, p = stats.mannwhitneyu(d1, d2)
+    print(f"U:\t{U}")
+    print(f"\t{p}")
     cliffs_d = 2*U / (len(d1)*len(d2)) - 1
     return cliffs_d
+
+def scheirer_ray_hare_test(data: pd.DataFrame)-> Tuple[float, float, float]:
+    '''
+        Calculates Scheirer Ray Hare test, which is the non-parametric
+        alternative to the two-way ANOVA.
+        :param data: Pandas dataframe with the data to be analyzed
+
+        :return: Tuple
+            H-statistic for factor IV type
+            p-value for factor IV type
+            H-statistic  for factor host system
+            p-value for factor host system
+            H-statistic for interaction of the two factors
+            p-value for interaction of the two factors
+    '''
+    n_observations = len(data)
+    data["rank"] = data["Measure"].rank()
+
+    # calculating the sum of the squares
+    rows = data.groupby(["IV_type"], as_index=False).agg({"rank":["count", "mean", "var"]}).rename(columns={"rank":"row"})
+    rows.columns = ["_".join(col) for col in rows.columns]
+    rows.columns = rows.columns.str.replace(r"_$","", regex=True)
+    rows["sqdev"] = (rows.row_mean - rows.row_mean.mean())**2
+
+    cols = data.groupby(["Host_system"], as_index=False).agg({"rank":["count", "mean", "var"]}).rename(columns={"rank":"col"})
+    cols.columns = ["_".join(col) for col in cols.columns]
+    cols.columns = cols.columns.str.replace(r"_$","", regex=True)
+    cols["sqdev"] = (cols.col_mean-cols.col_mean.mean())**2
+
+    data_sum         = data.groupby(["IV_type", "Host_system"], as_index=False).agg({"rank":["count", "mean", "var"]})
+    data_sum.columns = ["_".join(col) for col in data_sum.columns]
+    data_sum.columns = data_sum.columns.str.replace(r"_$","", regex=True)
+
+    # Calculate sum of squares for each factor, interaction and mean of squares
+    Rows_SS    = (rows["sqdev"] * rows["row_count"]).sum()
+    Columns_SS = (cols["sqdev"] * cols["col_count"]).sum()
+    Within_SS  = data_sum.rank_var.sum()*(data_sum.rank_count.min()-1)
+    MS         = data["rank"].var()
+    TOTAL_SS   = MS * (n_observations-1)
+    Inter_SS   = TOTAL_SS - Within_SS - Rows_SS - Columns_SS
+
+    # calculating the H-statistics and degrees of freedom
+    H_rows = Rows_SS/MS
+    H_cols = Columns_SS/MS
+    H_int  = Inter_SS/MS
+    df_rows   = len(rows)-1
+    df_cols   = len(cols)-1
+    df_int    = df_rows*df_cols
+    
+    # calculating the p-values
+    p_rows  = 1-stats.chi2.cdf(H_rows, df_rows)
+    p_cols  = 1-stats.chi2.cdf(H_cols, df_cols)
+    p_inter = 1-stats.chi2.cdf(H_int, df_int)
+
+    return H_rows, p_rows, H_cols, p_cols, H_int, p_inter
+
+def get_eta_squared(H, k, n):
+    '''
+        Based on Cohen (2008), Explaining psychological statistics
+    '''
+    eta = (H - k + 1)/(n - k)
+    return eta
+
 
 ######################
 ### DIRECT REPEATS ###
@@ -1108,11 +1176,11 @@ def create_sampling_space(seq: str, s: Tuple[int, int], e: Tuple[int, int])-> pd
     start, end = zip(*combinations)
     temp_df = pd.DataFrame(data=dict({"Start": start, "End": end, "Sequence": sequences}))
 
-    # Find the index of the row with the maximum value in the 'Start' column for each 'Sequence'
-    max_start_index = temp_df.groupby('Sequence')['Start'].idxmax()
+    # Find the index of the row with the maximum value in the "Start" column for each "Sequence"
+    max_start_index = temp_df.groupby("Sequence")["Start"].idxmax()
     result_df = temp_df.loc[max_start_index]
     # Replicate each row by the number of times it was found in the group
-    result_df = result_df.loc[result_df.index.repeat(temp_df.groupby('Sequence').size())]
+    result_df = result_df.loc[result_df.index.repeat(temp_df.groupby("Sequence").size())]
     df_no_duplicates = result_df.reset_index(drop=True).drop("Sequence", axis=1)
 
     return df_no_duplicates

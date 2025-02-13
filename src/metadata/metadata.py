@@ -61,7 +61,7 @@ def analyse_metadata(dfs: list, dfnames: list)-> None:
                 results[header].append(np.nan)
         
     result_df = pd.DataFrame(results)
-    pd.set_option('display.float_format', '{:.1f}'.format)
+    pd.set_option("display.float_format", "{:.1f}".format)
     save_path = os.path.join(RESULTSPATH, "metadata")
     if not os.path.exists(save_path):
         os.makedirs(save_path)
@@ -101,7 +101,7 @@ def dataset_distributions(dfs: list, dfnames: list)-> None:
     save_path = os.path.join(RESULTSPATH, "metadata")
     if not os.path.exists(save_path):
         os.makedirs(save_path)
-    plt.savefig(os.path.join(save_path, f"dataset_distribution_{CUTOFF}.png"))
+    plt.savefig(os.path.join(save_path, f"dataset_distribution_{CUTOFF}.png"), dpi=300)
     plt.close()
     stats_df = pd.DataFrame(stats)
     stats_df.to_csv(os.path.join(save_path, f"dataset_stats_{CUTOFF}.csv"), float_format="%.2f", index=False)

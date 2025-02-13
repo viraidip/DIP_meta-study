@@ -104,8 +104,6 @@ def frac_20_100_long_dis(dfs: list)-> None:
     for df in dfs:
         for s in SEGMENTS:
             long_df = get_long_dis(df[df["Segment"] == s].copy())
-    #        if long_df.shape[0] <= 20:
-     #           continue
             lengths = long_df["deleted_sequence"].apply(len)
             long_20_100 += len([x for x in lengths if 20 <= x <= 100])
             long_all += len(lengths)
@@ -204,7 +202,7 @@ def start_end_positions(dfs: list, dfnames: list)-> None:
 
 
 if __name__ == "__main__":
-    plt.style.use('seaborn')
+    plt.style.use("seaborn")
     dfnames = get_dataset_names(cutoff=40)
     dfs, _ = load_all(dfnames)
 
