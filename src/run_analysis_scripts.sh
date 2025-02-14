@@ -1,5 +1,4 @@
 
-
 echo "Metadata"
 cd metadata
 python metadata.py
@@ -12,12 +11,6 @@ python length_segments.py
 python nucleotide_enrichment.py
 cd ..
 
-echo "datasplit"
-cd datasplit
-python compare_3_5.py
-python compare_vivo_vitro.py
-cd ..
-
 echo long_DelVGs
 cd long_delvgs
 python long_delvgs.py
@@ -26,6 +19,7 @@ cd ..
 echo Run overall scripts
 cd overall_comparision
 python compare_expected.py
+python compare_mean.py
 python general_analyses.py
 cd ..
 

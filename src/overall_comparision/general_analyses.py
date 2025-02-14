@@ -47,6 +47,7 @@ def plot_distribution_over_segments(dfs: list, dfnames: list, folder: str="gener
     cramers_vs = list()
     counts = [len(df) for df in dfs]
     y = dict({s: list() for s in SEGMENTS})
+    labels = dfnames[:]
 
     # generate data
     plot_exp = list()
@@ -78,7 +79,7 @@ def plot_distribution_over_segments(dfs: list, dfnames: list, folder: str="gener
     iav_overall["Perc"] = iav_overall["Count"] / sum(iav_overall["Count"]) * 100
     iav_exp = np.sum(np.array(plot_exp[:13]), axis=0)
     iav_exp = iav_exp / np.sum(iav_exp) * sum(iav_overall["Count"])
-    dfnames.insert(13, "IAV overall")
+    labels.insert(13, "IAV overall")
     r, pvalue = stats.chisquare(iav_overall["Count"], iav_exp)
     if pvalue < 0.05:
         v_data = np.stack((np.rint(iav_overall["Count"].to_numpy()), np.rint(iav_exp)), axis=1).astype(int)
@@ -96,7 +97,7 @@ def plot_distribution_over_segments(dfs: list, dfnames: list, folder: str="gener
     ibv_overall["Perc"] = ibv_overall["Count"] / sum(ibv_overall["Count"]) * 100
     ibv_exp = np.sum(np.array(plot_exp[14:]), axis=0)
     ibv_exp = ibv_exp / np.sum(ibv_exp) * sum(ibv_overall["Count"])
-    dfnames.append("IBV overall")
+    labels.append("IBV overall")
     r, pvalue = stats.chisquare(ibv_overall["Count"], ibv_exp)
     if pvalue < 0.05:
         v_data = np.stack((np.rint(ibv_overall["Count"].to_numpy()), np.rint(ibv_exp)), axis=1).astype(int)
@@ -110,18 +111,18 @@ def plot_distribution_over_segments(dfs: list, dfnames: list, folder: str="gener
         y[s].insert(14, ibv_overall[ibv_overall["Segment"] == s]["Perc"].values[0])
 
     # add data for expected by length (reference)
-    labels = [f"{dfname} (n={count}, V={p})  " for dfname, count, p in zip(dfnames, counts, cramers_vs)]
-    dfnames.append("Expected by length")
+    plot_labels = [f"{label} (n={count}, V={p})  " for label, count, p in zip(labels, counts, cramers_vs)]
+    labels.append("Expected by length")
     counts.append(0)
     plot_exp = np.sum(np.array(plot_exp), axis=0)
     plot_exp = plot_exp / sum(plot_exp) * 100
     for idx, s in enumerate(SEGMENTS):
         y[s].append(plot_exp[idx])
-    labels.append("Expected by length            ")
+    plot_labels.append("Expected by length            ")
 
-    x = np.arange(0, len(dfnames))
+    x = np.arange(0, len(labels))
     bar_width = 0.7
-    bottom = np.zeros(len(dfnames))
+    bottom = np.zeros(len(labels))
 
     for i, s in enumerate(SEGMENTS):
         axs.barh(x, y[s], bar_width, color=colors[i], label=s, left=bottom, edgecolor="black")
@@ -131,7 +132,7 @@ def plot_distribution_over_segments(dfs: list, dfnames: list, folder: str="gener
         bottom += y[s]
     
     axs.set_xlabel("Fraction of DelVGs per segment [%]")
-    plt.yticks(range(len(dfnames)), labels)
+    plt.yticks(range(len(plot_labels)), plot_labels)
     plt.gca().get_yticklabels()[-1].set_fontweight("bold")
     plt.gca().get_yticklabels()[-2].set_fontweight("bold")
     plt.gca().get_yticklabels()[-10].set_fontweight("bold")
@@ -146,7 +147,7 @@ def plot_distribution_over_segments(dfs: list, dfnames: list, folder: str="gener
     plt.close()
 
     frac_df = pd.DataFrame(y)
-    frac_df["name"] = dfnames
+    frac_df["name"] = labels
     frac_df.to_csv(os.path.join(save_path, "fraction_segments.csv"), index=False)
 
 

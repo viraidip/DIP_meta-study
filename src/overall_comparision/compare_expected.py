@@ -265,8 +265,8 @@ def nucleotide_pair_plot(dfs: list, expected_dfs: list, pos: str, labels: list, 
     save_path = os.path.join(RESULTSPATH, folder)
     if not os.path.exists(save_path):
         os.makedirs(save_path)
-    path = os.path.join(save_path, f"{pos}_deletion_site_motif_plot.png", dpi=300)
-    plt.savefig(path)
+    path = os.path.join(save_path, f"{pos}_deletion_site_motif_plot.png")
+    plt.savefig(path, dpi=300)
     plt.close()
 
 
