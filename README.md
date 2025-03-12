@@ -3,7 +3,7 @@
 # DelVG meta study
 This is the code for the analyses performed in the publication "Meta-analysis of genomic characteristics for antiviral influenza defective interfering particle prioritization".
 
-## setup
+## Setup
 Before running the with different datasets the repository needs to be set up accordingly.
 
 1. change the variables in `utils.py` line 16 & 17:
@@ -11,8 +11,26 @@ Before running the with different datasets the repository needs to be set up acc
     DATAPATH = "/path/to/datasets"
     RESULTSPATH = "/path/to/resultfolder"
    ```
-2. Put your data in the folder that is defined in DATAPATH. Each each publication should get a new folder and in this folder each SRA entry is a single .csv file. To generate datasets the [DI identification pipeline](https://github.com/BROOKELAB/Influenza-virus-DI-identification-pipeline) by Alnaji et al. can be used.
+2. The necesary data is already available in the folder 'data'. So you can set the DATAPATH to this directory (unless you want to use your own data) 
 3. Install all dependencies. This can be done by conda using the following command:
    ```
    conda env create --file=env.yml
    ```
+
+## Running analyses
+To run all analyses the script src/run_analysis_scripts.sh is available.
+First you need to activate the conda environment.
+   ```
+   conda activate dips
+   ```
+Afterwards move into the folder with the code (assuming you are in the root of this repo):
+   ```
+   cd src  
+   ```
+Then it can be run using the following command:
+   ```
+   bash run_analysis_scripts.sh
+   ```
+
+For some analyses we used jupyter notebooks for easier accessibility.
+These need to be run separately.
