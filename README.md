@@ -11,8 +11,9 @@ Before running the with different datasets the repository needs to be set up acc
     DATAPATH = "/path/to/datasets"
     RESULTSPATH = "/path/to/resultfolder"
    ```
-2. The necesary data is already available in the folder 'data'. So you can set the DATAPATH to this directory (unless you want to use your own data) 
-3. Install all dependencies. This can be done by conda using the following command:
+2. The necesary datasets are already available in the folder 'data'. So you can set the DATAPATH to this directory (unless you want to use your own data)
+3. Download and store the fasta files of the strains in a folder called `strain_segment_fastas`. Each strain is an independent folder with the segments being individual fasta files.
+4. Install all dependencies. This can be done by conda using the following command:
    ```
    conda env create --file=env.yml
    ```
