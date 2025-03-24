@@ -1,7 +1,7 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14872995.svg)](https://doi.org/10.5281/zenodo.14872995)
 
-# DelVG meta study
-This is the code for the analyses performed in the publication "Meta-analysis of genomic characteristics for antiviral influenza defective interfering particle prioritization".
+# Meta-analysis of influenza virus defective interfering particles
+This is the code for the analyses performed in the publication [Meta-analysis of genomic characteristics for antiviral influenza defective interfering particle prioritization](https://doi.org/10.1093/nargab/lqaf031).
 
 ## Setup
 Before running the with different datasets the repository needs to be set up accordingly.
